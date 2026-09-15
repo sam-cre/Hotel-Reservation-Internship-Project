@@ -42,21 +42,23 @@ The original assignment PDF remains local and excluded from Git. This document i
 
 ## Engineering safeguards
 
-| ID  | Safeguard                                                                | Reason                                                                                   |
-| --- | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| S01 | Reservation creation uses a database transaction and row lock            | Prevents two customers from booking the last unit simultaneously                         |
-| S02 | Passwords use Argon2id hashing                                           | Protects passwords if the database is exposed                                            |
-| S03 | JWTs use secure HTTP-only cookies through same-origin API proxying       | Reduces token theft and cross-site cookie problems                                       |
-| S04 | Server validates all untrusted input                                     | Prevents malformed data from reaching business logic or SQL                              |
-| S05 | SQL statements are parameterized                                         | Prevents SQL injection                                                                   |
-| S06 | Authorization is enforced by the backend using the current database role | Prevents client-controlled or stale role decisions                                       |
-| S07 | Authenticated responses use `Cache-Control: private, no-store`           | Prevents shared caching of customer data                                                 |
-| S08 | Critical behavior has automated tests                                    | Makes completion independently verifiable                                                |
-| S09 | UI is keyboard accessible, responsive, and does not rely on color alone  | Establishes a credible quality floor                                                     |
-| S10 | Logs redact credentials, cookies, authorization data, and passwords      | Prevents secret leakage through diagnostics                                              |
-| S11 | Every push is preceded by staged-diff and secret review                  | Protects the private repository and future public release                                |
-| S12 | Reservation creation requires an idempotency key                         | Prevents duplicate bookings when a customer retries or double-submits the same request   |
-| S13 | Every inventory-changing operation uses the same room-type lock          | Prevents booking, cancellation, deactivation, and inventory edits from racing each other |
+| ID  | Safeguard                                                                  | Reason                                                                                   |
+| --- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| S01 | Reservation creation uses a database transaction and row lock              | Prevents two customers from booking the last unit simultaneously                         |
+| S02 | Passwords use Argon2id hashing                                             | Protects passwords if the database is exposed                                            |
+| S03 | JWTs use secure HTTP-only cookies through same-origin API proxying         | Reduces token theft and cross-site cookie problems                                       |
+| S04 | Server validates all untrusted input                                       | Prevents malformed data from reaching business logic or SQL                              |
+| S05 | SQL statements are parameterized                                           | Prevents SQL injection                                                                   |
+| S06 | Authorization is enforced by the backend using the current database role   | Prevents client-controlled or stale role decisions                                       |
+| S07 | Authenticated responses use `Cache-Control: private, no-store`             | Prevents shared caching of customer data                                                 |
+| S08 | Critical behavior has automated tests                                      | Makes completion independently verifiable                                                |
+| S09 | UI is keyboard accessible, responsive, and does not rely on color alone    | Establishes a credible quality floor                                                     |
+| S10 | Logs redact credentials, cookies, authorization data, and passwords        | Prevents secret leakage through diagnostics                                              |
+| S11 | Every push is preceded by staged-diff and secret review                    | Protects the private repository and future public release                                |
+| S12 | Reservation creation requires an idempotency key                           | Prevents duplicate bookings when a customer retries or double-submits the same request   |
+| S13 | Every inventory-changing operation uses the same room-type lock            | Prevents booking, cancellation, deactivation, and inventory edits from racing each other |
+| S14 | Optional browser tracking remains disabled until required consent          | Gives guests a real choice before non-essential data collection begins                   |
+| S15 | Legal, accessibility, policy, and contact links are verified before launch | Prevents a visually complete footer from hiding missing or unreachable guest information |
 
 ## Explicitly out of scope
 

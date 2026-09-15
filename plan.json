@@ -212,6 +212,7 @@
       "acceptance_criteria": [
         "Color, typography, spacing, shape, buttons, forms, focus, statuses, and responsive layout match the approved design document.",
         "A customer search surface and administrator table demonstrate the shared system at 320px and desktop widths.",
+        "The approved identity mark and favicon, flexible equal-height search controls, styled keyboard-accessible selects, room-dialog spacing, structured footer, and cookie-preference preview pass visual and interaction review.",
         "The user approves screenshots before the remaining interface is built."
       ],
       "verifications": [
@@ -221,6 +222,15 @@
           "pass": {
             "min_tests_passed": 1,
             "stdout_regex": "(Tests|tests).*(passed|PASS)"
+          }
+        },
+        {
+          "method": "command-output",
+          "command": "npm run verify:design",
+          "pass": {
+            "exit_code": 0,
+            "stdout_contains": ["frontend", "backend"],
+            "stdout_regex": "[1-9][0-9]* passed"
           }
         }
       ],
@@ -341,14 +351,16 @@
     {
       "id": "T7",
       "title": "Build the customer application",
-      "description": "Implement home search, hotel results, hotel details, authentication, reservation review, confirmation, and My Reservations using relative API routes and server-authoritative data.",
+      "description": "Implement home search, hotel results, hotel details, authentication, reservation review, confirmation, My Reservations, structured footer navigation, guest-support links, and cookie preferences using relative API routes and server-authoritative data.",
       "satisfies": ["R2", "R3", "R4", "R5", "R9", "R10"],
       "depends_on": ["T2", "T4", "T5", "T6"],
       "acceptance_criteria": [
         "The complete customer journey works through keyboard and pointer input.",
         "URL state preserves search criteria between relevant pages.",
         "Every asynchronous surface has loading, empty, failure, and success behavior, and stale responses cannot replace newer URL state.",
-        "The browser never calculates authoritative availability or price."
+        "The browser never calculates authoritative availability or price.",
+        "Footer links reach owner-reviewed privacy, reservation terms, accessibility, contact, and cookie-preference content without placeholder or broken destinations.",
+        "Non-essential scripts remain disabled until required consent is recorded, and the guest can reject or reopen preferences."
       ],
       "verifications": [
         {
@@ -443,7 +455,7 @@
     {
       "id": "T10",
       "title": "Harden and audit the complete local application",
-      "description": "Run formatting, linting, PostgreSQL-backed continuous integration, dependency, secret, accessibility, security, responsive, failure-path, and complete requirement audits. Resolve confirmed findings only after presenting the remediation plan.",
+      "description": "Run formatting, linting, PostgreSQL-backed continuous integration, dependency, secret, accessibility, security, responsive, metadata, link, image-budget, failure-path, launch-readiness, and complete requirement audits. Resolve confirmed findings only after presenting the remediation plan.",
       "satisfies": ["R1", "R2", "R4", "R6", "R9", "R10", "R12"],
       "depends_on": ["T7", "T8", "T9"],
       "acceptance_criteria": [
@@ -451,6 +463,7 @@
         "No known high-confidence critical or high-severity finding remains unresolved.",
         "No secret is detected in the working tree or Git history.",
         "Desktop, 320px mobile, keyboard, reduced-motion, targeted aria-live, and external-failure reviews pass.",
+        "Applicable launch-readiness checks have evidence, and every not-applicable check records a reason.",
         "GitHub Actions passes against an ephemeral PostgreSQL service without requiring local Docker."
       ],
       "verifications": [
@@ -476,13 +489,14 @@
     {
       "id": "T11",
       "title": "Deploy and verify the production system",
-      "description": "Guide the user through Neon, Render, and Vercel configuration. Apply migrations, provision the administrator, configure secrets and rewrites, then run public health, customer, administrator, CSRF, cookie-forwarding, cache, and cold-start smoke checks.",
+      "description": "Guide the user through Neon, Render, and Vercel configuration. Apply migrations, provision the administrator, configure secrets, rewrites, HTTPS headers, metadata, robots, and sitemap behavior, then run public health, customer, administrator, CSRF, consent, cookie-forwarding, cache, broken-link, and cold-start smoke checks.",
       "satisfies": ["R1", "R2", "R8", "R11", "R13"],
       "depends_on": ["T10"],
       "acceptance_criteria": [
         "Public frontend and API URLs are reachable over HTTPS.",
         "The frontend uses the production API rewrite, preserves every Set-Cookie security attribute, and rejects invalid mutation origins.",
         "Neon persists data across API redeploys and cold starts.",
+        "Public pages have verified titles, descriptions, canonical and social metadata, intended indexability, a reachable sitemap, security headers, and no broken required links.",
         "Production customer and administrator journeys pass without exposing secrets."
       ],
       "verifications": [
@@ -507,13 +521,14 @@
     {
       "id": "T12",
       "title": "Finalize documentation and explanation readiness",
-      "description": "Reconcile documentation with implemented evidence, complete local setup and API references, record public URLs, validate links and commands, prepare the demonstration guide, and run the final assignment audit.",
+      "description": "Reconcile documentation with implemented evidence, complete local setup and API references, record public URLs, validate links and commands, record launch-readiness evidence and owner-reviewed guest policies, prepare the demonstration guide, and run the final assignment audit.",
       "satisfies": ["R12", "R13", "R14"],
       "depends_on": ["T11"],
       "acceptance_criteria": [
         "The fresh-checkout verification script exits 0, the frontend root returns HTTP 200, and the API health route returns HTTP 200 with status ok.",
         "Documentation describes only implemented and verified behavior.",
         "Every mandatory assignment row links to evidence.",
+        "Privacy, reservation terms, accessibility, contact, and cookie-preference content is owner-reviewed, reachable, and dated before launch.",
         "The user can walk through the ten required explanation topics using the demonstration guide."
       ],
       "verifications": [

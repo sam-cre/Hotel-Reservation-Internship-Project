@@ -1,0 +1,33 @@
+:root {
+  --color-ink: #112d33;
+  --color-action: #155c66;
+  --color-action-hover: #0d434b;
+  --color-glass: #c6d7d5;
+  --color-fog: #f1f2ef;
+  --color-surface: #fbfbf8;
+  --color-accent: #9a7448;
+  --color-error: #a63737;
+  --color-success: #2e6a4f;
+  --color-warning: #8a5b12;
+  --color-muted: #56676a;
+  --color-border: #cfd4d1;
+  --color-control-border: #748184;
+  --color-soft: #e3e8e5;
+  --color-night: #102f35;
+  --color-night-soft: #183c43;
+  --font-body: 'Manrope Variable', sans-serif;
+  --font-heading: 'Newsreader Variable', Georgia, serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --radius-small: 4px;
+  --radius-control: 6px;
+  --radius-surface: 8px;
+  --focus-ring: 0 0 0 2px var(--color-surface), 0 0 0 5px var(--color-action);
+}

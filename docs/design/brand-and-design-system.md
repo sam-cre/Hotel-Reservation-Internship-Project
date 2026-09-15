@@ -1,12 +1,16 @@
 # Stillwater Hotels Brand and Design System
 
-Status: Planning
+Status: Design foundation validated and approved
 
 ## Brand
 
-Stillwater Hotels is a fictional collection of calm, design-conscious hotels in walkable cities. The interface should feel considered, quiet, and trustworthy without pretending to be an exclusive luxury club.
+Stillwater Hotels is a fictional collection of full-service destination hotels in notable cities and waterfront locations. Each property has its own architectural character, supported by a consistent standard of service. The interface should feel established, confident, and trustworthy without becoming showy.
 
 Visual direction: Harbor Quiet with Operational Clarity.
+
+The primary mark combines a central architectural form, two curved wings, and three restrained water reflections. It is rendered as a flat single-color SVG and paired with the Stillwater Hotels wordmark. The shape follows the owner's selected generated concept without retaining raster shading.
+
+A simplified micro-mark removes the smallest reflections and is used as the browser favicon. This keeps the identity recognizable at 16px and 24px without forcing the full navigation mark into an unsuitable size.
 
 ## Design principles
 
@@ -19,20 +23,21 @@ Visual direction: Harbor Quiet with Operational Clarity.
 
 ## Color tokens
 
-| Token         | Value     | Use                                        |
-| ------------- | --------- | ------------------------------------------ |
-| Harbor ink    | `#17383A` | Primary text and strong structural details |
-| Tide teal     | `#0B676B` | Primary actions and selected states        |
-| Deep tide     | `#074B4E` | Hover and pressed actions                  |
-| Sea glass     | `#B7D7D2` | Quiet highlights and secondary surfaces    |
-| Morning fog   | `#F3F7F6` | Page background                            |
-| Salt white    | `#FFFFFF` | Elevated content surfaces                  |
-| Driftwood     | `#806A4D` | Restrained warm accent                     |
-| Error red     | `#A63737` | Errors and destructive actions             |
-| Success green | `#2E6A4F` | Confirmed and successful states            |
-| Warning amber | `#8A5B12` | Caution states                             |
+| Token         | Value     | Use                                          |
+| ------------- | --------- | -------------------------------------------- |
+| Atlantic ink  | `#112D33` | Primary text and strong structural details   |
+| Petrol        | `#155C66` | Primary actions and selected states          |
+| Deep petrol   | `#0D434B` | Hover and pressed actions                    |
+| Mineral       | `#C6D7D5` | Quiet highlights and focus contrast          |
+| Limestone     | `#F1F2EF` | Page background                              |
+| Porcelain     | `#FBFBF8` | Elevated content surfaces                    |
+| Aged brass    | `#9A7448` | Decorative rules and icons, never small text |
+| Night         | `#102F35` | Branded header and administrator navigation  |
+| Error red     | `#A63737` | Errors and destructive actions               |
+| Success green | `#2E6A4F` | Confirmed and successful states              |
+| Warning amber | `#8A5B12` | Caution states                               |
 
-Contrast must be tested against the actual backgrounds before tokens become validated.
+Automated browser checks verify contrast on the implemented pages at desktop, tablet, and mobile widths. New color combinations must pass the same checks before use.
 
 ## Typography
 
@@ -70,9 +75,9 @@ Base spacing scale:
 
 ## Shape and depth
 
-- Small controls: 6px radius
-- Buttons and inputs: 8px radius
-- Major image and bounded content surfaces: 12px radius
+- Small surfaces: 4px radius
+- Buttons and inputs: 6px radius
+- Major image and bounded content surfaces: 8px radius
 - Pills are reserved for compact statuses, never ordinary buttons
 - Borders provide most structural separation
 - Shadows are used only when elevation communicates interaction or overlay order
@@ -81,16 +86,16 @@ Base spacing scale:
 
 ### Primary
 
-- Tide-teal fill with white text
-- Deep-tide hover and pressed state
+- Petrol fill with white text
+- Deep-petrol hover and pressed state
 - Visible keyboard focus ring outside the button edge
 - Disabled state remains readable and cannot rely on opacity alone
 
 ### Secondary
 
-- Transparent or salt-white surface
-- Harbor-ink border and label
-- Quiet sea-glass hover surface
+- Transparent or porcelain surface
+- Atlantic-ink border and label
+- Quiet mineral hover surface
 
 ### Destructive
 
@@ -104,6 +109,8 @@ Every button has default, hover, focus-visible, pressed, loading, and disabled s
 
 - Labels remain visible above inputs
 - Placeholder text never replaces a label
+- Search inputs, selects, and the primary action share a 52px minimum height and baseline
+- Custom select menus preserve keyboard, focus, and screen-reader behavior while using the approved palette
 - Validation appears next to the affected field
 - Date fields remain keyboard operable
 - Reservation validation is repeated by the server
@@ -117,6 +124,7 @@ Every button has default, hover, focus-visible, pressed, loading, and disabled s
 - The stay line remains visible during reservation review
 - Confirmation resembles a refined booking folio, not a novelty ticket
 - Availability and calculated-price changes use concise `aria-live` announcements without narrating decorative updates
+- The footer groups exploration, guest support, legal information, and reopenable cookie preferences
 
 ## Administrator layout
 
@@ -138,4 +146,16 @@ The independent review's ledger concept is retained only where it improves compr
 
 ## Visual review gate
 
-Before broad implementation, one customer search page and one administrator table are rendered at desktop and mobile widths. The system proceeds only after typography, spacing, buttons, forms, focus, and density are approved.
+The customer search page and administrator table were reviewed at desktop and mobile widths. The owner approved the typography, spacing, controls, identity, navigation, room dialog, footer, and full-service hotel direction on September 15, 2026.
+
+## Implemented preview surfaces
+
+- `/design/customer`: city and date search, URL state, sample results, sorting, empty results, and room-detail dialogs
+- `/design/admin`: sample reservation filters, a semantic table with horizontal scrolling and a pinned details action on narrow screens, and cancellation confirmation
+- `/design/components`: button variants, loading and disabled states, labelled inputs, errors, status badges, and palette
+
+These routes exist only in local development. Sample records never call booking or administrator mutation APIs. The real customer and administrator applications remain later tasks.
+
+Shared components live in `frontend/src/components/`. Theme values live in `frontend/src/styles/tokens.css`; layout styling uses CSS Modules. Photos and fonts are local assets with documented [credits](asset-credits.md).
+
+Verification includes 10 component tests and browser checks at 320px, 390px, 640px, 960px, and 1440px. The suite also checks 200 percent text scaling, favicon delivery, custom-select keyboard behavior, open-menu accessibility, aligned search controls, and dialog spacing. Native dialogs retain focus, close with Escape, and restore focus to their trigger. The full design command is `npm run verify:design`.

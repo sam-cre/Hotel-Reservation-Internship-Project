@@ -72,7 +72,7 @@ try {
   assert.match(await page.text(), /Stillwater Hotels/);
   const entry = await fetch(`${origin}/src/App.jsx`);
   assert.equal(entry.status, 200);
-  assert.match(await entry.text(), /A quieter place to stay/);
+  assert.match(await entry.text(), /Hotels worth arriving for/);
   const health = await fetch(`${origin}/api/health`);
   assert.equal(health.status, 200);
   assert.deepEqual(await health.json(), { status: 'ok' });
