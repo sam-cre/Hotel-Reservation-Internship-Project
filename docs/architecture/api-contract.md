@@ -1,6 +1,6 @@
 # API Contract
 
-Status: Planning
+Status: Authentication routes implemented; hotel, room, reservation, and weather routes planned
 
 All routes are rooted at `/api`. JSON request bodies use `Content-Type: application/json`. Protected routes require the secure authentication cookie.
 
@@ -8,7 +8,7 @@ All routes are rooted at `/api`. JSON request bodies use `Content-Type: applicat
 
 - Dates use `YYYY-MM-DD`.
 - Monetary values are serialized as two-decimal strings.
-- Identifiers are positive integers.
+- Identifiers are serialized as positive decimal strings so PostgreSQL `bigint` values do not lose precision in JavaScript.
 - Unknown JSON fields are rejected for mutation requests.
 - Invalid input returns HTTP 400.
 - Missing authentication returns HTTP 401.
@@ -17,25 +17,27 @@ All routes are rooted at `/api`. JSON request bodies use `Content-Type: applicat
 - Missing resources return HTTP 404.
 - Conflicting inventory, duplicate email, conflicting idempotency-key reuse, or invalid transitions return HTTP 409.
 - Unexpected failures return HTTP 500 with a safe message and request ID.
-- Unsafe requests require `X-CSRF-Protection: 1`, an exact allowed `Origin`, and a non-cross-site `Sec-Fetch-Site` value in production.
+- Unsafe requests require JSON, `X-CSRF-Protection: 1`, an exact allowed `Origin`, and `Sec-Fetch-Site: same-origin` when that browser header is present.
 
 ## Authentication
 
 ### POST `/auth/register`
 
-Public. Accepts `name`, `email`, and `password`. Always creates a customer. Sets the authentication cookie and returns the safe user object.
+Public and rate limited. Accepts only `name`, `email`, and `password`. Always creates a customer. Sets the authentication cookie and returns HTTP 201 with `{ "user": SafeUser }`. Duplicate email returns HTTP 409. Unknown fields, including `role`, return HTTP 400.
 
 ### POST `/auth/login`
 
-Public but rate limited. Accepts `email` and `password`. Returns one generic failure message for an unknown email or incorrect password. Sets the authentication cookie on success.
+Public and rate limited. Accepts only `email` and `password`. Returns one generic HTTP 401 failure for an unknown email or incorrect password. Sets the authentication cookie and returns `{ "user": SafeUser }` on success.
 
 ### POST `/auth/logout`
 
-Clears the authentication cookie. This route is required to make the assignment's logout feature explicit even though it was omitted from the endpoint list.
+Clears the authentication cookie and returns HTTP 204. This route is required to make the assignment's logout feature explicit even though it was omitted from the endpoint list.
 
 ### GET `/auth/me`
 
-Returns the current safe user object after loading the user and current role from PostgreSQL.
+Returns `{ "user": SafeUser }` after verifying the token and loading the user and current role from PostgreSQL. Missing, invalid, expired, or orphaned sessions return the same HTTP 401 response.
+
+`SafeUser` contains decimal-string `id`, `name`, `email`, `role`, and ISO 8601 `createdAt`. Password hashes and JWT values are never included in JSON responses.
 
 ## Hotels
 

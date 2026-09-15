@@ -1,12 +1,12 @@
 # Engineering Handoff
 
-Status: T2 merged; T3 locally validated and awaiting Git checkpoint
+Status: T3 merged; T4 locally validated and awaiting Git checkpoint
 
 Last verified: September 15, 2026
 
 ## Product
 
-Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified project foundation, approved design previews, and an in-progress PostgreSQL foundation. It does not yet contain authentication, live hotel APIs, or real reservation behavior.
+Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified foundation, approved design previews, PostgreSQL infrastructure, and backend authentication. It does not yet contain live hotel APIs or real reservation behavior.
 
 ## Current task state
 
@@ -14,8 +14,9 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 | -------------- | -------------------- | -------------------------------------- |
 | T1             | Committed and pushed | Commit `97e3229` on private `main`     |
 | T2             | Merged               | Pull request 1, merge commit `c2d0061` |
-| T3             | Locally validated    | `npm run verify:database` passes       |
-| T4 through T12 | Planned              | See the implementation plan            |
+| T3             | Merged               | Pull request 2, merge commit `b5d12e1` |
+| T4             | Locally validated    | 68 tests and the complete T4 gate pass |
+| T5 through T12 | Planned              | See the implementation plan            |
 
 ## Start here
 
@@ -25,6 +26,7 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 4. Read the [API contract](architecture/api-contract.md).
 5. Read the [implementation plan](plans/implementation-plan.md).
 6. Read [database operations](operations/database.md) before running database commands.
+7. Read [authentication operations](operations/authentication.md) before running the backend.
 
 ## Development commands
 
@@ -69,6 +71,6 @@ npm run verify:design
 
 ## Current and next implementation tasks
 
-T3 establishes the PostgreSQL foundation before authentication or live booking work. The local suite uses isolated PGlite for portable PostgreSQL validation. A separately configured `TEST_DATABASE_URL` activates production-driver verification against a disposable normal PostgreSQL server. T4 authentication is next after the owner commits, pushes, and merges T3.
+T4 implements the backend authentication boundary and is locally validated on `feature/authentication`. The suite verifies customer-only registration, generic login failures, secure cookies, short-lived token checks, exact-origin and CSRF defenses, bounded attempts, and current database role authorization. T5 hotel, room, search, and availability APIs are next after the owner commits, pushes, and merges T4.
 
 The detailed acceptance criteria and verification command live in the [implementation plan](plans/implementation-plan.md) and `plan.json`.

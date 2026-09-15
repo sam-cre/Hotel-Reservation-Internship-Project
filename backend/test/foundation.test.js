@@ -43,6 +43,7 @@ describe('environment validation', () => {
       NODE_ENV: 'development',
       HOST: '127.0.0.1',
       PORT: 3001,
+      TRUST_PROXY_HOPS: 0,
     });
   });
   it.each(['0', '-1', '65536', 'not-a-port', '3.5'])(
@@ -58,4 +59,12 @@ describe('environment validation', () => {
       'Invalid environment configuration: NODE_ENV',
     );
   });
+  it.each(['-1', '3', 'not-a-number'])(
+    'rejects invalid proxy hop count %s',
+    (TRUST_PROXY_HOPS) => {
+      expect(() => readEnvironment({ TRUST_PROXY_HOPS })).toThrow(
+        'Invalid environment configuration: TRUST_PROXY_HOPS',
+      );
+    },
+  );
 });

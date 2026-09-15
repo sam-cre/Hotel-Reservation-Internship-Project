@@ -1,6 +1,6 @@
 # Quality and Security Strategy
 
-Status: Planning
+Status: T4 authentication controls implemented; later quality gates remain planned
 
 ## Quality gates
 
@@ -86,7 +86,7 @@ The complete local verification command will run:
 - Exact allowed origins at Express
 - Required custom CSRF header on state-changing requests
 - Exact Origin validation for state-changing requests, with missing or foreign origins rejected in production
-- Cross-site Fetch Metadata rejection, with tests for missing and malformed headers
+- Cross-site Fetch Metadata rejection; a missing header is accepted only when the required exact Origin and CSRF header pass
 - JSON-only mutation bodies
 - `SameSite=Lax` cookie
 - Security headers appropriate to the frontend and API
@@ -116,7 +116,7 @@ The complete local verification command will run:
 ## Security-audit schedule
 
 1. Architecture threat-model review before implementation approval
-2. Focused review after authentication and reservations are implemented
+2. Focused authentication review completed during T4; repeat after reservations are implemented
 3. Full local audit before deployment
 4. Production configuration review without penetration testing third-party infrastructure
 

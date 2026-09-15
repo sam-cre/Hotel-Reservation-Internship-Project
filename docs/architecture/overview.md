@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Status: Foundation and T3 database infrastructure implemented; feature modules remain planned
+Status: Foundation, database infrastructure, and T4 authentication implemented; resource and reservation modules remain planned
 
 ## System shape
 
@@ -75,6 +75,8 @@ README.md
 
 Backend modules are grouped by product capability: authentication, hotels, rooms, reservations, and weather. Each module owns its routes, validation, service logic, and database queries. This keeps related behavior together without adding excessive architectural layers.
 
+The authentication module separates HTTP routing, validation, password hashing, token operations, cookie serialization, request-safety checks, rate limits, and parameterized database access. Express composes these parts once at startup. Future modules receive reusable authentication and administrator-authorization middleware without reading cookie or JWT details themselves.
+
 ## Frontend state
 
 - URL state holds city, dates, guest count, filters, and selected hotel identifiers.
@@ -112,4 +114,4 @@ Messages are safe for customers. Internal stack traces and database details are 
 
 ## Browser mutation boundary
 
-Unsafe requests use JSON, an exact configured origin, a required `X-CSRF-Protection: 1` header, and Fetch Metadata checks. In production, the API rejects a missing or foreign `Origin` and rejects `Sec-Fetch-Site: cross-site`. This is intentionally strict because the supported client is the same-origin React application.
+Unsafe requests use JSON, an exact configured origin, a required `X-CSRF-Protection: 1` header, and Fetch Metadata checks. The API rejects a missing or foreign `Origin`. When `Sec-Fetch-Site` is present, only `same-origin` is accepted. This is intentionally strict because the supported client is the same-origin React application.
