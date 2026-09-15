@@ -1,10 +1,18 @@
 import { randomUUID } from 'node:crypto';
 import express from 'express';
 import helmet from 'helmet';
+import { HttpError, sendError } from './http/errors.js';
+import { createAuthModule } from './modules/auth/routes.js';
 
-export function createApp({ logError = console.error } = {}) {
+export function createApp({
+  logError = console.error,
+  authentication,
+  configureRoutes,
+  trustProxyHops = 0,
+} = {}) {
   const app = express();
   app.disable('x-powered-by');
+  if (trustProxyHops > 0) app.set('trust proxy', trustProxyHops);
   app.use(helmet());
   app.use((req, res, next) => {
     req.requestId = randomUUID();
@@ -14,6 +22,13 @@ export function createApp({ logError = console.error } = {}) {
   });
   app.use(express.json({ limit: '16kb' }));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+  const auth = authentication ? createAuthModule(authentication) : null;
+  if (auth) {
+    app.locals.authenticate = auth.authenticate;
+    app.use('/api', auth.protectMutation);
+    app.use('/api/auth', auth.router);
+  }
+  configureRoutes?.(app, auth);
   app.use((req, res) => {
     res.status(404).json({
       error: {
@@ -27,27 +42,29 @@ export function createApp({ logError = console.error } = {}) {
   // Express recognizes error middleware by its four-argument signature.
   // eslint-disable-next-line no-unused-vars
   app.use((error, req, res, next) => {
+    if (error instanceof HttpError) return sendError(res, req.requestId, error);
     const malformed = error.type === 'entity.parse.failed';
     const tooLarge = error.type === 'entity.too.large';
     const status = malformed ? 400 : tooLarge ? 413 : 500;
     if (status === 500)
       logError({ event: 'request_failed', requestId: req.requestId });
-    res.status(status).json({
-      error: {
-        code: malformed
+    return sendError(
+      res,
+      req.requestId,
+      new HttpError(
+        status,
+        malformed
           ? 'INVALID_JSON'
           : tooLarge
             ? 'PAYLOAD_TOO_LARGE'
             : 'INTERNAL_ERROR',
-        message: malformed
+        malformed
           ? 'Request body must be valid JSON.'
           : tooLarge
             ? 'Request body is too large.'
             : 'An unexpected error occurred.',
-        details: {},
-        requestId: req.requestId,
-      },
-    });
+      ),
+    );
   });
   return app;
 }

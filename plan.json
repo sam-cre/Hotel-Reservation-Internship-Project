@@ -280,7 +280,7 @@
       "verifications": [
         {
           "method": "test",
-          "command": "npm --workspace backend test -- authentication authorization",
+          "command": "npm run verify:authentication",
           "pass": {
             "min_tests_passed": 1,
             "stdout_regex": "(Tests|tests).*(passed|PASS)"

@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 committed, T2 merged, T3 locally validated, T4 through T12 planned
+Status: Approved; T1 committed, T2 and T3 merged, T4 locally validated, T5 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -52,7 +52,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T3. PostgreSQL schema and migrations
 
-- Status: Locally validated on `feature/database-foundation`; normal PostgreSQL server verification activates when `TEST_DATABASE_URL` is available
+- Status: Merged through pull request 2 as commit `b5d12e1`; normal PostgreSQL server verification activates when `TEST_DATABASE_URL` is available
 - Evidence: The T3 gate passes with 33 backend tests, 10 frontend regression tests, formatting, linting, production build, environment checks, and Git exclusion checks. Twenty-two database tests validate the schema and operational code through isolated PGlite. One production-driver test is ready for the disposable PostgreSQL CI service and is explicitly skipped when `TEST_DATABASE_URL` is absent.
 - Satisfies: R7, R10, R12
 - Depends on: T1
@@ -62,6 +62,8 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T4. Authentication and authorization
 
+- Status: Locally validated on `feature/authentication`
+- Evidence: Twenty-two focused authentication and authorization tests cover customer-only registration, password hashing, safe response fields, secure production cookies, current-user restoration, expired and incorrectly scoped sessions, generic login failures, exact-origin and CSRF checks, JSON-only mutations, Fetch Metadata rejection, bounded attempts, safe database failures, customer denial, forged role claims, current database role changes, and orphaned tokens. The complete T4 gate passes with 58 backend tests, 10 frontend tests, formatting, linting, production build, environment checks, API proxy checks, and zero npm advisories. One normal PostgreSQL test remains conditional on `TEST_DATABASE_URL`.
 - Satisfies: R2, R6, R10, R14
 - Depends on: T3
 - Deliver: registration, login, logout, `/auth/me`, Argon2id, secure cookie JWT, current role loading, strict custom-header, origin, and Fetch Metadata defenses, and rate limits

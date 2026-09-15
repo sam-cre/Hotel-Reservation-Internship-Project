@@ -1,10 +1,10 @@
 # Stillwater Hotels Documentation
 
-Status: T1 committed; T2 merged; T3 locally validated and awaiting Git checkpoint
+Status: T1 committed; T2 and T3 merged; T4 implemented and locally validated
 
 Stillwater Hotels is a multi-property hotel reservation application built for the internship assignment. This documentation distinguishes assignment requirements, engineering safeguards, and optional enhancements.
 
-Start with the [engineering handoff](HANDOFF.md) for current status and safe commands. The [root README](../README.md) describes the runnable foundation and sample design previews. The PostgreSQL schema and operational tooling are implemented; authentication, live APIs, and real booking behavior are not yet implemented.
+Start with the [engineering handoff](HANDOFF.md) for current status and safe commands. The [root README](../README.md) describes the runnable foundation and sample design previews. PostgreSQL infrastructure and backend authentication are implemented. Live hotel, room, reservation, and weather behavior remains planned.
 
 ## Reading path
 
@@ -18,14 +18,16 @@ Start with the [engineering handoff](HANDOFF.md) for current status and safe com
 8. [Launch readiness checklist](quality/launch-readiness-checklist.md)
 9. [Git and deployment workflow](operations/git-and-deployment.md)
 10. [Database operations](operations/database.md)
-11. [Architecture decisions](decisions/README.md)
-12. [T2 design review reconciliation](decisions/t2-design-review.md)
-13. [Implementation plan](plans/implementation-plan.md)
+11. [Authentication operations](operations/authentication.md)
+12. [Architecture decisions](decisions/README.md)
+13. [T2 design review reconciliation](decisions/t2-design-review.md)
+14. [Implementation plan](plans/implementation-plan.md)
 
 ## Validation history
 
 - [T2 design validation](history/2026-09-15-t2-design-validation.md)
 - [T3 database validation](history/2026-09-15-t3-database-validation.md)
+- [T4 authentication validation](history/2026-09-15-t4-authentication-validation.md)
 
 ## Status vocabulary
 

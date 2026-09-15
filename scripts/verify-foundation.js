@@ -48,7 +48,11 @@ const example = await readFile(
   'utf8',
 );
 assert(!/postgres(?:ql)?:\/\/[^\s]+:[^\s]+@/.test(example));
+assert.match(example, /^JWT_SECRET=$/m);
+assert.match(example, /^ALLOWED_ORIGINS=http:\/\/127\.0\.0\.1:5173,/m);
+assert(!/^JWT_SECRET=.+$/m.test(example));
 assert.equal(readEnvironment({}).PORT, 3001);
+assert.equal(readEnvironment({}).TRUST_PROXY_HOPS, 0);
 console.info('environment and Git exclusions verified');
 
 const api = createApp().listen(0, '127.0.0.1');

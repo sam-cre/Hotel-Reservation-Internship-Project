@@ -4,9 +4,9 @@ A hotel reservation application for the internship assignment, using React, Expr
 
 ## Current state
 
-The application foundation and PostgreSQL infrastructure are implemented: npm workspaces, React and Express foundations, versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, formatting, linting, and verification.
+The application foundation, PostgreSQL infrastructure, and backend authentication boundary are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, customer registration and login, secure cookie sessions, current-role authorization, request protections, and automated verification.
 
-The Harbor Quiet design foundation is validated and owner-approved, with local guest, administrator, and component previews. Reservations, database persistence, authentication, and deployment remain planned. This repository is not ready to accept real bookings.
+The Harbor Quiet design foundation is validated and owner-approved, with local guest, administrator, and component previews. Live hotel, room, reservation, customer-interface, administrator-interface, weather, and deployment work remains planned. This repository is not ready to accept real bookings.
 
 ## Design previews
 
@@ -22,7 +22,7 @@ Fonts and photos are served locally. See [asset credits](docs/design/asset-credi
 
 ## Local development
 
-Requirements: Node.js 24, npm 11, and Git. The application preview still starts without PostgreSQL. Database commands require a PostgreSQL connection URL.
+Requirements: Node.js 24, npm 11, Git, and PostgreSQL for the backend. The frontend design preview can still start independently without PostgreSQL. The backend now fails closed unless its database and authentication settings are present.
 
 From the repository root in PowerShell:
 
@@ -40,15 +40,16 @@ Start applications separately with `npm run dev --workspace backend` and `npm ru
 
 ## Environment variables
 
-Defaults allow local startup without an environment file. For overrides, copy `.env.example` to `.env` at the repository root. The backend loads that file; shell environment values take precedence. Vite reads the backend port for its local proxy without exposing backend variables to browser code.
+Copy `.env.example` to the ignored `.env` file at the repository root and provide the required database and authentication values. The backend loads that file; shell environment values take precedence. Vite reads the backend port for its local proxy without exposing backend variables to browser code.
 
-| Variable   | Default       | Purpose                                                |
-| ---------- | ------------- | ------------------------------------------------------ |
-| `NODE_ENV` | `development` | Runtime mode: development, test, or production         |
-| `HOST`     | `127.0.0.1`   | API bind address; cloud hosting will require `0.0.0.0` |
-| `PORT`     | `3001`        | API listening port, from 1 through 65535               |
+| Variable           | Default       | Purpose                                                |
+| ------------------ | ------------- | ------------------------------------------------------ |
+| `NODE_ENV`         | `development` | Runtime mode: development, test, or production         |
+| `HOST`             | `127.0.0.1`   | API bind address; cloud hosting will require `0.0.0.0` |
+| `PORT`             | `3001`        | API listening port, from 1 through 65535               |
+| `TRUST_PROXY_HOPS` | `0`           | Known reverse-proxy hops used for client IP detection  |
 
-Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both development processes after changing configuration. Never store secrets in a variable prefixed `VITE_`, which is intended for public frontend configuration.
+Database variables are documented in [database operations](docs/operations/database.md). JWT, cookie, origin, and rate-limit variables are documented in [authentication operations](docs/operations/authentication.md). Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both development processes after changing configuration. Never store secrets in a variable prefixed `VITE_`, which is intended for public frontend configuration.
 
 ## Verification
 
@@ -56,7 +57,7 @@ Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both deve
 npm run verify:foundation
 ```
 
-This checks formatting, linting, backend and frontend component tests, the frontend production build, Git exclusions, and live frontend-to-API proxy behavior on temporary local ports. `npm run verify` currently runs the same foundation checks; it will expand as features are implemented.
+This checks formatting, linting, backend and frontend component tests, the frontend production build, Git exclusions, and live frontend-to-API proxy behavior on temporary local ports. `npm run verify` runs the complete current T4 gate, including the dependency advisory check.
 
 The complete design check also runs Chromium browser tests:
 
@@ -87,6 +88,15 @@ T3 provides versioned migrations, PostgreSQL connection pooling, deterministic d
 ```powershell
 npm run test:database
 npm run verify:database
+```
+
+## Authentication foundation
+
+T4 provides registration, login, logout, current-user restoration, secure JWT cookies, current-role authorization, browser mutation defenses, and bounded authentication attempts. See [authentication operations](docs/operations/authentication.md) for configuration, endpoint behavior, security boundaries, and limitations.
+
+```powershell
+npm --workspace backend test -- authentication authorization
+npm run verify:authentication
 ```
 
 ## Structure
