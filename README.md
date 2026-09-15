@@ -4,7 +4,7 @@ A hotel reservation application for the internship assignment, using React, Expr
 
 ## Current state
 
-The application foundation is implemented: npm workspaces, a React entry page and fallback route, Express process health, safe JSON errors, environment validation, local API proxying, formatting, linting, and foundation verification.
+The application foundation and PostgreSQL infrastructure are implemented: npm workspaces, React and Express foundations, versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, formatting, linting, and verification.
 
 The Harbor Quiet design foundation is validated and owner-approved, with local guest, administrator, and component previews. Reservations, database persistence, authentication, and deployment remain planned. This repository is not ready to accept real bookings.
 
@@ -22,7 +22,7 @@ Fonts and photos are served locally. See [asset credits](docs/design/asset-credi
 
 ## Local development
 
-Requirements: Node.js 24, npm 11, and Git. PostgreSQL is not needed for the foundation milestone.
+Requirements: Node.js 24, npm 11, and Git. The application preview still starts without PostgreSQL. Database commands require a PostgreSQL connection URL.
 
 From the repository root in PowerShell:
 
@@ -79,6 +79,15 @@ Additional commands:
 - `npm start --workspace backend`: start the API without the file watcher
 
 `/api/health` checks process liveness only. Database readiness will be added with PostgreSQL integration.
+
+## Database foundation
+
+T3 provides versioned migrations, PostgreSQL connection pooling, deterministic development data, and explicit administrator provisioning. See [database operations](docs/operations/database.md) for configuration, safety boundaries, commands, and recovery guidance.
+
+```powershell
+npm run test:database
+npm run verify:database
+```
 
 ## Structure
 

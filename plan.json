@@ -253,7 +253,7 @@
       "verifications": [
         {
           "method": "test",
-          "command": "npm --workspace backend test -- database",
+          "command": "npm run verify:database",
           "pass": {
             "min_tests_passed": 1,
             "stdout_regex": "(Tests|tests).*(passed|PASS)"

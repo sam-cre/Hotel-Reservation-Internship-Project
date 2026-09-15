@@ -1,6 +1,6 @@
 # Data Model and Reservation Rules
 
-Status: Planning
+Status: T3 schema implemented; reservation services remain planned
 
 ## Tables
 
@@ -21,7 +21,7 @@ Status: Planning
 - `city`: required text with a normalized search index
 - `address`: required text
 - `rating`: numeric value constrained from 0.0 through 5.0
-- `image_url`: required validated HTTP or HTTPS URL
+- `image_url`: required validated HTTP or HTTPS URL or first-party absolute asset path
 - `is_active`: required boolean, defaults to true
 - `created_at`: timestamp with time zone
 
@@ -51,6 +51,7 @@ One row represents a room type, not a physical numbered room.
 - `total_price`: non-negative `numeric(10,2)` booking-time snapshot
 - `status`: `confirmed` or `cancelled`
 - `idempotency_key`: required UUID, unique per user
+- `request_fingerprint`: required SHA-256 hexadecimal digest used to detect conflicting reuse of an idempotency key
 - `created_at`: timestamp with time zone
 
 ## Date model
@@ -130,3 +131,11 @@ Using one lock target gives these operations a shared queue. Without it, a booki
 ## Money
 
 Prices use PostgreSQL `numeric`, not JavaScript floating-point arithmetic. PostgreSQL calculates the authoritative total. The API serializes monetary values consistently as two-decimal strings.
+
+## Migration ownership
+
+- `backend/migrations/` is the authoritative schema history.
+- Applied migration checksums are immutable. Corrections use a new numbered file.
+- The runner serializes deployments with a PostgreSQL advisory lock and applies each migration transactionally.
+- Foreign keys use `ON DELETE RESTRICT` so historical reservations cannot lose their user or room relationship.
+- Search, inventory, overlap, and customer-history indexes match the planned query paths.

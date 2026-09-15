@@ -17,6 +17,7 @@ const ignored = [
   'certificate.pfx',
   'node_modules/example.js',
   'frontend/dist/index.html',
+  'tmp/pdfs/assignment-1.png',
   '.security-audit/report.md',
 ];
 for (const path of ignored) {
