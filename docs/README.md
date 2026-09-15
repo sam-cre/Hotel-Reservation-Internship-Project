@@ -1,23 +1,25 @@
 # Stillwater Hotels Documentation
 
-Status: Foundation implemented; remaining features planned
+Status: T1 committed; T2 validated and approved; T3 is next
 
 Stillwater Hotels is a multi-property hotel reservation application built for the internship assignment. This documentation distinguishes assignment requirements, engineering safeguards, and optional enhancements.
 
-The [root README](../README.md) describes the runnable foundation. Architecture and product documents describe the approved target; their planned features are not yet implemented.
+Start with the [engineering handoff](HANDOFF.md) for current status and safe commands. The [root README](../README.md) describes the runnable foundation and sample design previews. Architecture and product documents describe the approved target; the database, authentication, and real booking features are not yet implemented.
 
 ## Reading path
 
-1. [Requirements and scope](project/requirements-and-scope.md)
-2. [Architecture overview](architecture/overview.md)
-3. [Data model and reservation rules](architecture/data-model-and-reservations.md)
-4. [API contract](architecture/api-contract.md)
-5. [Brand and design system](design/brand-and-design-system.md)
-6. [Quality and security strategy](quality/quality-and-security.md)
-7. [Git and deployment workflow](operations/git-and-deployment.md)
-8. [Architecture decisions](decisions/README.md)
-9. [Independent review reconciliation](decisions/review-reconciliation.md)
-10. [Implementation plan](plans/implementation-plan.md)
+1. [Engineering handoff](HANDOFF.md)
+2. [Requirements and scope](project/requirements-and-scope.md)
+3. [Architecture overview](architecture/overview.md)
+4. [Data model and reservation rules](architecture/data-model-and-reservations.md)
+5. [API contract](architecture/api-contract.md)
+6. [Brand and design system](design/brand-and-design-system.md)
+7. [Quality and security strategy](quality/quality-and-security.md)
+8. [Launch readiness checklist](quality/launch-readiness-checklist.md)
+9. [Git and deployment workflow](operations/git-and-deployment.md)
+10. [Architecture decisions](decisions/README.md)
+11. [T2 design review reconciliation](decisions/t2-design-review.md)
+12. [Implementation plan](plans/implementation-plan.md)
 
 ## Status vocabulary
 

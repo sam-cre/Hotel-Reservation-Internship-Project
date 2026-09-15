@@ -1,0 +1,26 @@
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.brand > span {
+  font-family: var(--font-heading);
+  font-size: 29px;
+  font-weight: 500;
+  line-height: 0.95;
+}
+.brand small {
+  display: block;
+  margin-top: 6px;
+  font: 700 10px var(--font-body);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.brand:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 4px;
+}

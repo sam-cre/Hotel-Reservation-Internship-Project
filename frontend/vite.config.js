@@ -7,6 +7,11 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, root, '');
   return {
     plugins: [react()],
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./test/setup.js'],
+      include: ['test/**/*.test.{js,jsx}'],
+    },
     server: {
       host: '127.0.0.1',
       port: 5173,

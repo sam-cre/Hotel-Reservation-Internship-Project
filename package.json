@@ -17,12 +17,16 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "npm run test --workspace backend",
+    "test": "npm run test --workspace backend && npm run test --workspace frontend",
+    "test:design-browser": "playwright test --config playwright.design.config.js",
+    "verify:design": "npm run verify:foundation && npm run test:design-browser",
     "verify:foundation": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js",
     "verify": "npm run verify:foundation"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
     "concurrently": "10.0.5",
     "eslint": "10.10.0",
     "eslint-plugin-react-hooks": "7.1.1",

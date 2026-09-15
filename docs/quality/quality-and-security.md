@@ -18,6 +18,7 @@ The complete local verification command will run:
 - Accessibility assertions
 - Secret scan
 - Dependency audit review
+- Metadata, internal-link, image-budget, and production-header checks from the launch-readiness checklist
 
 ## Test layers
 
@@ -139,12 +140,22 @@ Security working artifacts belong in `.security-audit/` and remain uncommitted b
 - Automated axe checks plus manual keyboard review
 - `aria-live` announcements for availability, price, booking success, and meaningful asynchronous failures
 
+## Privacy and guest-information checks
+
+- Essential storage is documented and contains no personal information.
+- Non-essential scripts remain disabled until any required consent is recorded.
+- Reject and accept choices have equal prominence, and preferences can be reopened from the footer.
+- Privacy, reservation terms, accessibility, and contact pages are reachable and contain owner-reviewed content before release.
+- Analytics remains out of scope unless the owner separately approves its purpose and consent behavior.
+
+The complete adapted checklist is maintained in [Launch Readiness Checklist](launch-readiness-checklist.md).
+
 ## Verification integrity
 
 Tests written by the implementation agent are not sufficient evidence by themselves. The plan adds:
 
 - Requirement traceability
-- Independent peer review
+- Targeted independent peer review when a material uncertainty or risk warrants it
 - Human review before commits
 - Production smoke tests
 - A final explanation walkthrough by the intern

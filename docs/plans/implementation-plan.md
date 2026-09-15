@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 verified locally, T2 through T12 planned
+Status: Approved; T1 committed, T2 validated and approved, T3 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -30,7 +30,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T1. Safe project foundation
 
-- Status: Verified locally; initial commit and push are user-owned and pending
+- Status: Verified and committed by the project owner as `97e3229`, pushed to private `main`
 - Evidence: `npm run verify:foundation` passed with 11 backend tests, formatting, linting, a production frontend build, environment and ignore checks, and live API proxy checks. The documented `npm run dev` command also served the frontend and both health URLs successfully.
 - Satisfies: R1, R12, R13
 - Depends on: none
@@ -40,10 +40,13 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T2. Harbor Quiet design foundation
 
+- Status: Validated and approved; ready for the project owner's Git checkpoint
+- Evidence: Shared controls, sample guest and administrator pages, and a component gallery run locally. Ten component tests and 27 browser tests cover interactions, accessible labels, contrast, 200 percent text scaling, narrow layouts, focus management, the custom select, favicon delivery, control alignment, dialog spacing, cookie choices, and production isolation. The owner approved the visual direction on September 15, 2026.
 - Satisfies: R9, R14
 - Depends on: T1
-- Deliver: fonts, tokens, foundational components, customer search preview, administrator table preview, desktop and mobile review
+- Deliver: fonts, tokens, identity and favicon, foundational components, customer search preview, administrator table preview, desktop and mobile review
 - Verify: `npm --workspace frontend test -- design-system`
+- Browser verification: `npm run verify:design`
 - Human gate: approve screenshots before broad UI implementation
 - Estimate: 210 minutes
 
@@ -84,7 +87,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 - Satisfies: R2, R3, R4, R5, R9, R10
 - Depends on: T2, T4, T5, T6
-- Deliver: home, search results, hotel details, authentication, reservation review, confirmation, and My Reservations
+- Deliver: home, search results, hotel details, authentication, reservation review, confirmation, My Reservations, structured footer navigation, guest-support links, and cookie-preference controls
 - Verify: customer component tests and `npm run test:e2e -- customer-journey`
 - Estimate: 420 minutes
 
@@ -108,7 +111,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 - Satisfies: R1, R2, R4, R6, R9, R10, R12
 - Depends on: T7, T8, T9
-- Deliver: requirement audit, lint, tests, builds, PostgreSQL-backed CI, accessibility, responsive review, secret review, dependency review, and security audit
+- Deliver: requirement audit, launch-readiness audit, lint, tests, builds, PostgreSQL-backed CI, accessibility, responsive review, metadata and link validation, asset budgets, secret review, dependency review, and security audit
 - Verify: `npm run verify:local`
 - Estimate: 300 minutes
 
@@ -116,7 +119,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 - Satisfies: R1, R2, R8, R11, R13
 - Depends on: T10
-- Deliver: Neon database, Render API, Vercel frontend, migrations, administrator, secrets, rewrites, and public cold-start, CSRF, and cookie smoke tests
+- Deliver: Neon database, Render API, Vercel frontend, migrations, administrator, secrets, rewrites, HTTPS and security headers, robots and sitemap behavior, public metadata, and cold-start, CSRF, consent, cookie, cache, and broken-link smoke tests
 - Verify: `npm run smoke:production`
 - Estimate: 240 minutes
 
@@ -124,7 +127,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 - Satisfies: R12, R13, R14
 - Depends on: T11
-- Deliver: evidence-grounded README, API and architecture references, public URLs, requirement matrix, setup verification, and demonstration guide
+- Deliver: evidence-grounded README, API and architecture references, public URLs, requirement matrix, setup verification, launch-readiness evidence, owner-reviewed guest-policy content, and demonstration guide
 - Verify: `npm run verify:docs`, README content checks, and final `npm run verify`
 - Estimate: 180 minutes
 

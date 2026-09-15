@@ -85,3 +85,5 @@ Return HTTP 404 when a customer requests another customer's reservation. This do
 ## Review reconciliation
 
 The rationale for accepted, refined, and rejected independent-review recommendations is recorded in [Independent review reconciliation](review-reconciliation.md).
+
+The final design-foundation review, accessibility refinements, and owner approval are recorded in [T2 design review reconciliation](t2-design-review.md).
