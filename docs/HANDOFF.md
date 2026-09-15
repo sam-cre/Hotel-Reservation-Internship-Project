@@ -1,21 +1,21 @@
 # Engineering Handoff
 
-Status: T2 validated and approved; T3 is next
+Status: T2 merged; T3 locally validated and awaiting Git checkpoint
 
 Last verified: September 15, 2026
 
 ## Product
 
-Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified project foundation and approved design previews. It does not yet contain the PostgreSQL schema, authentication, live hotel APIs, or real reservation behavior.
+Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified project foundation, approved design previews, and an in-progress PostgreSQL foundation. It does not yet contain authentication, live hotel APIs, or real reservation behavior.
 
 ## Current task state
 
-| Task           | Status                       | Evidence                                                      |
-| -------------- | ---------------------------- | ------------------------------------------------------------- |
-| T1             | Committed and pushed         | Commit `97e3229` on private `main`                            |
-| T2             | Validated and owner-approved | `npm run verify:design` passes                                |
-| T3             | Next                         | PostgreSQL schema, migrations, seeds, and connection handling |
-| T4 through T12 | Planned                      | See the implementation plan                                   |
+| Task           | Status               | Evidence                               |
+| -------------- | -------------------- | -------------------------------------- |
+| T1             | Committed and pushed | Commit `97e3229` on private `main`     |
+| T2             | Merged               | Pull request 1, merge commit `c2d0061` |
+| T3             | Locally validated    | `npm run verify:database` passes       |
+| T4 through T12 | Planned              | See the implementation plan            |
 
 ## Start here
 
@@ -24,6 +24,7 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 3. Read the [data model and reservation rules](architecture/data-model-and-reservations.md).
 4. Read the [API contract](architecture/api-contract.md).
 5. Read the [implementation plan](plans/implementation-plan.md).
+6. Read [database operations](operations/database.md) before running database commands.
 
 ## Development commands
 
@@ -66,8 +67,8 @@ npm run verify:design
 - `AGENTS.md`, `local-workspace/`, the assignment PDF, credentials, and environment files remain outside Git.
 - Peer review is optional. Request it only for material uncertainty or risk that benefits from independent analysis.
 
-## Next implementation task
+## Current and next implementation tasks
 
-T3 establishes the PostgreSQL foundation before authentication or live booking work. It must deliver versioned migrations, constraints, indexes, deterministic development data, safe administrator provisioning, and tests against a real PostgreSQL database.
+T3 establishes the PostgreSQL foundation before authentication or live booking work. The local suite uses isolated PGlite for portable PostgreSQL validation. A separately configured `TEST_DATABASE_URL` activates production-driver verification against a disposable normal PostgreSQL server. T4 authentication is next after the owner commits, pushes, and merges T3.
 
 The detailed acceptance criteria and verification command live in the [implementation plan](plans/implementation-plan.md) and `plan.json`.

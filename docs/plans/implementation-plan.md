@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 committed, T2 validated and approved, T3 through T12 planned
+Status: Approved; T1 committed, T2 merged, T3 locally validated, T4 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -40,7 +40,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T2. Harbor Quiet design foundation
 
-- Status: Validated and approved; ready for the project owner's Git checkpoint
+- Status: Merged through pull request 1 as commit `c2d0061`
 - Evidence: Shared controls, sample guest and administrator pages, and a component gallery run locally. Ten component tests and 27 browser tests cover interactions, accessible labels, contrast, 200 percent text scaling, narrow layouts, focus management, the custom select, favicon delivery, control alignment, dialog spacing, cookie choices, and production isolation. The owner approved the visual direction on September 15, 2026.
 - Satisfies: R9, R14
 - Depends on: T1
@@ -52,10 +52,12 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T3. PostgreSQL schema and migrations
 
+- Status: Locally validated on `feature/database-foundation`; normal PostgreSQL server verification activates when `TEST_DATABASE_URL` is available
+- Evidence: The T3 gate passes with 33 backend tests, 10 frontend regression tests, formatting, linting, production build, environment checks, and Git exclusion checks. Twenty-two database tests validate the schema and operational code through isolated PGlite. One production-driver test is ready for the disposable PostgreSQL CI service and is explicitly skipped when `TEST_DATABASE_URL` is absent.
 - Satisfies: R7, R10, R12
 - Depends on: T1
 - Deliver: migrations, constraints, indexes, active-record flags, price snapshots, idempotency fields, connection handling, development seeds, and idempotent administrator provisioning
-- Verify: `npm --workspace backend test -- database`
+- Verify: `npm run verify:database`
 - Estimate: 240 minutes
 
 ### T4. Authentication and authorization

@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Status: Planning
+Status: Foundation and T3 database infrastructure implemented; feature modules remain planned
 
 ## System shape
 
