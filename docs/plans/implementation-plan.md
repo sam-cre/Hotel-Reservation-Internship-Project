@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 through T4 merged, T5 locally validated, T6 through T12 planned
+Status: Approved; T1 through T5 merged, T6 portable gate passed with PostgreSQL pull-request verification pending, T7 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -72,7 +72,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T5. Hotel, room, search, and availability APIs
 
-- Status: Locally validated on `feature/hotel-room-apis`
+- Status: Merged through pull request 4 as commit `b3e2522`
 - Evidence: Twenty-three focused catalog tests cover public reads, exact city search, complete-stay filtering, server-derived prices, room availability, guest capacity, sold-out inventory, back-to-back stays, cancelled reservations, soft deletion, administrator authorization, strict inputs, duplicates, missing resources, and reservation-safe inventory edits. The complete T5 gate passes with 81 backend tests, 10 frontend tests, formatting, linting, production build, environment checks, API proxy checks, and zero npm advisories. One normal PostgreSQL test remains conditional on `TEST_DATABASE_URL`.
 - Satisfies: R3, R6, R7, R10
 - Depends on: T3, T4
@@ -82,10 +82,12 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T6. Transaction-safe reservation engine
 
+- Status: Portable gate passed on `feature/reservation-engine`; normal PostgreSQL pull-request gate pending
+- Evidence: Nineteen portable reservation tests cover creation, overlap boundaries, multiple units, capacity, inactive resources, strict fields, exact-decimal price snapshots, idempotency, ownership, administrator access, cancellation, and inventory release. The complete portable gate passes with 100 backend tests, 10 frontend tests, formatting, linting, production build, environment checks, API proxy checks, and zero npm advisories. Pull-request CI runs the five conditional normal PostgreSQL tests, including four synchronized concurrency races, before merge.
 - Satisfies: R4, R5, R6, R7, R10, R14
 - Depends on: T5
 - Deliver: universal inventory locking, overlap counting, multi-unit inventory, nightly and total price snapshots, idempotent creation, ownership, listing, and confirmed-to-cancelled status changes
-- Verify: `npm --workspace backend test -- reservations concurrency pricing ownership`
+- Verify: `npm run verify:reservations`
 - Critical gate: synchronized concurrent requests for the final unit produce exactly one reservation, and mixed booking and administrator races preserve valid inventory
 - Estimate: 480 minutes
 

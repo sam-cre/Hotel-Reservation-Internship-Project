@@ -141,6 +141,17 @@ export function createCatalogRepository(database) {
       return true;
     },
 
+    async lockHotelRooms(client, hotelId) {
+      await client.query(
+        `SELECT id::text
+         FROM rooms
+         WHERE hotel_id = $1
+         ORDER BY id
+         FOR UPDATE`,
+        [hotelId],
+      );
+    },
+
     async listPublicRooms(hotelId, stay) {
       if (!stay) {
         const result = await database.query(

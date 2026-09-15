@@ -10,7 +10,7 @@ This guide covers hotel, room-type, search, and informative availability behavio
 - Hotel and room mutations require a current administrator session.
 - All mutation requests must satisfy the authentication guide's JSON, exact-origin, Fetch Metadata, and CSRF-header rules.
 - The API calculates starting prices, nightly prices, remaining units, and estimated totals from PostgreSQL values. Browser-submitted price values never influence public results.
-- Availability is informative until T6 adds transactional reservation creation. A booking request must recheck inventory while holding the room-type row lock.
+- Availability is informative. T6 reservation creation rechecks inventory while holding the room-type row lock before confirming a booking.
 
 ## Public routes
 

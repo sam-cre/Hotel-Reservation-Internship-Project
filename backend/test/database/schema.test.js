@@ -63,7 +63,7 @@ describe('initial PostgreSQL schema', () => {
       'users',
     ]);
     const reservationColumns = await database.query(`
-      SELECT column_name
+      SELECT column_name, numeric_precision, numeric_scale
       FROM information_schema.columns
       WHERE table_schema = 'public' AND table_name = 'reservations'
     `);
@@ -75,6 +75,11 @@ describe('initial PostgreSQL schema', () => {
         'request_fingerprint',
       ]),
     );
+    expect(
+      reservationColumns.rows.find(
+        (column) => column.column_name === 'total_price',
+      ),
+    ).toMatchObject({ numeric_precision: 18, numeric_scale: 2 });
   });
 
   it('enforces normalized users and allowed roles', async () => {

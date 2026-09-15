@@ -1,6 +1,6 @@
 # Architecture Overview
 
-Status: Foundation, database infrastructure, T4 authentication, and T5 catalog APIs implemented; reservation and weather modules remain planned
+Status: Foundation, database infrastructure, authentication, catalog, and reservation APIs implemented; connected frontend and weather modules remain planned
 
 ## System shape
 
@@ -78,6 +78,8 @@ Backend modules are grouped by product capability: authentication, hotels, rooms
 The authentication module separates HTTP routing, validation, password hashing, token operations, cookie serialization, request-safety checks, rate limits, and parameterized database access. Express composes these parts once at startup. Future modules receive reusable authentication and administrator-authorization middleware without reading cookie or JWT details themselves.
 
 The catalog module separates route handling, strict request validation, domain rules, response mapping, and parameterized PostgreSQL queries. Public queries expose only active hotels and room types. Administrator deletion changes active state instead of removing rows, preserving references needed by future reservation history. Search and availability calculate prices and remaining inventory on the server from database values.
+
+The reservation module owns booking validation, idempotency fingerprints, transaction boundaries, ownership rules, price snapshots, status transitions, and reservation response mapping. Booking, cancellation, room inventory edits, and room deactivation all serialize through the same room-type row lock before changing availability-related state.
 
 ## Frontend state
 
