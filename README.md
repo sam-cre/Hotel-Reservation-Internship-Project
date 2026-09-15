@@ -4,9 +4,9 @@ A hotel reservation application for the internship assignment, using React, Expr
 
 ## Current state
 
-The application foundation, PostgreSQL infrastructure, backend authentication boundary, and hotel and room catalog APIs are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, customer registration and login, secure cookie sessions, current-role authorization, request protections, public catalog search, informative availability, administrator catalog management, and automated verification.
+The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, and reservation APIs are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, customer registration and login, secure cookie sessions, current-role authorization, request protections, public catalog search, administrator catalog management, transaction-safe booking, idempotent retries, price snapshots, ownership, cancellation, and automated verification.
 
-The Harbor Quiet design foundation is validated and owner-approved, with local guest, administrator, and component previews. Reservation, connected customer-interface, connected administrator-interface, weather, and deployment work remains planned. This repository is not ready to accept real bookings.
+The Harbor Quiet design foundation is validated and owner-approved, with local guest, administrator, and component previews. Connected customer-interface, connected administrator-interface, weather, and deployment work remains planned. This repository is not ready to accept production bookings.
 
 ## Design previews
 
@@ -57,7 +57,7 @@ Database variables are documented in [database operations](docs/operations/datab
 npm run verify:foundation
 ```
 
-This checks formatting, linting, backend and frontend component tests, the frontend production build, Git exclusions, and live frontend-to-API proxy behavior on temporary local ports. `npm run verify` runs the complete current T5 gate, including catalog tests and the dependency advisory check.
+This checks formatting, linting, backend and frontend component tests, the frontend production build, Git exclusions, and live frontend-to-API proxy behavior on temporary local ports. `npm run verify` runs the complete current T6 gate, including reservation tests and the dependency advisory check.
 
 The complete design check also runs Chromium browser tests:
 
@@ -106,6 +106,15 @@ T5 provides public hotel browsing, exact city search, hotel details, room types,
 ```powershell
 npm --workspace backend test -- catalog
 npm run verify:catalog
+```
+
+## Reservation APIs
+
+T6 provides authenticated booking, server-authoritative price snapshots, deterministic idempotent retries, customer-owned reservation history, administrator reservation listing, and terminal cancellation. All availability-changing operations use the same room-type row lock. See [reservation operations](docs/operations/reservations.md) and the [reservation model](docs/architecture/data-model-and-reservations.md).
+
+```powershell
+npm --workspace backend test -- reservations
+npm run verify:reservations
 ```
 
 ## Structure

@@ -1,5 +1,7 @@
 function money(value) {
-  return Number(value).toFixed(2);
+  if (typeof value === 'number') return value.toFixed(2);
+  const [whole, fraction = ''] = String(value).split('.');
+  return `${whole}.${fraction.padEnd(2, '0').slice(0, 2)}`;
 }
 
 export function mapHotel(row) {

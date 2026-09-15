@@ -1,6 +1,6 @@
 # Quality and Security Strategy
 
-Status: T4 authentication controls and T5 catalog safeguards implemented; later quality gates remain planned
+Status: Authentication, catalog, and reservation safeguards implemented; later quality gates remain planned
 
 ## Quality gates
 
@@ -103,6 +103,9 @@ The complete local verification command will run:
 - Constraints repeat critical validation
 - Transactions always release clients in `finally`
 - Row locking protects inventory-changing operations
+- Reservation creation, cancellation, inventory edits, and deactivation share the room-type row lock
+- Per-user UUID idempotency keys prevent duplicate reservation creation
+- Booking prices are snapshotted from the locked room record
 - Hotel and room deletion uses deactivation so historical foreign-key references remain intact
 - Migrations are versioned and reviewed
 

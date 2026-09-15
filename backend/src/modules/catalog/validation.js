@@ -44,7 +44,13 @@ function isImageUrl(value) {
 export const identifierSchema = z
   .string()
   .regex(/^[1-9]\d*$/)
-  .refine((value) => BigInt(value) <= maximumBigint)
+  .refine((value) => {
+    try {
+      return BigInt(value) <= maximumBigint;
+    } catch {
+      return false;
+    }
+  })
   .transform((value) => BigInt(value).toString());
 
 export const hotelIdParamsSchema = z

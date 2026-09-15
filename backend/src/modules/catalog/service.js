@@ -74,6 +74,7 @@ export function createCatalogService({ database, now = () => new Date() }) {
       await withTransaction(database, async (client) => {
         const hotel = await repository.findActiveHotelForUpdate(client, id);
         if (!hotel) throw notFound('Hotel');
+        await repository.lockHotelRooms(client, id);
         await repository.deactivateHotel(client, id);
       });
     },

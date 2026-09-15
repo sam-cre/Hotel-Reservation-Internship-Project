@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { HttpError, sendError } from './http/errors.js';
 import { createAuthModule } from './modules/auth/routes.js';
 import { createCatalogRouter } from './modules/catalog/routes.js';
+import { createReservationRouter } from './modules/reservations/routes.js';
 
 export function createApp({
   logError = console.error,
@@ -11,6 +12,7 @@ export function createApp({
   authentication,
   catalogNow,
   configureRoutes,
+  reservationNow,
   trustProxyHops = 0,
 } = {}) {
   const app = express();
@@ -39,6 +41,15 @@ export function createApp({
         authenticate: auth.authenticate,
         authorizeAdmin: auth.authorizeAdmin,
         now: catalogNow,
+      }),
+    );
+    app.use(
+      '/api',
+      createReservationRouter({
+        database,
+        authenticate: auth.authenticate,
+        authorizeAdmin: auth.authorizeAdmin,
+        now: reservationNow,
       }),
     );
   }

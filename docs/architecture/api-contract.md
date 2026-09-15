@@ -1,6 +1,6 @@
 # API Contract
 
-Status: Authentication and catalog routes implemented; reservation and weather routes planned
+Status: Authentication, catalog, and reservation routes implemented; weather route planned
 
 All routes are rooted at `/api`. JSON request bodies use `Content-Type: application/json`. Protected routes require the secure authentication cookie.
 
@@ -106,23 +106,27 @@ Only confirmed reservations consume inventory. Date overlap uses half-open inter
 
 ### POST `/reservations`
 
-Authenticated customer or administrator. Accepts `roomId`, `checkIn`, `checkOut`, and `guests`. Requires an `Idempotency-Key` UUID header. It does not accept price, total, user ID, role, or status. Returns HTTP 201 with the server-created confirmed reservation. Repeating the same request and key returns the original result; reusing the key for different input returns HTTP 409.
+Authenticated customer or administrator. Accepts exactly `roomId`, `checkIn`, `checkOut`, and `guests`. Requires an `Idempotency-Key` UUID header. It does not accept price, total, user ID, role, or status. Returns HTTP 201 with `{ "reservation": Reservation }` after creating a confirmed reservation. Repeating identical normalized input with the same user and key returns the original reservation with HTTP 200. Reusing the key for different input returns HTTP 409.
+
+The transaction locks the user row for deterministic idempotency, then the room-type row for inventory. It rejects inactive resources, excess guests, and exhausted inventory. PostgreSQL snapshots the locked nightly price and multiplies it by the date difference.
 
 ### GET `/reservations/my`
 
-Authenticated. Returns only reservations owned by the current user, newest first.
+Authenticated. Returns `{ "reservations": Reservation[] }` containing only reservations owned by the current user, newest first.
 
 ### GET `/reservations/:id`
 
-Authenticated. Returns the reservation only to its owner or an administrator.
+Authenticated. Returns `{ "reservation": Reservation }` only to its owner or an administrator. A different customer receives the same HTTP 404 response as an unknown identifier.
 
 ### GET `/admin/reservations`
 
-Administrator only. Returns reservations with customer, hotel, and room-type summaries. Supports status filtering without adding general-purpose analytics.
+Administrator only. Returns `{ "reservations": Reservation[] }` with customer, hotel, and room-type summaries. The optional `status` query accepts only `confirmed` or `cancelled`.
 
 ### PUT `/admin/reservations/:id/status`
 
-Administrator only. Accepts one allowed target status and enforces the transition rules.
+Administrator only. Accepts exactly `{ "status": "cancelled" }`. A confirmed reservation becomes cancelled and releases inventory. Cancelled is terminal, so repeated cancellation or restoration returns HTTP 409.
+
+`Reservation` contains decimal-string `id`, `userId`, and `roomId`; date-only `checkIn` and `checkOut`; integer `guests`; two-decimal-string `pricePerNight` and `totalPrice`; `status`; ISO 8601 `createdAt`; and room and hotel summaries. Administrator list items also include the customer's safe identifier, name, and email.
 
 ## Weather
 

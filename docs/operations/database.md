@@ -1,6 +1,6 @@
 # Database Operations
 
-Status: T3 implemented and locally validated
+Status: T3 database foundation and T6 reservation-total migration implemented
 
 PostgreSQL stores users, hotels, room types, and reservations. Application code uses the `pg` driver. Versioned SQL files remain the authoritative schema history.
 
@@ -34,6 +34,8 @@ Copy `.env.example` to the ignored `.env` file and adjust connection URLs for th
 ```powershell
 npm run db:migrate --workspace backend
 ```
+
+Migration `002_expand_reservation_total.sql` widens reservation totals to `numeric(18,2)`. This preserves exact decimal arithmetic for longer stays without changing the room nightly-price type.
 
 The migration runner:
 

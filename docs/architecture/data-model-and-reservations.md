@@ -1,6 +1,6 @@
 # Data Model and Reservation Rules
 
-Status: T3 schema implemented; reservation services remain planned
+Status: T3 schema and T6 reservation services implemented
 
 ## Tables
 
@@ -48,7 +48,7 @@ One row represents a room type, not a physical numbered room.
 - `check_out`: PostgreSQL `date`
 - `guests`: positive integer
 - `price_per_night_snapshot`: positive `numeric(10,2)` captured at booking time
-- `total_price`: non-negative `numeric(10,2)` booking-time snapshot
+- `total_price`: positive `numeric(18,2)` booking-time snapshot
 - `status`: `confirmed` or `cancelled`
 - `idempotency_key`: required UUID, unique per user
 - `request_fingerprint`: required SHA-256 hexadecimal digest used to detect conflicting reuse of an idempotency key
@@ -98,6 +98,8 @@ Reservation creation runs inside one PostgreSQL transaction:
 
 The user-row lock makes duplicate submissions deterministic. The room-type lock serializes booking attempts for the same inventory. A concurrent request waits, then observes the reservation committed by the first request.
 
+An identical retry with the same user and idempotency key returns the original reservation. Reusing that key with different room, date, or guest input returns a conflict. The fingerprint contains only normalized reservation input and does not contain credentials or personal information.
+
 ## Status transitions
 
 Allowed transition:
@@ -127,6 +129,8 @@ Using one lock target gives these operations a shared queue. Without it, a booki
 - Public search and availability queries exclude inactive hotels and room types.
 - Historical reservations continue to resolve their original hotel and room-type data.
 - Deactivation and inventory edits use the universal inventory-lock protocol.
+
+Hotel deactivation locks its room rows in identifier order before changing active state. Stable lock order reduces deadlock risk when a hotel operation touches several room types.
 
 ## Money
 

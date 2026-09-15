@@ -337,7 +337,7 @@
       "verifications": [
         {
           "method": "test",
-          "command": "npm --workspace backend test -- reservations concurrency pricing ownership",
+          "command": "npm run verify:reservations",
           "pass": {
             "min_tests_passed": 1,
             "stdout_regex": "(Tests|tests).*(passed|PASS)"
