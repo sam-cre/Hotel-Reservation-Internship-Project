@@ -1,12 +1,12 @@
 # Engineering Handoff
 
-Status: T3 merged; T4 locally validated and awaiting Git checkpoint
+Status: T4 merged; T5 locally validated and awaiting Git checkpoint
 
 Last verified: September 15, 2026
 
 ## Product
 
-Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified foundation, approved design previews, PostgreSQL infrastructure, and backend authentication. It does not yet contain live hotel APIs or real reservation behavior.
+Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified foundation, approved design previews, PostgreSQL infrastructure, backend authentication, and implemented hotel and room catalog APIs. It does not yet contain reservation creation or a connected production customer interface.
 
 ## Current task state
 
@@ -15,8 +15,9 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 | T1             | Committed and pushed | Commit `97e3229` on private `main`     |
 | T2             | Merged               | Pull request 1, merge commit `c2d0061` |
 | T3             | Merged               | Pull request 2, merge commit `b5d12e1` |
-| T4             | Locally validated    | 68 tests and the complete T4 gate pass |
-| T5 through T12 | Planned              | See the implementation plan            |
+| T4             | Merged               | Pull request 3, merge commit `b13fb8b` |
+| T5             | Locally validated    | 91 tests and the complete T5 gate pass |
+| T6 through T12 | Planned              | See the implementation plan            |
 
 ## Start here
 
@@ -27,6 +28,7 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 5. Read the [implementation plan](plans/implementation-plan.md).
 6. Read [database operations](operations/database.md) before running database commands.
 7. Read [authentication operations](operations/authentication.md) before running the backend.
+8. Read [catalog operations](operations/catalog.md) before changing hotel or room data.
 
 ## Development commands
 
@@ -42,7 +44,7 @@ The Vite frontend uses `http://localhost:5173`. The Express API uses `http://loc
 Run the complete current verification:
 
 ```powershell
-npm run verify:design
+npm run verify:catalog
 ```
 
 ## Architecture boundaries
@@ -71,6 +73,6 @@ npm run verify:design
 
 ## Current and next implementation tasks
 
-T4 implements the backend authentication boundary and is locally validated on `feature/authentication`. The suite verifies customer-only registration, generic login failures, secure cookies, short-lived token checks, exact-origin and CSRF defenses, bounded attempts, and current database role authorization. T5 hotel, room, search, and availability APIs are next after the owner commits, pushes, and merges T4.
+T5 implements public hotel discovery, hotel details, room-type listing, stay availability, server-computed starting prices, and administrator hotel and room management. Public reads omit deactivated records. Administrator deletion is historical-safe deactivation. T6 will add the transaction-safe reservation engine, which must recheck availability while holding the same room-type lock used by inventory changes.
 
 The detailed acceptance criteria and verification command live in the [implementation plan](plans/implementation-plan.md) and `plan.json`.

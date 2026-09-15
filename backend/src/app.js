@@ -3,10 +3,13 @@ import express from 'express';
 import helmet from 'helmet';
 import { HttpError, sendError } from './http/errors.js';
 import { createAuthModule } from './modules/auth/routes.js';
+import { createCatalogRouter } from './modules/catalog/routes.js';
 
 export function createApp({
   logError = console.error,
+  database,
   authentication,
+  catalogNow,
   configureRoutes,
   trustProxyHops = 0,
 } = {}) {
@@ -27,6 +30,17 @@ export function createApp({
     app.locals.authenticate = auth.authenticate;
     app.use('/api', auth.protectMutation);
     app.use('/api/auth', auth.router);
+  }
+  if (database && auth) {
+    app.use(
+      '/api',
+      createCatalogRouter({
+        database,
+        authenticate: auth.authenticate,
+        authorizeAdmin: auth.authorizeAdmin,
+        now: catalogNow,
+      }),
+    );
   }
   configureRoutes?.(app, auth);
   app.use((req, res) => {

@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 committed, T2 and T3 merged, T4 locally validated, T5 through T12 planned
+Status: Approved; T1 through T4 merged, T5 locally validated, T6 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -62,7 +62,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T4. Authentication and authorization
 
-- Status: Locally validated on `feature/authentication`
+- Status: Merged through pull request 3 as commit `b13fb8b`
 - Evidence: Twenty-two focused authentication and authorization tests cover customer-only registration, password hashing, safe response fields, secure production cookies, current-user restoration, expired and incorrectly scoped sessions, generic login failures, exact-origin and CSRF checks, JSON-only mutations, Fetch Metadata rejection, bounded attempts, safe database failures, customer denial, forged role claims, current database role changes, and orphaned tokens. The complete T4 gate passes with 58 backend tests, 10 frontend tests, formatting, linting, production build, environment checks, API proxy checks, and zero npm advisories. One normal PostgreSQL test remains conditional on `TEST_DATABASE_URL`.
 - Satisfies: R2, R6, R10, R14
 - Depends on: T3
@@ -72,10 +72,12 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T5. Hotel, room, search, and availability APIs
 
+- Status: Locally validated on `feature/hotel-room-apis`
+- Evidence: Twenty-three focused catalog tests cover public reads, exact city search, complete-stay filtering, server-derived prices, room availability, guest capacity, sold-out inventory, back-to-back stays, cancelled reservations, soft deletion, administrator authorization, strict inputs, duplicates, missing resources, and reservation-safe inventory edits. The complete T5 gate passes with 81 backend tests, 10 frontend tests, formatting, linting, production build, environment checks, API proxy checks, and zero npm advisories. One normal PostgreSQL test remains conditional on `TEST_DATABASE_URL`.
 - Satisfies: R3, R6, R7, R10
 - Depends on: T3, T4
 - Deliver: required CRUD routes with historical-safe deactivation, hotel search, details, room types, capacity filtering, inventory results, and starting price
-- Verify: `npm --workspace backend test -- hotels rooms availability`
+- Verify: `npm run verify:catalog`
 - Estimate: 300 minutes
 
 ### T6. Transaction-safe reservation engine

@@ -13,6 +13,7 @@ const authentication = {
   config: authenticationConfig,
 };
 const server = createApp({
+  database,
   authentication,
   trustProxyHops: config.TRUST_PROXY_HOPS,
 }).listen(config.PORT, config.HOST, () => {

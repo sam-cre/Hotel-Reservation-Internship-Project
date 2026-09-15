@@ -24,6 +24,17 @@ export async function withDatabaseClient(pool, work) {
 }
 
 export async function withTransaction(pool, work) {
+  if (typeof pool.connect !== 'function') {
+    await pool.query('BEGIN');
+    try {
+      const result = await work(pool);
+      await pool.query('COMMIT');
+      return result;
+    } catch (error) {
+      await pool.query('ROLLBACK');
+      throw error;
+    }
+  }
   return withDatabaseClient(pool, async (client) => {
     await client.query('BEGIN');
     try {
