@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { ZodError } from 'zod';
-import { asyncHandler, HttpError } from '../../http/errors.js';
+import { asyncHandler } from '../../http/errors.js';
+import { parseRequest } from '../../http/validation.js';
 import { createExpiredSessionCookie, createSessionCookie } from './cookies.js';
 import { createAuthenticationMiddleware, requireRole } from './middleware.js';
 import { createAuthRateLimits } from './rate-limits.js';
@@ -9,26 +9,6 @@ import { requireSafeBrowserMutation } from './request-safety.js';
 import { createAuthService } from './service.js';
 import { createTokenService } from './tokens.js';
 import { loginSchema, registrationSchema } from './validation.js';
-
-function parse(schema, value) {
-  try {
-    return schema.parse(value);
-  } catch (error) {
-    if (!(error instanceof ZodError)) throw error;
-    const fields = [
-      ...new Set(
-        error.issues
-          .flatMap((issue) =>
-            issue.code === 'unrecognized_keys' ? issue.keys : issue.path[0],
-          )
-          .filter((field) => typeof field === 'string'),
-      ),
-    ];
-    throw new HttpError(400, 'VALIDATION_ERROR', 'Request is invalid.', {
-      fields,
-    });
-  }
-}
 
 export function createAuthModule({ database, config }) {
   const repository = createAuthRepository(database);
@@ -47,7 +27,7 @@ export function createAuthModule({ database, config }) {
     limits.registration,
     asyncHandler(async (req, res) => {
       const result = await service.register(
-        parse(registrationSchema, req.body),
+        parseRequest(registrationSchema, req.body),
       );
       res.set('Set-Cookie', createSessionCookie(result.token, config));
       res.status(201).json({ user: result.user });
@@ -58,7 +38,7 @@ export function createAuthModule({ database, config }) {
     limits.loginByIp,
     limits.loginByIdentity,
     asyncHandler(async (req, res) => {
-      const result = await service.login(parse(loginSchema, req.body));
+      const result = await service.login(parseRequest(loginSchema, req.body));
       res.set('Set-Cookie', createSessionCookie(result.token, config));
       res.json({ user: result.user });
     }),

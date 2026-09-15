@@ -307,7 +307,7 @@
       "verifications": [
         {
           "method": "test",
-          "command": "npm --workspace backend test -- hotels rooms availability",
+          "command": "npm run verify:catalog",
           "pass": {
             "min_tests_passed": 1,
             "stdout_regex": "(Tests|tests).*(passed|PASS)"

@@ -23,8 +23,9 @@
     "verify:design": "npm run verify:foundation && npm run test:design-browser",
     "verify:database": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js",
     "verify:authentication": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high",
+    "verify:catalog": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high",
     "verify:foundation": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js",
-    "verify": "npm run verify:authentication"
+    "verify": "npm run verify:catalog"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

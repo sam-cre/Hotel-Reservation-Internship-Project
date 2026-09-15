@@ -1,6 +1,6 @@
 # Quality and Security Strategy
 
-Status: T4 authentication controls implemented; later quality gates remain planned
+Status: T4 authentication controls and T5 catalog safeguards implemented; later quality gates remain planned
 
 ## Quality gates
 
@@ -97,11 +97,13 @@ The complete local verification command will run:
 ### Database
 
 - Parameterized SQL only
+- Strict request schemas reject unknown catalog fields and malformed identifiers
 - Least-privilege application database credentials
 - TLS connection to Neon
 - Constraints repeat critical validation
 - Transactions always release clients in `finally`
 - Row locking protects inventory-changing operations
+- Hotel and room deletion uses deactivation so historical foreign-key references remain intact
 - Migrations are versioned and reviewed
 
 ### Secrets and logging

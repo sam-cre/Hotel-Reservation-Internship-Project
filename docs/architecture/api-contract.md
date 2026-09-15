@@ -1,6 +1,6 @@
 # API Contract
 
-Status: Authentication routes implemented; hotel, room, reservation, and weather routes planned
+Status: Authentication and catalog routes implemented; reservation and weather routes planned
 
 All routes are rooted at `/api`. JSON request bodies use `Content-Type: application/json`. Protected routes require the secure authentication cookie.
 
@@ -52,49 +52,55 @@ Public. Supported query parameters:
 
 When complete stay criteria are present, results contain only hotels with at least one room type that fits the guest count and has remaining inventory. `startingPrice` is the lowest available room-type price for that request.
 
-Without dates, the route supports browsing and reports the lowest room-type price without claiming date availability.
+Without dates, the route supports browsing and reports the lowest active room-type price without claiming date availability. City matching is case-insensitive, whitespace-trimmed, and exact. Results are ordered by city and hotel name.
+
+Returns `{ "hotels": HotelSummary[] }`. A hotel summary contains decimal-string `id`, `name`, `description`, `city`, `address`, one-decimal-string `rating`, `imageUrl`, `isActive`, ISO 8601 `createdAt`, and two-decimal-string `startingPrice`.
 
 ### GET `/hotels/:id`
 
-Public. Returns hotel details. It does not claim availability without complete stay criteria.
+Public. Returns `{ "hotel": Hotel }` for an active hotel. It does not claim availability without complete stay criteria. Missing and inactive hotels return HTTP 404.
 
 ### POST `/hotels`
 
-Administrator only. Creates a hotel from validated fields.
+Administrator only. Accepts exactly `name`, `description`, `city`, `address`, `rating`, and `imageUrl`. Creates a hotel and returns HTTP 201 with `{ "hotel": Hotel }`. A duplicate hotel name within the same city returns HTTP 409.
 
 ### PUT `/hotels/:id`
 
-Administrator only. Replaces editable hotel values using a complete validated body.
+Administrator only. Replaces editable hotel values using the complete POST body and returns `{ "hotel": Hotel }`.
 
 ### DELETE `/hotels/:id`
 
-Administrator only. Deactivates the hotel and its room types without destroying historical reservation references.
+Administrator only. Deactivates the hotel and its room types in one transaction without destroying historical reservation references. Returns HTTP 204.
 
 ## Rooms
 
 ### GET `/hotels/:hotelId/rooms`
 
-Public. Returns room types for one hotel. Optional complete stay criteria add `remainingRooms` and `available` to each room type.
+Public. Returns `{ "rooms": Room[] }` for one active hotel. Optional complete stay criteria add `remainingRooms`, `available`, and `estimatedTotal` to each active room type. The list includes rooms that do not satisfy the guest count, marked unavailable, so the hotel detail interface can explain all room choices. Results are ordered by nightly price and room name.
+
+A room contains decimal-string `id` and `hotelId`, `name`, `description`, two-decimal-string `pricePerNight`, integer `capacity`, integer `totalRooms`, `isActive`, and ISO 8601 `createdAt`.
 
 ### POST `/hotels/:hotelId/rooms`
 
-Administrator only. Creates a room type.
+Administrator only. Accepts exactly `name`, `description`, numeric `pricePerNight`, integer `capacity`, and integer `totalRooms`. Creates a room type and returns HTTP 201 with `{ "room": Room }`.
 
 ### PUT `/rooms/:id`
 
-Administrator only. Replaces editable room-type values. Inventory reduction is rejected if it contradicts active reservations.
+Administrator only. Replaces editable room-type values using the same complete field set as creation. Inventory or capacity reduction is rejected with HTTP 409 if it contradicts future confirmed reservations.
 
 ### DELETE `/rooms/:id`
 
-Administrator only. Deactivates the room type without destroying historical reservation references.
+Administrator only. Deactivates the room type without destroying historical reservation references. Returns HTTP 204.
 
 ## Availability
 
 ### GET `/rooms/availability`
 
-Public. Requires `hotelId`, `checkIn`, `checkOut`, and `guests`. Returns matching room types with capacity, total inventory, remaining inventory, nightly price, and estimated total.
+Public. Requires `hotelId`, `checkIn`, `checkOut`, and `guests`. Returns `{ "criteria": { "hotelId", "checkIn", "checkOut", "guests" }, "rooms": Room[] }`. The room list includes only active room types with sufficient capacity and positive remaining inventory. Each result contains capacity, total inventory, remaining inventory, nightly price, and estimated total.
 
 Availability responses are informative. Reservation creation always rechecks inside a protected transaction.
+
+Only confirmed reservations consume inventory. Date overlap uses half-open intervals: an existing reservation overlaps when its check-in is before the requested check-out and its check-out is after the requested check-in. A checkout date therefore does not block a new check-in on that same date.
 
 ## Reservations
 
