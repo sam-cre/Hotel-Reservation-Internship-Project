@@ -1,26 +1,27 @@
 # Engineering Handoff
 
-Status: T1 through T7 merged; T8 validated and awaiting the project owner's Git checkpoint
+Status: T1 through T8 merged; T9 validated and awaiting the project owner's Git checkpoint
 
-Last verified: September 15, 2026
+Last verified: September 16, 2026
 
 ## Product
 
-Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified foundation, approved design previews, PostgreSQL infrastructure, backend authentication, catalog APIs, a transaction-safe reservation engine, and connected customer and administrator applications. Weather integration remains planned.
+Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified foundation, approved design previews, PostgreSQL infrastructure, backend authentication, catalog APIs, a transaction-safe reservation engine, connected customer and administrator applications, and an isolated weather integration.
 
 ## Current task state
 
-| Task           | Status               | Evidence                                          |
-| -------------- | -------------------- | ------------------------------------------------- |
-| T1             | Committed and pushed | Commit `97e3229` on private `main`                |
-| T2             | Merged               | Pull request 1, merge commit `c2d0061`            |
-| T3             | Merged               | Pull request 2, merge commit `b5d12e1`            |
-| T4             | Merged               | Pull request 3, merge commit `b13fb8b`            |
-| T5             | Merged               | Pull request 4, merge commit `b3e2522`            |
-| T6             | Merged               | Pull request 5, merge commit `e4b8ba8`            |
-| T7             | Merged               | Pull request 6 plus corrective pull requests 7-8  |
-| T8             | Validated            | Complete local gate passed; owner checkpoint next |
-| T9 through T12 | Planned              | See the implementation plan                       |
+| Task            | Status               | Evidence                                          |
+| --------------- | -------------------- | ------------------------------------------------- |
+| T1              | Committed and pushed | Commit `97e3229` on private `main`                |
+| T2              | Merged               | Pull request 1, merge commit `c2d0061`            |
+| T3              | Merged               | Pull request 2, merge commit `b5d12e1`            |
+| T4              | Merged               | Pull request 3, merge commit `b13fb8b`            |
+| T5              | Merged               | Pull request 4, merge commit `b3e2522`            |
+| T6              | Merged               | Pull request 5, merge commit `e4b8ba8`            |
+| T7              | Merged               | Pull request 6 plus corrective pull requests 7-8  |
+| T8              | Merged               | Pull request 9, merge commit `c5f2698`            |
+| T9              | Validated            | Complete local gate passed; owner checkpoint next |
+| T10 through T12 | Planned              | See the implementation plan                       |
 
 ## Start here
 
@@ -35,6 +36,7 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 9. Read [reservation operations](operations/reservations.md) before changing booking transactions or statuses.
 10. Read [customer application operations](operations/customer-application.md) before changing routes, sessions, or booking presentation.
 11. Read [administrator application operations](operations/administrator-application.md) before changing management routes or forms.
+12. Read [weather operations](operations/weather.md) before changing the provider adapter, cache, or hotel weather panel.
 
 ## Development commands
 
@@ -50,7 +52,7 @@ The Vite frontend uses `http://localhost:5173`. The Express API uses `http://loc
 Run the complete current verification:
 
 ```powershell
-npm run verify:admin
+npm run verify:weather
 ```
 
 ## Architecture boundaries
@@ -79,6 +81,6 @@ npm run verify:admin
 
 ## Current and next implementation tasks
 
-T8 connects the administrator React workspace to the existing role-protected catalog and reservation APIs. It includes protected navigation, hotel and room management, reservation filtering and cancellation, destructive confirmations, server-error preservation, and mobile-safe operational tables. T9 adds the isolated backend weather integration.
+T9 adds the isolated backend Open-Meteo adapter and a non-blocking current-conditions panel to hotel details. T10 performs the full local hardening and security audit.
 
 The detailed acceptance criteria and verification command live in the [implementation plan](plans/implementation-plan.md) and `plan.json`.

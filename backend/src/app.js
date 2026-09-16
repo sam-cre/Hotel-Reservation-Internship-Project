@@ -5,6 +5,7 @@ import { HttpError, sendError } from './http/errors.js';
 import { createAuthModule } from './modules/auth/routes.js';
 import { createCatalogRouter } from './modules/catalog/routes.js';
 import { createReservationRouter } from './modules/reservations/routes.js';
+import { createWeatherRouter } from './modules/weather/routes.js';
 
 export function createApp({
   logError = console.error,
@@ -13,6 +14,7 @@ export function createApp({
   catalogNow,
   configureRoutes,
   reservationNow,
+  weather,
   trustProxyHops = 0,
 } = {}) {
   const app = express();
@@ -53,6 +55,7 @@ export function createApp({
       }),
     );
   }
+  if (weather) app.use('/api', createWeatherRouter(weather));
   configureRoutes?.(app, auth);
   app.use((req, res) => {
     res.status(404).json({

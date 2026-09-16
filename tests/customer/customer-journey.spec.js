@@ -24,6 +24,16 @@ const room = {
   available: true,
 };
 
+const weather = {
+  location: 'Charleston, South Carolina, United States',
+  observedAt: '2026-09-16T11:15',
+  temperature: 78.4,
+  apparentTemperature: 80.1,
+  weatherCode: 2,
+  windSpeed: 8.7,
+  units: { temperature: '°F', windSpeed: 'mp/h' },
+};
+
 function dates() {
   const checkIn = new Date();
   checkIn.setDate(checkIn.getDate() + 21);
@@ -72,6 +82,7 @@ async function mockApi(page) {
       return json({ user }, path.endsWith('register') ? 201 : 200);
     }
     if (path === '/api/auth/logout') return route.fulfill({ status: 204 });
+    if (path === '/api/weather') return json({ weather });
     if (path === '/api/hotels/11/rooms') return json({ rooms: [room] });
     if (path === '/api/hotels/11') return json({ hotel });
     if (path === '/api/hotels') return json({ hotels: [hotel] });
@@ -119,6 +130,9 @@ test('customer-journey books a server-priced room and retrieves confirmation', a
   await expect(
     page.getByRole('heading', { name: 'Harbor View King' }),
   ).toBeVisible();
+  await expect(
+    page.getByRole('region', { name: 'Weather in Charleston' }),
+  ).toContainText('78°F');
   await expect(page.getByText(/\$1,395/)).toBeVisible();
   await page.getByRole('link', { name: 'Review this room' }).click();
 

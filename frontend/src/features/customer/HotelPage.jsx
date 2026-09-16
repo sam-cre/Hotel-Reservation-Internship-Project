@@ -4,6 +4,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button.jsx';
 import { apiMessage, catalogApi } from '../../services/api.js';
 import { StayLine } from './StayLine.jsx';
+import { WeatherSummary } from './WeatherSummary.jsx';
 import {
   money,
   stayFromParams,
@@ -94,6 +95,7 @@ export function HotelPage() {
               <p className={styles.kicker}>{hotel.city}</p>
               <h1>{hotel.name}</h1>
               <p className={styles.hotelLead}>{hotel.description}</p>
+              <WeatherSummary city={hotel.city} />
               <p className={styles.location}>
                 <MapPin size={17} aria-hidden="true" />
                 {hotel.address}

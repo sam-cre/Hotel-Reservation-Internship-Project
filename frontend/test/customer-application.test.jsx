@@ -3,7 +3,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from '../src/App.jsx';
-import { authApi, catalogApi, reservationApi } from '../src/services/api.js';
+import {
+  authApi,
+  catalogApi,
+  reservationApi,
+  weatherApi,
+} from '../src/services/api.js';
 
 vi.mock('../src/services/api.js', () => ({
   apiMessage(error, fallback) {
@@ -19,6 +24,9 @@ vi.mock('../src/services/api.js', () => ({
     hotels: vi.fn(),
     hotel: vi.fn(),
     rooms: vi.fn(),
+  },
+  weatherApi: {
+    current: vi.fn(),
   },
   reservationApi: {
     create: vi.fn(),
@@ -99,6 +107,15 @@ beforeEach(() => {
   catalogApi.hotels.mockResolvedValue([hotel]);
   catalogApi.hotel.mockResolvedValue(hotel);
   catalogApi.rooms.mockResolvedValue([room]);
+  weatherApi.current.mockResolvedValue({
+    location: 'Charleston, South Carolina, United States',
+    observedAt: '2026-09-16T11:15',
+    temperature: 78.4,
+    apparentTemperature: 80.1,
+    weatherCode: 2,
+    windSpeed: 8.7,
+    units: { temperature: '°F', windSpeed: 'mp/h' },
+  });
   reservationApi.create.mockResolvedValue(reservation);
   reservationApi.one.mockResolvedValue(reservation);
   reservationApi.mine.mockResolvedValue([reservation]);
@@ -139,9 +156,29 @@ describe('customer application', () => {
       await screen.findByRole('heading', { name: 'Harbor View King' }),
     ).toBeInTheDocument();
     expect(screen.getByText(/\$1,395/)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('region', { name: 'Weather in Charleston' }),
+    ).toHaveTextContent('78°F');
     await user.click(screen.getByRole('link', { name: 'Review this room' }));
     expect(
       await screen.findByRole('heading', { name: 'Welcome back.' }),
+    ).toBeInTheDocument();
+  });
+
+  it('keeps hotel and room details usable when weather is unavailable', async () => {
+    weatherApi.current.mockRejectedValue(new Error('provider unavailable'));
+    renderApp(
+      '/hotels/11?city=Charleston&checkIn=2026-10-10&checkOut=2026-10-13&guests=2',
+    );
+
+    expect(
+      await screen.findByRole('heading', { name: 'Harbor View King' }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText('Current weather is temporarily unavailable.'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Review this room' }),
     ).toBeInTheDocument();
   });
 

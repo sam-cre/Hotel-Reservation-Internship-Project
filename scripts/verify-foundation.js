@@ -111,6 +111,14 @@ try {
   );
   assert.equal(administrator.status, 200);
   assert.match(await administrator.text(), /Administrator access required/);
+  const weatherPanel = await fetch(
+    `${origin}/src/features/customer/WeatherSummary.jsx`,
+  );
+  assert.equal(weatherPanel.status, 200);
+  assert.match(
+    await weatherPanel.text(),
+    /Current weather is temporarily unavailable/,
+  );
   const health = await fetch(`${origin}/api/health`);
   assert.equal(health.status, 200);
   assert.deepEqual(await health.json(), { status: 'ok' });

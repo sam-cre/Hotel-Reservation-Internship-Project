@@ -28,8 +28,9 @@
     "verify:reservations": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high",
     "verify:customer": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high && npm run test:e2e -- customer-journey",
     "verify:admin": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high && npm run test:e2e",
+    "verify:weather": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high && npm run test:e2e",
     "verify:foundation": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js",
-    "verify": "npm run verify:admin"
+    "verify": "npm run verify:weather"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",
