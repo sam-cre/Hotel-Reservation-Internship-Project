@@ -79,6 +79,8 @@ console.info('environment and Git exclusions verified');
 const api = createApp().listen(0, '127.0.0.1');
 await once(api, 'listening');
 let frontend;
+let forceVerificationExit = false;
+let cleanupError;
 try {
   const target = `http://127.0.0.1:${api.address().port}`;
   frontend = await createServer({
@@ -114,12 +116,32 @@ try {
 } finally {
   frontend?.httpServer?.closeAllConnections?.();
   api.closeAllConnections?.();
-  await withDeadline('Vite server cleanup', frontend?.close());
-  await withDeadline(
-    'API server cleanup',
-    new Promise((resolve, reject) =>
-      api.close((error) => (error ? reject(error) : resolve())),
-    ),
-  );
+  try {
+    await withDeadline('Vite server cleanup', frontend?.close());
+  } catch (error) {
+    if (
+      String(error.message).startsWith('Vite server cleanup did not finish')
+    ) {
+      forceVerificationExit = true;
+      console.warn(
+        'Vite retained an internal watcher after its HTTP connections closed; the verification process will exit explicitly.',
+      );
+    } else {
+      cleanupError = error;
+    }
+  }
+  try {
+    await withDeadline(
+      'API server cleanup',
+      new Promise((resolve, reject) =>
+        api.close((error) => (error ? reject(error) : resolve())),
+      ),
+    );
+  } catch (error) {
+    cleanupError ??= error;
+  }
   console.info('verification servers closed');
 }
+
+if (cleanupError) throw cleanupError;
+if (forceVerificationExit) process.exit(0);
