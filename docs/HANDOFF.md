@@ -1,6 +1,6 @@
 # Engineering Handoff
 
-Status: T1 through T8 merged; T9 validated and awaiting the project owner's Git checkpoint
+Status: T1 through T9 merged; T10 local hardening implemented and locally validated, awaiting the project owner's Git checkpoint
 
 Last verified: September 16, 2026
 
@@ -10,18 +10,19 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 
 ## Current task state
 
-| Task            | Status               | Evidence                                          |
-| --------------- | -------------------- | ------------------------------------------------- |
-| T1              | Committed and pushed | Commit `97e3229` on private `main`                |
-| T2              | Merged               | Pull request 1, merge commit `c2d0061`            |
-| T3              | Merged               | Pull request 2, merge commit `b5d12e1`            |
-| T4              | Merged               | Pull request 3, merge commit `b13fb8b`            |
-| T5              | Merged               | Pull request 4, merge commit `b3e2522`            |
-| T6              | Merged               | Pull request 5, merge commit `e4b8ba8`            |
-| T7              | Merged               | Pull request 6 plus corrective pull requests 7-8  |
-| T8              | Merged               | Pull request 9, merge commit `c5f2698`            |
-| T9              | Validated            | Complete local gate passed; owner checkpoint next |
-| T10 through T12 | Planned              | See the implementation plan                       |
+| Task        | Status               | Evidence                                                               |
+| ----------- | -------------------- | ---------------------------------------------------------------------- |
+| T1          | Committed and pushed | Commit `97e3229` on private `main`                                     |
+| T2          | Merged               | Pull request 1, merge commit `c2d0061`                                 |
+| T3          | Merged               | Pull request 2, merge commit `b5d12e1`                                 |
+| T4          | Merged               | Pull request 3, merge commit `b13fb8b`                                 |
+| T5          | Merged               | Pull request 4, merge commit `b3e2522`                                 |
+| T6          | Merged               | Pull request 5, merge commit `e4b8ba8`                                 |
+| T7          | Merged               | Pull request 6 plus corrective pull requests 7-8                       |
+| T8          | Merged               | Pull request 9, merge commit `c5f2698`                                 |
+| T9          | Merged               | Pull request 10, merge commit `48ca2bc`                                |
+| T10         | Validated locally    | Security remediation and full local gate passed; owner checkpoint next |
+| T11 and T12 | Planned              | See the implementation plan                                            |
 
 ## Start here
 
@@ -43,17 +44,19 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 Run from the repository root in PowerShell:
 
 ```powershell
-npm install
+npm ci
 npm run dev
 ```
 
 The Vite frontend uses `http://localhost:5173`. The Express API uses `http://localhost:3001`, and Vite proxies browser `/api` requests to Express.
 
-Run the complete current verification:
+Run the complete current verification (the canonical local gate):
 
 ```powershell
-npm run verify:weather
+npm run verify:local
 ```
+
+`npm run verify` is an alias for `npm run verify:local`. The pull-request workflow runs a pinned Gitleaks secret scan and then this same gate.
 
 ## Architecture boundaries
 
@@ -81,6 +84,8 @@ npm run verify:weather
 
 ## Current and next implementation tasks
 
-T9 adds the isolated backend Open-Meteo adapter and a non-blocking current-conditions panel to hotel details. T10 performs the full local hardening and security audit.
+T10 completes the local hardening and defensive security audit of the owner's own code. It bounds unauthenticated weather work, enforces same-origin post-login redirects, constrains catalog image origins to an allowlist, and adds a pinned secret scanner to the pull-request gate. Registration account enumeration (SEC-300) is recorded as an accepted low risk for the no-email scope. See the [security remediation record](history/2026-09-16-t10-local-hardening-validation.md), the [assignment traceability matrix](project/assignment-traceability.md), and the [explanation readiness guide](project/explanation-readiness.md).
+
+T11 is production deployment (Neon, Render, Vercel). It has not started. This repository is not deployed.
 
 The detailed acceptance criteria and verification command live in the [implementation plan](plans/implementation-plan.md) and `plan.json`.

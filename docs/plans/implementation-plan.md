@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 through T8 merged, T9 validated and awaiting the project owner's Git checkpoint, T10 through T12 planned
+Status: Approved; T1 through T9 merged, T10 local hardening implemented and locally validated and awaiting the project owner's Git checkpoint, T11 and T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -113,7 +113,8 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T9. Weather integration
 
-- Status: Validated locally on `feature/weather-integration`; pull-request gate required before merge
+- Status: Merged through pull request 10 as merge commit `48ca2bc`
+- Evidence: Backend and frontend weather tests plus the full gate passed. GitHub Verification run `35121220742` passed in 2 minutes 40 seconds. CodeRabbit completed.
 - Satisfies: R8, R9, R10
 - Depends on: T5, T7
 - Deliver: backend Open-Meteo integration, mapping, timeout, cache, and graceful UI fallback
@@ -122,6 +123,8 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T10. Local hardening and security audit
 
+- Status: Implemented and validated locally on `feature/local-hardening`; owner Git checkpoint next
+- Evidence: Four confirmed defensive findings remediated with regression tests (SEC-100 bounded weather work, SEC-200 same-origin redirect, SEC-201 catalog image allowlist, SEC-400 pinned secret scanner). SEC-300 recorded as accepted risk with behavior unchanged. `npm run verify:local` passed end to end: formatting, lint, backend 119 tests passing with 5 real-PostgreSQL tests skipped locally, frontend 37 tests, production build, foundation and secret-scan checks, zero dependency advisories, and six Playwright journeys. All five local security proofs report the expected verdict. See [the T10 validation record](../history/2026-09-16-t10-local-hardening-validation.md).
 - Satisfies: R1, R2, R4, R6, R9, R10, R12
 - Depends on: T7, T8, T9
 - Deliver: requirement audit, launch-readiness audit, lint, tests, builds, PostgreSQL-backed CI, accessibility, responsive review, metadata and link validation, asset budgets, secret review, dependency review, and security audit

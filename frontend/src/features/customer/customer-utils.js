@@ -66,6 +66,33 @@ export const shortDate = (value) =>
     timeZone: 'UTC',
   }).format(new Date(`${value}T00:00:00Z`));
 
-export function safeReturnTo(value) {
-  return value?.startsWith('/') && !value.startsWith('//') ? value : '/';
+function currentOrigin() {
+  return typeof window === 'undefined' ? undefined : window.location.origin;
+}
+
+function hasUnsafeCharacters(value) {
+  for (const character of value) {
+    const codePoint = character.codePointAt(0);
+    if (character === '\\' || codePoint < 32 || codePoint === 127) return true;
+  }
+  return false;
+}
+
+// A stored return destination must resolve to a path on this same application.
+// Anything that could canonicalize to another origin (protocol-relative paths,
+// backslash tricks, control characters, absolute URLs) falls back to the home
+// route so a crafted login link cannot forward an authenticated guest offsite.
+export function safeReturnTo(value, origin = currentOrigin()) {
+  if (typeof value !== 'string' || value === '') return '/';
+  if (hasUnsafeCharacters(value)) return '/';
+  if (!value.startsWith('/') || value.startsWith('//')) return '/';
+  if (!origin) return value;
+  try {
+    const url = new URL(value, origin);
+    if (url.origin !== origin) return '/';
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '/';
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return '/';
+  }
 }

@@ -76,6 +76,54 @@ assert.equal(readEnvironment({}).PORT, 3001);
 assert.equal(readEnvironment({}).TRUST_PROXY_HOPS, 0);
 console.info('environment and Git exclusions verified');
 
+const tracked = execFileSync('git', ['ls-files'], {
+  cwd: root,
+  encoding: 'utf8',
+}).split(/\r?\n/);
+const sensitivePattern =
+  /(^|\/)\.env(\.[^/]+)?$|\.(pem|key|pfx|p12|crt|cer|keystore|jks)$|(^|\/)id_(rsa|dsa|ecdsa|ed25519)$/i;
+const sensitiveTracked = tracked.filter(
+  (path) => path && path !== '.env.example' && sensitivePattern.test(path),
+);
+assert.equal(
+  sensitiveTracked.length,
+  0,
+  `Sensitive files must not be tracked: ${sensitiveTracked.join(', ')}`,
+);
+
+const workflow = await readFile(
+  new URL('../.github/workflows/verification.yml', import.meta.url),
+  'utf8',
+);
+assert.match(
+  workflow,
+  /gitleaks\/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e/,
+  'The verification workflow must pin the verified Gitleaks action commit',
+);
+const gitleaksConfig = await readFile(
+  new URL('../.gitleaks.toml', import.meta.url),
+  'utf8',
+);
+assert.match(
+  gitleaksConfig,
+  /useDefault = true/,
+  'Gitleaks must extend the maintained default ruleset',
+);
+const canaryRule = gitleaksConfig.match(
+  /id = "stillwater-canary"[\s\S]*?regex = '''(.+?)'''/,
+);
+assert(canaryRule, 'The Gitleaks configuration must define the canary rule');
+const canaryRegex = new RegExp(canaryRule[1]);
+assert(
+  canaryRegex.test('SENTINEL_LEAKED_TOKEN_0123456789ABCDEF'),
+  'The canary rule must match its sentinel token, proving the ruleset is active',
+);
+assert(
+  !canaryRegex.test('an ordinary configuration value'),
+  'The canary rule must not match benign text',
+);
+console.info('secret-scan configuration and canary verified');
+
 const api = createApp().listen(0, '127.0.0.1');
 await once(api, 'listening');
 let frontend;

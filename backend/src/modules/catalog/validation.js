@@ -27,18 +27,23 @@ function isCalendarDate(value) {
   );
 }
 
-function isImageUrl(value) {
-  if (value.startsWith('/') && !value.startsWith('//')) return true;
-  try {
-    const url = new URL(value);
-    return (
-      ['http:', 'https:'].includes(url.protocol) &&
-      !url.username &&
-      !url.password
-    );
-  } catch {
-    return false;
-  }
+export function createImageUrlValidator(allowedHosts = new Set()) {
+  return (value) => {
+    // Same-origin managed asset paths are always allowed.
+    if (value.startsWith('/') && !value.startsWith('//')) return true;
+    let url;
+    try {
+      url = new URL(value);
+    } catch {
+      return false;
+    }
+    // Remote images must be HTTPS, carry no embedded credentials, and target a
+    // host that has been explicitly approved. The allowlist is empty by
+    // default, so arbitrary remote origins fail closed.
+    if (url.protocol !== 'https:') return false;
+    if (url.username || url.password) return false;
+    return allowedHosts.has(url.host);
+  };
 }
 
 export const identifierSchema = z
@@ -105,21 +110,24 @@ export const availabilitySchema = z
   })
   .strict();
 
-export const hotelMutationSchema = z
-  .object({
-    name: text(160),
-    description: text(5000),
-    city: text(120),
-    address: text(300),
-    rating: z
-      .number()
-      .finite()
-      .min(0)
-      .max(5)
-      .refine((value) => hasPrecision(value, 1)),
-    imageUrl: text(2048).refine(isImageUrl),
-  })
-  .strict();
+export function createHotelMutationSchema(imageHostAllowlist = new Set()) {
+  const isImageUrl = createImageUrlValidator(imageHostAllowlist);
+  return z
+    .object({
+      name: text(160),
+      description: text(5000),
+      city: text(120),
+      address: text(300),
+      rating: z
+        .number()
+        .finite()
+        .min(0)
+        .max(5)
+        .refine((value) => hasPrecision(value, 1)),
+      imageUrl: text(2048).refine(isImageUrl),
+    })
+    .strict();
+}
 
 export const roomMutationSchema = z
   .object({

@@ -1,5 +1,6 @@
 import { createApp } from './app.js';
 import { readAuthenticationEnvironment } from './config/authentication.js';
+import { readCatalogEnvironment } from './config/catalog.js';
 import { readEnvironment } from './config/environment.js';
 import { readDatabaseEnvironment } from './db/config.js';
 import { createDatabasePool } from './db/pool.js';
@@ -8,6 +9,7 @@ import { readWeatherEnvironment } from './config/weather.js';
 const config = readEnvironment();
 const databaseConfig = readDatabaseEnvironment();
 const authenticationConfig = readAuthenticationEnvironment();
+const catalogConfig = readCatalogEnvironment();
 const weatherConfig = readWeatherEnvironment();
 const database = createDatabasePool(databaseConfig);
 const authentication = {
@@ -17,6 +19,7 @@ const authentication = {
 const server = createApp({
   database,
   authentication,
+  catalog: catalogConfig,
   trustProxyHops: config.TRUST_PROXY_HOPS,
   weather: { config: weatherConfig },
 }).listen(config.PORT, config.HOST, () => {

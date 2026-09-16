@@ -1,6 +1,6 @@
 # Weather Integration Operations
 
-Status: Implemented in T9
+Status: Implemented in T9; resource bounds added in T10 (SEC-100)
 
 ## Purpose
 
@@ -22,20 +22,27 @@ Weather is supplemental. A slow, unavailable, unknown, or malformed provider res
 
 ## Configuration
 
-| Variable                | Default                                          | Allowed range        |
-| ----------------------- | ------------------------------------------------ | -------------------- |
-| `WEATHER_TIMEOUT_MS`    | `4000`                                           | 250 through 15000 ms |
-| `WEATHER_CACHE_TTL_MS`  | `600000`                                         | 1000 through 3600000 |
-| `WEATHER_GEOCODING_URL` | `https://geocoding-api.open-meteo.com/v1/search` | Valid URL            |
-| `WEATHER_FORECAST_URL`  | `https://api.open-meteo.com/v1/forecast`         | Valid URL            |
+| Variable                       | Default                                          | Allowed range        |
+| ------------------------------ | ------------------------------------------------ | -------------------- |
+| `WEATHER_TIMEOUT_MS`           | `4000`                                           | 250 through 15000 ms |
+| `WEATHER_CACHE_TTL_MS`         | `600000`                                         | 1000 through 3600000 |
+| `WEATHER_MAX_IN_FLIGHT`        | `4`                                              | 1 through 64         |
+| `WEATHER_MAX_CACHE_ENTRIES`    | `500`                                            | 1 through 100000     |
+| `WEATHER_RATE_LIMIT_WINDOW_MS` | `60000`                                          | 1000 through 3600000 |
+| `WEATHER_RATE_LIMIT_MAX`       | `60`                                             | 1 through 10000      |
+| `WEATHER_GEOCODING_URL`        | `https://geocoding-api.open-meteo.com/v1/search` | Valid URL            |
+| `WEATHER_FORECAST_URL`         | `https://api.open-meteo.com/v1/forecast`         | Valid URL            |
 
 The URL overrides support controlled test environments and provider migrations. They are backend-only settings and must never use a `VITE_` prefix.
 
 ## Reliability boundaries
 
 - Each provider request has its own abort deadline.
+- The public route is rate limited per client by `WEATHER_RATE_LIMIT_WINDOW_MS` and `WEATHER_RATE_LIMIT_MAX`. Requests over the limit return HTTP 429 `RATE_LIMITED` before any provider work.
 - Successful values are cached by trimmed, case-normalized city.
 - Simultaneous requests for the same city share one in-flight promise.
+- Distinct city lookups pass through a shared concurrency limit of `WEATHER_MAX_IN_FLIGHT`, so a burst of different cities cannot start unlimited simultaneous provider calls.
+- The success cache holds at most `WEATHER_MAX_CACHE_ENTRIES`. Expired entries are dropped and the oldest entry is evicted first, so the cache cannot grow without bound.
 - Provider and parsing failures are never cached.
 - The cache is process-local and intentionally non-authoritative.
 - Multiple Render instances may perform separate lookups, which is acceptable for supplemental weather.
@@ -58,7 +65,7 @@ npm --workspace frontend test -- customer
 Run the complete current gate:
 
 ```powershell
-npm run verify:weather
+npm run verify:local
 ```
 
 ## Troubleshooting

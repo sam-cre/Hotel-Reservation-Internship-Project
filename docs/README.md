@@ -1,6 +1,6 @@
 # Stillwater Hotels Documentation
 
-Status: T1 through T8 merged; T9 validated and awaiting the project owner's Git checkpoint
+Status: T1 through T9 merged; T10 local hardening implemented and locally validated, awaiting the project owner's Git checkpoint
 
 Stillwater Hotels is a multi-property hotel reservation application built for the internship assignment. This documentation distinguishes assignment requirements, engineering safeguards, and optional enhancements.
 
@@ -26,7 +26,9 @@ Start with the [engineering handoff](HANDOFF.md) for current status and safe com
 16. [Weather integration operations](operations/weather.md)
 17. [Architecture decisions](decisions/README.md)
 18. [T2 design review reconciliation](decisions/t2-design-review.md)
-19. [Implementation plan](plans/implementation-plan.md)
+19. [Assignment traceability matrix](project/assignment-traceability.md)
+20. [Explanation readiness guide](project/explanation-readiness.md)
+21. [Implementation plan](plans/implementation-plan.md)
 
 ## Validation history
 
@@ -38,6 +40,7 @@ Start with the [engineering handoff](HANDOFF.md) for current status and safe com
 - [T7 customer application validation](history/2026-09-15-t7-customer-validation.md)
 - [T8 administrator application validation](history/2026-09-15-t8-administrator-validation.md)
 - [T9 weather integration validation](history/2026-09-16-t9-weather-validation.md)
+- [T10 local hardening validation](history/2026-09-16-t10-local-hardening-validation.md)
 
 ## Status vocabulary
 

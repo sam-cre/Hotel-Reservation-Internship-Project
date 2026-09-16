@@ -42,24 +42,29 @@ Start applications separately with `npm run dev --workspace backend` and `npm ru
 
 Copy `.env.example` to the ignored `.env` file at the repository root and provide the required database and authentication values. The backend loads that file; shell environment values take precedence. Vite reads the backend port for its local proxy without exposing backend variables to browser code.
 
-| Variable               | Default       | Purpose                                                |
-| ---------------------- | ------------- | ------------------------------------------------------ |
-| `NODE_ENV`             | `development` | Runtime mode: development, test, or production         |
-| `HOST`                 | `127.0.0.1`   | API bind address; cloud hosting will require `0.0.0.0` |
-| `PORT`                 | `3001`        | API listening port, from 1 through 65535               |
-| `TRUST_PROXY_HOPS`     | `0`           | Known reverse-proxy hops used for client IP detection  |
-| `WEATHER_TIMEOUT_MS`   | `4000`        | Maximum time allowed for each Open-Meteo request       |
-| `WEATHER_CACHE_TTL_MS` | `600000`      | Successful city weather cache duration                 |
+| Variable                       | Default       | Purpose                                                     |
+| ------------------------------ | ------------- | ----------------------------------------------------------- |
+| `NODE_ENV`                     | `development` | Runtime mode: development, test, or production              |
+| `HOST`                         | `127.0.0.1`   | API bind address; cloud hosting will require `0.0.0.0`      |
+| `PORT`                         | `3001`        | API listening port, from 1 through 65535                    |
+| `TRUST_PROXY_HOPS`             | `0`           | Known reverse-proxy hops used for client IP detection       |
+| `WEATHER_TIMEOUT_MS`           | `4000`        | Maximum time allowed for each Open-Meteo request            |
+| `WEATHER_CACHE_TTL_MS`         | `600000`      | Successful city weather cache duration                      |
+| `WEATHER_MAX_IN_FLIGHT`        | `4`           | Concurrent distinct-city provider lookups allowed           |
+| `WEATHER_MAX_CACHE_ENTRIES`    | `500`         | Maximum cached cities before first-in eviction              |
+| `WEATHER_RATE_LIMIT_WINDOW_MS` | `60000`       | Public weather rate-limit window                            |
+| `WEATHER_RATE_LIMIT_MAX`       | `60`          | Public weather requests allowed per window per client       |
+| `CATALOG_IMAGE_HOST_ALLOWLIST` | (empty)       | Comma-separated HTTPS hosts allowed for remote hotel images |
 
 Database variables are documented in [database operations](docs/operations/database.md). JWT, cookie, origin, and rate-limit variables are documented in [authentication operations](docs/operations/authentication.md). Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both development processes after changing configuration. Never store secrets in a variable prefixed `VITE_`, which is intended for public frontend configuration.
 
 ## Verification
 
 ```powershell
-npm run verify:weather
+npm run verify:local
 ```
 
-This checks formatting, linting, backend and frontend component tests, the production build, Git exclusions, the live frontend-to-API proxy, dependency advisories, and all connected customer and administrator Playwright journeys. `npm run verify` runs this complete current gate.
+This canonical gate checks formatting, linting, backend and frontend component tests, the production build, Git exclusions, the secret-scan configuration and its canary, the live frontend-to-API proxy, dependency advisories, and all connected customer and administrator Playwright journeys. `npm run verify` is an alias for it. The pull-request workflow runs a pinned Gitleaks secret scan and then this same gate; its PostgreSQL integration and concurrency tests run against an ephemeral database service and are skipped locally when `TEST_DATABASE_URL` is absent.
 
 The complete design check also runs Chromium browser tests:
 
