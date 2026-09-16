@@ -72,7 +72,7 @@ Result:
 
 The five locally skipped backend tests already passed against PostgreSQL 17 in the T6 pull-request workflow. The original 27-test T2 browser suite also passed after the connected application was added.
 
-The pull-request workflow installs Chromium and runs the same T7 gate against PostgreSQL 17. It must report all 105 backend tests with no skip and all customer browser journeys passing before merge.
+The initial T7 pull-request workflow completed all PostgreSQL and frontend tests and the production build, then timed out while closing the temporary verification servers. GitHub marked the job cancelled, but GitHub CLI returned exit code 0 and the owner's scripted merge continued. A corrective pull request adds explicit connection cleanup and re-runs the same gate against PostgreSQL 17. The corrected workflow must report all 105 backend tests with no skip and all customer browser journeys passing.
 
 ## Visual review
 

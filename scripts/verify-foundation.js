@@ -8,6 +8,27 @@ import { createApp } from '../backend/src/app.js';
 import { readEnvironment } from '../backend/src/config/environment.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+
+async function withDeadline(label, work, milliseconds = 5000) {
+  let timeout;
+  try {
+    return await Promise.race([
+      work,
+      new Promise((_, reject) => {
+        timeout = setTimeout(
+          () =>
+            reject(
+              new Error(`${label} did not finish within ${milliseconds}ms`),
+            ),
+          milliseconds,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 const ignored = [
   '.env',
   '.env.production',
@@ -91,8 +112,14 @@ try {
   assert.equal((await missing.json()).error.code, 'NOT_FOUND');
   console.info('frontend serving and backend API proxy verified');
 } finally {
-  await frontend?.close();
-  await new Promise((resolve, reject) =>
-    api.close((error) => (error ? reject(error) : resolve())),
+  frontend?.httpServer?.closeAllConnections?.();
+  api.closeAllConnections?.();
+  await withDeadline('Vite server cleanup', frontend?.close());
+  await withDeadline(
+    'API server cleanup',
+    new Promise((resolve, reject) =>
+      api.close((error) => (error ? reject(error) : resolve())),
+    ),
   );
+  console.info('verification servers closed');
 }
