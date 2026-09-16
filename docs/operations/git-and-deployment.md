@@ -125,7 +125,7 @@ Each run checks out the repository with `persist-credentials: false` and full hi
 
 ### Secret scanning
 
-- The pull-request gate runs `gitleaks/gitleaks-action` pinned to commit `e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e` (v3.0.0). No `GITLEAKS_LICENSE` is required because the repository belongs to a personal account; a license would be required only if the repository moved under a GitHub organization.
+- The pull-request gate runs `gitleaks/gitleaks-action` pinned to commit `e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e` (v3.0.0). The step is given the workflow's automatic `GITHUB_TOKEN` through `env`, which the action requires to read a pull request's commits; the workflow grants `contents: read` and `pull-requests: read` for this. No `GITLEAKS_LICENSE` is required because the repository belongs to a personal account; a license would be required only if the repository moved under a GitHub organization.
 - `.gitleaks.toml` extends the maintained default ruleset, adds a canary rule, and narrowly allowlists `.env.example`, the config file itself, and the synthetic `test-only-password` used by disposable test databases.
 - `scripts/verify-foundation.js` runs in every gate and asserts, without any scanner binary, that CI pins the verified action commit, that no `.env` variant, private key, or certificate is tracked, and that the canary rule matches its sentinel token but not benign text. This proves the ruleset is active rather than silently empty.
 - Owner-side history scan (optional, requires the Gitleaks binary installed locally):

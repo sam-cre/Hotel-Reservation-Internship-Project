@@ -78,3 +78,7 @@ Results: SEC-100, SEC-200, SEC-201, and SEC-400 report Fully Mitigated. SEC-300 
 - Documentation: this record and the documents it links.
 
 Security working artifacts under `.security-audit/` remain uncommitted by design.
+
+## Post-merge correction
+
+The T10 pull request (number 11, merge commit `3445740`) was merged while its Verification run was red. The `gitleaks-action` step failed because it was not given a `GITHUB_TOKEN`, which the action requires to read a pull request's commits, so the run stopped before `npm run verify:local` and the PostgreSQL tests executed in CI. A follow-up change adds `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` to that step and grants `pull-requests: read`, restoring a green Verification run that exercises the secret scan and the full gate, including the PostgreSQL integration and concurrency tests that are skipped locally. The local `npm run verify:local` evidence recorded above was accurate; only the continuous integration secret-scan step needed the token.
