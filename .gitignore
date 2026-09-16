@@ -13,6 +13,8 @@ tmp/
 *.p12
 *.pfx
 .security-audit/
+results.sarif
+*.sarif
 .vercel/
 .render/
 .idea/
