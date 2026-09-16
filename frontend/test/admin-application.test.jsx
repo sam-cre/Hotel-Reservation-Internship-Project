@@ -20,6 +20,9 @@ vi.mock('../src/services/api.js', () => ({
     hotel: vi.fn(),
     rooms: vi.fn(),
   },
+  weatherApi: {
+    current: vi.fn(),
+  },
   reservationApi: {
     create: vi.fn(),
     mine: vi.fn(),

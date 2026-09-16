@@ -132,12 +132,33 @@ Administrator only. Accepts exactly `{ "status": "cancelled" }`. A confirmed res
 
 ### GET `/weather`
 
-Public. Requires `city`. The backend geocodes the city and requests current weather from Open-Meteo. It returns a small internal shape containing resolved location, temperature, apparent temperature, weather code, and wind speed.
+Public. Requires one trimmed `city` query string from 1 through 120 characters. Unknown fields and control characters are rejected. The backend geocodes the city and requests current weather from Open-Meteo. The frontend never calls the external provider directly.
 
-- Request timeout: bounded
-- Cache: short-lived in-memory cache
-- Failure behavior: hotel details continue to work and show weather as unavailable
-- External error bodies are never forwarded directly to the browser
+Successful response:
+
+```json
+{
+  "weather": {
+    "location": "Charleston, South Carolina, United States",
+    "observedAt": "2026-09-16T11:15",
+    "temperature": 78.4,
+    "apparentTemperature": 80.1,
+    "weatherCode": 2,
+    "windSpeed": 8.7,
+    "units": {
+      "temperature": "°F",
+      "windSpeed": "mp/h"
+    }
+  }
+}
+```
+
+- `WEATHER_LOCATION_NOT_FOUND`, HTTP 404: geocoding returned no location.
+- `WEATHER_UPSTREAM_TIMEOUT`, HTTP 503: an external request exceeded its configured deadline.
+- `WEATHER_UPSTREAM_UNAVAILABLE`, HTTP 503: the provider failed or returned a non-success status.
+- `WEATHER_UPSTREAM_INVALID`, HTTP 503: the provider response did not match the validated contract.
+
+Successful results use a normalized, short-lived in-memory city cache. Concurrent requests for the same normalized city share one external lookup. Failures are not cached. External bodies, URLs, and low-level errors are never forwarded to the browser. The hotel page loads weather independently, so any weather error produces a quiet unavailable state without hiding hotel or room data.
 
 ## Health
 

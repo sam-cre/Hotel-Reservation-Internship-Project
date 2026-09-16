@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 through T7 merged, T8 validated and awaiting the project owner's Git checkpoint, T9 through T12 planned
+Status: Approved; T1 through T8 merged, T9 validated and awaiting the project owner's Git checkpoint, T10 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -93,7 +93,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T7. Customer application
 
-- Status: Validated on `feature/customer-application`; owner Git checkpoint pending
+- Status: Merged through pull request 6 plus corrective pull requests 7 and 8 as commit `fd06aa7`
 - Evidence: Five focused component tests and three Playwright journeys cover URL-preserved criteria, live search results, hotel and room details, protected routing, registration, server-provided totals, price-field exclusion, idempotency headers, booking confirmation, reservation history, policy content, cookie reopening, axe accessibility, and 320px overflow. Desktop and mobile visual inspection passed.
 - Satisfies: R2, R3, R4, R5, R9, R10
 - Depends on: T2, T4, T5, T6
@@ -103,7 +103,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T8. Administrator application
 
-- Status: Validated locally; pull-request gate required before merge
+- Status: Merged through pull request 9 as commit `c5f2698`
 - Evidence: Five focused component tests cover customer-role exclusion, cancellation confirmation, visible reservation conflicts, typed hotel submission, pending-state duplicate prevention, and conflict-preserving room edits. Three administrator Chromium journeys cover every assignment management action, customer blocking, 320px containment, and an axe accessibility scan. The complete gate passes 100 local backend tests, 20 frontend tests, the production build, proxy verification, the dependency audit, and all six connected customer and administrator browser journeys.
 - Satisfies: R6, R9, R10
 - Depends on: T2, T4, T5, T6
@@ -113,6 +113,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T9. Weather integration
 
+- Status: Validated locally on `feature/weather-integration`; pull-request gate required before merge
 - Satisfies: R8, R9, R10
 - Depends on: T5, T7
 - Deliver: backend Open-Meteo integration, mapping, timeout, cache, and graceful UI fallback

@@ -46,6 +46,13 @@ export const catalogApi = {
   },
 };
 
+export const weatherApi = {
+  async current(city, signal) {
+    return (await api.get('/weather', { params: { city }, signal })).data
+      .weather;
+  },
+};
+
 export const reservationApi = {
   async create(input, idempotencyKey) {
     return (

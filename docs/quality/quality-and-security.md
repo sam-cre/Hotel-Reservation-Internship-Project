@@ -120,6 +120,16 @@ T7 provides focused component coverage for protected routing, URL state, server-
 - Production errors omit stacks and SQL details
 - No credentials appear in screenshots, documentation, fixtures, or seed data
 
+### External weather service
+
+- The browser calls the same-origin Express API, never Open-Meteo directly.
+- City input is length-bounded and validated before use as an encoded query parameter.
+- Provider base URLs come only from validated backend configuration.
+- External response bodies are parsed against narrow schemas and reduced to an internal contract.
+- Timeouts bound external work, and only successful responses enter the short-lived cache.
+- Safe API errors omit provider bodies and transport details.
+- Weather failure cannot suppress hotel, inventory, price, or reservation information.
+
 ## Security-audit schedule
 
 1. Architecture threat-model review before implementation approval

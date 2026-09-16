@@ -4,9 +4,9 @@ A hotel reservation application for the internship assignment, using React, Expr
 
 ## Current state
 
-The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, reservation APIs, and connected customer and administrator applications are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, secure account sessions, public hotel search, room availability, protected reservation review, transaction-safe booking, confirmation, reservation history, hotel and room management, reservation administration, guest-information pages, consent controls, and automated verification.
+The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, reservation APIs, connected customer and administrator applications, and weather integration are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, secure account sessions, public hotel search, room availability, protected reservation review, transaction-safe booking, confirmation, reservation history, hotel and room management, reservation administration, guest-information pages, consent controls, current hotel-city conditions, and automated verification.
 
-The Harbor Quiet design foundation is validated and owner-approved. The production frontend serves the connected customer experience and the role-protected administrator workspace. Weather and deployment work remain planned. This repository is not ready to accept production bookings.
+The Harbor Quiet design foundation is validated and owner-approved. The production frontend serves the connected customer experience and the role-protected administrator workspace. Deployment work remains planned. This repository is not ready to accept production bookings.
 
 ## Design previews
 
@@ -42,19 +42,21 @@ Start applications separately with `npm run dev --workspace backend` and `npm ru
 
 Copy `.env.example` to the ignored `.env` file at the repository root and provide the required database and authentication values. The backend loads that file; shell environment values take precedence. Vite reads the backend port for its local proxy without exposing backend variables to browser code.
 
-| Variable           | Default       | Purpose                                                |
-| ------------------ | ------------- | ------------------------------------------------------ |
-| `NODE_ENV`         | `development` | Runtime mode: development, test, or production         |
-| `HOST`             | `127.0.0.1`   | API bind address; cloud hosting will require `0.0.0.0` |
-| `PORT`             | `3001`        | API listening port, from 1 through 65535               |
-| `TRUST_PROXY_HOPS` | `0`           | Known reverse-proxy hops used for client IP detection  |
+| Variable               | Default       | Purpose                                                |
+| ---------------------- | ------------- | ------------------------------------------------------ |
+| `NODE_ENV`             | `development` | Runtime mode: development, test, or production         |
+| `HOST`                 | `127.0.0.1`   | API bind address; cloud hosting will require `0.0.0.0` |
+| `PORT`                 | `3001`        | API listening port, from 1 through 65535               |
+| `TRUST_PROXY_HOPS`     | `0`           | Known reverse-proxy hops used for client IP detection  |
+| `WEATHER_TIMEOUT_MS`   | `4000`        | Maximum time allowed for each Open-Meteo request       |
+| `WEATHER_CACHE_TTL_MS` | `600000`      | Successful city weather cache duration                 |
 
 Database variables are documented in [database operations](docs/operations/database.md). JWT, cookie, origin, and rate-limit variables are documented in [authentication operations](docs/operations/authentication.md). Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both development processes after changing configuration. Never store secrets in a variable prefixed `VITE_`, which is intended for public frontend configuration.
 
 ## Verification
 
 ```powershell
-npm run verify:admin
+npm run verify:weather
 ```
 
 This checks formatting, linting, backend and frontend component tests, the production build, Git exclusions, the live frontend-to-API proxy, dependency advisories, and all connected customer and administrator Playwright journeys. `npm run verify` runs this complete current gate.
@@ -137,6 +139,16 @@ T8 provides role-protected administrator navigation, reservation filtering and c
 npm --workspace frontend test -- admin
 npm run test:e2e -- admin-journey
 npm run verify:admin
+```
+
+## Weather integration
+
+T9 adds current hotel-city conditions through an Express-owned Open-Meteo adapter. The browser calls only the internal `/api/weather` route. The adapter validates provider responses, limits request duration, coalesces simultaneous city lookups, caches successful results briefly, and returns a stable internal shape. Weather remains supplemental, so provider failure leaves hotel and room details usable. See [weather operations](docs/operations/weather.md).
+
+```powershell
+npm --workspace backend test -- weather
+npm --workspace frontend test -- customer
+npm run verify:weather
 ```
 
 ## Structure
