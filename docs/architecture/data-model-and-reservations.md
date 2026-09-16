@@ -21,7 +21,8 @@ Status: T3 schema and T6 reservation services implemented
 - `city`: required text with a normalized search index
 - `address`: required text
 - `rating`: numeric value constrained from 0.0 through 5.0
-- `image_url`: required validated HTTP or HTTPS URL or first-party absolute asset path
+- `image_url`: required validated HTTPS URL on an approved host or first-party absolute asset path
+- `amenities`: `text[]` of up to 12 short non-empty labels shown to guests, defaulting to an empty array (added in migration `003_add_hotel_amenities.sql`)
 - `is_active`: required boolean, defaults to true
 - `created_at`: timestamp with time zone
 

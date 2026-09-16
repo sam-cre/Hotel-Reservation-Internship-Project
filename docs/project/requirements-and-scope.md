@@ -94,3 +94,4 @@ The original assignment PDF remains local and excluded from Git. This document i
 - Public registration always creates a customer.
 - Hotel images use a validated same-origin asset path or an HTTPS URL whose host is on the server-configured allowlist, which is empty by default. Insecure HTTP, credentialed URLs, and unapproved remote hosts are rejected. File uploads are out of scope.
 - Hotels and room types are deactivated instead of destructively deleted; inactive records stay available to historical reservations and are excluded from public browsing.
+- Hotel amenities are stored per hotel as a bounded list of short labels and are entered by an administrator, so guest-facing amenities reflect the actual hotel rather than a derived guess.

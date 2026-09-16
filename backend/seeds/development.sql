@@ -1,4 +1,4 @@
-INSERT INTO hotels (name, description, city, address, rating, image_url)
+INSERT INTO hotels (name, description, city, address, rating, image_url, amenities)
 VALUES
   (
     'The Battery',
@@ -6,7 +6,8 @@ VALUES
     'Charleston',
     '18 East Bay Street, Charleston, SC',
     4.9,
-    '/images/battery-terrace.jpg'
+    '/images/battery-terrace.jpg',
+    ARRAY['Rooftop terrace', 'Harbor dining', '24-hour concierge', 'Valet parking']
   ),
   (
     'The Calhoun',
@@ -14,7 +15,8 @@ VALUES
     'Charleston',
     '212 Calhoun Street, Charleston, SC',
     4.7,
-    '/images/calhoun-lobby.jpg'
+    '/images/calhoun-lobby.jpg',
+    ARRAY['Interior courtyard', 'Signature restaurant', 'Valet parking', 'Fitness center']
   ),
   (
     'The Forsyth',
@@ -22,13 +24,15 @@ VALUES
     'Savannah',
     '10 West Gaston Street, Savannah, GA',
     4.8,
-    '/images/calhoun-lobby.jpg'
+    '/images/calhoun-lobby.jpg',
+    ARRAY['Park setting', 'Full-service dining', 'Concierge', 'Meeting rooms']
   )
 ON CONFLICT (name, city) DO UPDATE SET
   description = EXCLUDED.description,
   address = EXCLUDED.address,
   rating = EXCLUDED.rating,
   image_url = EXCLUDED.image_url,
+  amenities = EXCLUDED.amenities,
   is_active = true;
 
 INSERT INTO rooms (

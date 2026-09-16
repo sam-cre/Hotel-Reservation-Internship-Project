@@ -32,7 +32,23 @@ export const emptyHotel = {
   address: '',
   rating: '4.5',
   imageUrl: '',
+  amenities: '',
 };
+
+export function parseAmenities(value) {
+  if (Array.isArray(value)) return value;
+  const seen = new Set();
+  const result = [];
+  for (const part of String(value ?? '').split(',')) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(trimmed);
+  }
+  return result.slice(0, 12);
+}
 
 export const emptyRoom = {
   name: '',
@@ -43,7 +59,11 @@ export const emptyRoom = {
 };
 
 export function hotelInput(values) {
-  return { ...values, rating: Number(values.rating) };
+  return {
+    ...values,
+    rating: Number(values.rating),
+    amenities: parseAmenities(values.amenities),
+  };
 }
 
 export function roomInput(values) {

@@ -105,6 +105,16 @@ export function HotelPage() {
                 {hotel.rating}
                 <span className="srOnly"> out of 5</span>
               </p>
+              {hotel.amenities?.length > 0 && (
+                <ul className={styles.features}>
+                  {hotel.amenities.map((feature) => (
+                    <li key={feature}>
+                      <Check size={15} aria-hidden="true" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </section>
           <section className={styles.roomSection} aria-labelledby="rooms-title">

@@ -17,6 +17,7 @@ export function HotelFormDialog({ hotel, open, onClose, onSaved }) {
           address: hotel.address,
           rating: hotel.rating,
           imageUrl: hotel.imageUrl,
+          amenities: (hotel.amenities ?? []).join(', '),
         }
       : emptyHotel,
   );
@@ -118,6 +119,15 @@ export function HotelFormDialog({ hotel, open, onClose, onSaved }) {
             required
           />
         </div>
+        <Field
+          label="Amenities"
+          name="amenities"
+          value={values.amenities}
+          onChange={change}
+          maxLength={800}
+          placeholder="Rooftop terrace, Valet parking, Concierge"
+          hint="Separate up to 12 amenities with commas."
+        />
         <div className={styles.dialogActions}>
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             Cancel

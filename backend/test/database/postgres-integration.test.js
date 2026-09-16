@@ -58,7 +58,7 @@ describe.skipIf(!runIntegration)('PostgreSQL server integration', () => {
     const migrations = await loadMigrations(migrationsDirectory);
     await expect(
       withDatabaseClient(pool, (client) => applyMigrations(client, migrations)),
-    ).resolves.toBe(2);
+    ).resolves.toBe(3);
     await expect(
       withDatabaseClient(pool, (client) => applyMigrations(client, migrations)),
     ).resolves.toBe(0);
@@ -73,6 +73,6 @@ describe.skipIf(!runIntegration)('PostgreSQL server integration', () => {
           (SELECT count(*)::integer FROM schema_migrations) AS migrations
       `),
     );
-    expect(result.rows[0]).toEqual({ hotels: 3, rooms: 6, migrations: 2 });
+    expect(result.rows[0]).toEqual({ hotels: 3, rooms: 6, migrations: 3 });
   });
 });

@@ -125,6 +125,7 @@ export function createHotelMutationSchema(imageHostAllowlist = new Set()) {
         .max(5)
         .refine((value) => hasPrecision(value, 1)),
       imageUrl: text(2048).refine(isImageUrl),
+      amenities: z.array(text(60)).max(12).default([]),
     })
     .strict();
 }

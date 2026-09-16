@@ -13,16 +13,6 @@ import {
 } from './customer-utils.js';
 import styles from './Customer.module.css';
 
-const hotelDetails = {
-  'The Battery': ['Rooftop terrace', 'Harbor dining', '24-hour concierge'],
-  'The Calhoun': [
-    'Interior courtyard',
-    'Signature restaurant',
-    'Valet parking',
-  ],
-  'The Forsyth': ['Park setting', 'Full-service hotel', 'Concierge'],
-};
-
 function HotelRow({ hotel, stay, eager }) {
   return (
     <article className={styles.hotelRow} aria-labelledby={`hotel-${hotel.id}`}>
@@ -49,19 +39,16 @@ function HotelRow({ hotel, stay, eager }) {
           </span>
         </div>
         <p className={styles.hotelDescription}>{hotel.description}</p>
-        <ul className={styles.features}>
-          {(
-            hotelDetails[hotel.name] || [
-              'Destination service',
-              'Thoughtful rooms',
-            ]
-          ).map((feature) => (
-            <li key={feature}>
-              <Check size={15} aria-hidden="true" />
-              {feature}
-            </li>
-          ))}
-        </ul>
+        {hotel.amenities?.length > 0 && (
+          <ul className={styles.features}>
+            {hotel.amenities.map((feature) => (
+              <li key={feature}>
+                <Check size={15} aria-hidden="true" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+        )}
         <div className={styles.hotelBottom}>
           <div>
             <p className={styles.price}>
