@@ -11,6 +11,29 @@ describe('backend foundation', () => {
     expect(response.headers['x-powered-by']).toBeUndefined();
     expect(response.headers['x-content-type-options']).toBe('nosniff');
   });
+  it('reports readiness when the database answers a probe query', async () => {
+    const database = { query: async () => ({ rows: [{ '?column?': 1 }] }) };
+    const response = await request(createApp({ database }))
+      .get('/api/ready')
+      .expect(200);
+    expect(response.body).toEqual({ status: 'ready' });
+    expect(response.headers['cache-control']).toBe('no-store');
+  });
+  it('reports unavailable without leaking details when the database probe fails', async () => {
+    const database = {
+      query: async () => {
+        throw new Error('connection refused to secret-host:5432');
+      },
+    };
+    const response = await request(createApp({ database }))
+      .get('/api/ready')
+      .expect(503);
+    expect(response.body).toEqual({ status: 'unavailable' });
+    expect(response.text).not.toContain('secret-host');
+  });
+  it('omits the readiness probe when no database is configured', async () => {
+    await request(createApp()).get('/api/ready').expect(404);
+  });
   it('returns JSON for missing routes with a matching request identifier', async () => {
     const response = await request(createApp()).get('/api/missing').expect(404);
     expect(response.body.error.code).toBe('NOT_FOUND');

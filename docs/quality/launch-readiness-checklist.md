@@ -36,15 +36,15 @@ Every item below is prefixed with its current status. Items are re-confirmed in 
 
 ## Search visibility and metadata
 
-- Pending T11: Every public page has a descriptive, unique title and meta description. Today `frontend/index.html` sets one static title and description; per-route metadata is added in T11.
+- Validated: Every public page has a descriptive, route-specific title. The `useDocumentTitle` hook sets a distinct title per customer and administrator route (`frontend/src/hooks/useDocumentTitle.js`, applied in the application shells), covered by a component test. A per-route meta description remains a T11 addition; `frontend/index.html` sets the default description today.
 - Pending T11: Canonical URLs identify the preferred public URL.
 - Pending T11: Open Graph and social-card metadata produce a valid share preview.
 - Pending T11: The social preview image is reachable, appropriately sized, and contains no private data.
 - Pending T11: Public hotel pages use suitable `Hotel` or `LodgingBusiness` structured data.
 - Validated: Public pages have one clear H1 and a logical heading hierarchy. Design-system and axe checks assert heading structure.
-- Pending T11: `robots.txt` permits intended public pages and blocks no public content by accident.
-- Pending T11: `sitemap.xml` lists intended public pages and is referenced from `robots.txt`.
-- Pending T11: Customer account and administrator pages are excluded from search indexing.
+- Validated locally: `robots.txt` permits intended public pages and blocks no public content by accident. `frontend/public/robots.txt` allows the search pages and disallows the account, booking, and administrator routes. Live reachability over HTTPS is re-verified in T11 once the Vercel domain is filled in.
+- Validated locally: `sitemap.xml` lists intended public pages and is referenced from `robots.txt`. `frontend/public/sitemap.xml` lists the home and search pages; the domain placeholder is finalized during deployment.
+- Validated locally: Customer account and administrator pages are excluded from search indexing. `robots.txt` disallows `/login`, `/register`, `/reserve`, `/reservations`, and `/admin`.
 - Pending T11: Search Console verification is configured only after a production domain exists.
 
 ## Performance and assets
@@ -59,11 +59,11 @@ Every item below is prefixed with its current status. Items are re-confirmed in 
 - Validated: Above-the-fold imagery receives appropriate loading priority and below-the-fold imagery is lazy-loaded. `SearchPage.jsx` marks the first result eager and the rest lazy.
 - Owner review: No delivered image exceeds the documented size budget without an approved reason. Current JPEGs are roughly 340 to 360 KB; the owner sets and approves the budget in T11.
 - Pending T11: Largest Contentful Paint, Cumulative Layout Shift, and interaction responsiveness meet the agreed mobile budgets. Measured against the deployed site.
-- Pending T11: The Render cold-start state remains understandable and provides a safe retry for reads only. The frontend already shows loading states and never auto-retries a booking mutation; verified against the live cold start in T11.
+- Validated: The API stays warm on the owner's paid Railway plan, so there is no free-tier cold start to recover from. The frontend still shows loading states and never auto-retries a booking mutation; a `/api/ready` endpoint confirms live database connectivity. Live behavior is re-verified in T11.
 
 ## Hotel and room information
 
-- Owner review: Each hotel page provides its name, location, rating source, description, imagery, amenities, and contact information. Name, location, rating, description, and imagery come from the catalog. The amenity list on the search page is currently partly derived from hotel name with a generic fallback, which can misrepresent administrator-created hotels; the owner decides whether to make amenities a stored field before release.
+- Owner review: Each hotel page provides its name, location, rating source, description, imagery, amenities, and contact information. Name, location, rating, description, imagery, and amenities come from the catalog. Amenities are a stored, administrator-editable field on each hotel (migration `003_add_hotel_amenities.sql`), so the search and hotel pages show real per-hotel amenities rather than a name-derived fallback. Contact information still needs a monitored production channel.
 - Owner review: Each room type clearly states bed configuration, capacity, size, amenities, and accessible-room information when applicable. Capacity is stored; bed configuration, size, and accessible-room fields are not modeled and need an owner scope decision.
 - Owner review: Hotel and room galleries provide meaningful alternative text and avoid duplicate or misleading imagery. Alt text is present; imagery accuracy is an owner content check.
 - Validated: Search criteria remain visible through hotel, room, and reservation-review pages. URL-preserved criteria are covered by customer component and journey tests.
@@ -126,7 +126,7 @@ Every item below is prefixed with its current status. Items are re-confirmed in 
 - Pending T11: Production customer and administrator journeys pass using synthetic records. Local journeys pass; the production run is a T11 task.
 - Pending T11: Authentication cookies, cross-site request defenses, cache controls, and authorization are verified against public URLs. Verified locally today; re-verified against the deployed origin in T11.
 - Validated: Database migrations, administrator provisioning, and rollback steps are documented in [database operations](../operations/database.md). Production backup expectations are finalized in T11.
-- Validated locally: Health checks and logs expose no guest data or secrets. Production operational alerts are configured in T11.
+- Validated locally: Health checks and logs expose no guest data or secrets. The liveness check at `/api/health` returns a fixed status, and the readiness check at `/api/ready` reports only `ready` or `unavailable` without leaking connection details, asserted in `backend/test/foundation.test.js`. Production operational alerts are configured in T11.
 - Validated: A fresh setup follows the README with `npm ci` without undocumented local state. A formal fresh-checkout verification is re-run in T12.
 
 ## VORA checks intentionally excluded

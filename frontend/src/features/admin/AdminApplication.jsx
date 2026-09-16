@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { ButtonLink } from '../../components/ui/Button.jsx';
 import { Brand } from '../../components/Brand.jsx';
 import { useAuth } from '../customer/useAuth.js';
@@ -24,6 +25,10 @@ function AccessPage({ title, children }) {
 export function AdminApplication() {
   const { user, loading } = useAuth();
   const location = useLocation();
+  const adminTitle = location.pathname.endsWith('/hotels')
+    ? 'Hotels and rooms'
+    : 'Reservations';
+  useDocumentTitle(`Operations: ${adminTitle}`);
 
   if (loading) {
     return (
