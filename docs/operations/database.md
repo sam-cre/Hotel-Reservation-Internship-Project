@@ -1,6 +1,6 @@
 # Database Operations
 
-Status: T3 database foundation and T6 reservation-total migration implemented
+Status: T3 database foundation, T6 reservation-total migration, and the T11 hotel-amenities migration implemented
 
 PostgreSQL stores users, hotels, room types, and reservations. Application code uses the `pg` driver. Versioned SQL files remain the authoritative schema history.
 
@@ -36,6 +36,8 @@ npm run db:migrate --workspace backend
 ```
 
 Migration `002_expand_reservation_total.sql` widens reservation totals to `numeric(18,2)`. This preserves exact decimal arithmetic for longer stays without changing the room nightly-price type.
+
+Migration `003_add_hotel_amenities.sql` adds an `amenities text[]` column to `hotels`, defaulting to an empty array, with check constraints that cap the list at 12 entries and reject empty-string entries. Per-entry length is enforced by the application schema.
 
 The migration runner:
 

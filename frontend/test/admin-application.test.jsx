@@ -55,6 +55,7 @@ const hotel = {
   description: 'A full-service waterfront hotel with broad harbor views.',
   rating: '4.9',
   imageUrl: '/images/battery-terrace.jpg',
+  amenities: ['Rooftop terrace', 'Valet parking'],
   startingPrice: '465.00',
 };
 
@@ -214,6 +215,10 @@ describe('administrator application', () => {
       screen.getByLabelText('Image URL'),
       '/images/calhoun-lobby.jpg',
     );
+    await user.type(
+      screen.getByLabelText('Amenities'),
+      'Rooftop terrace, Valet parking, Rooftop terrace',
+    );
     const dialog = screen.getByRole('dialog');
     const submit = within(dialog).getByRole('button', { name: 'Add hotel' });
     await user.click(submit);
@@ -221,7 +226,10 @@ describe('administrator application', () => {
     expect(submit).toBeDisabled();
     expect(adminApi.createHotel).toHaveBeenCalledTimes(1);
     expect(adminApi.createHotel).toHaveBeenCalledWith(
-      expect.objectContaining({ rating: 4.6 }),
+      expect.objectContaining({
+        rating: 4.6,
+        amenities: ['Rooftop terrace', 'Valet parking'],
+      }),
     );
     resolveCreate({ ...hotel, id: '12', name: 'The Wentworth' });
     expect(

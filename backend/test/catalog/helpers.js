@@ -26,6 +26,7 @@ export const hotelInput = Object.freeze({
   address: '100 Peachtree Street, Atlanta, GA',
   rating: 4.6,
   imageUrl: '/images/meridian.jpg',
+  amenities: ['Rooftop bar', 'Valet parking', 'Fitness center'],
 });
 
 export const roomInput = Object.freeze({

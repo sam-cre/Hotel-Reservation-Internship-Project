@@ -122,6 +122,7 @@ describe('administrator hotel management', () => {
       rating: '4.6',
       isActive: true,
     });
+    expect(created.body.hotel.amenities).toEqual(hotelInput.amenities);
 
     const replacement = {
       ...hotelInput,
@@ -140,6 +141,17 @@ describe('administrator hotel management', () => {
       name: replacement.name,
       rating: '4.8',
     });
+  });
+
+  it('defaults amenities to an empty list when none are provided', async () => {
+    const cookie = await createAdministratorSession(context);
+    const { amenities, ...withoutAmenities } = hotelInput;
+    void amenities;
+    const created = await apiMutation(context.request, 'post', '/api/hotels')
+      .set('Cookie', cookie)
+      .send({ ...withoutAmenities, name: 'The Understated' })
+      .expect(201);
+    expect(created.body.hotel.amenities).toEqual([]);
   });
 
   it('rejects unknown fields, invalid values, and duplicate hotel identity', async () => {

@@ -53,6 +53,7 @@ const hotel = {
   description: 'A full-service waterfront hotel with broad harbor views.',
   rating: '4.9',
   imageUrl: '/images/battery-terrace.jpg',
+  amenities: ['Rooftop terrace', 'Harbor dining'],
   startingPrice: '465.00',
 };
 
@@ -130,6 +131,7 @@ describe('customer application', () => {
     expect(
       await screen.findByRole('heading', { name: 'The Battery' }),
     ).toBeInTheDocument();
+    expect(screen.getByText('Rooftop terrace')).toBeInTheDocument();
     const roomLink = screen.getByRole('link', { name: /view rooms/i });
     expect(roomLink).toHaveAttribute(
       'href',

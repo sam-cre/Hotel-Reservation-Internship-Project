@@ -8,6 +8,7 @@ const hotelColumns = `
   h.address,
   h.rating,
   h.image_url,
+  h.amenities,
   h.is_active,
   h.created_at
 `;
@@ -89,10 +90,11 @@ export function createCatalogRepository(database) {
 
     async createHotel(input) {
       const result = await database.query(
-        `INSERT INTO hotels (name, description, city, address, rating, image_url)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO hotels
+           (name, description, city, address, rating, image_url, amenities)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING id::text, name, description, city, address, rating,
-                   image_url, is_active, created_at`,
+                   image_url, amenities, is_active, created_at`,
         [
           input.name,
           input.description,
@@ -100,6 +102,7 @@ export function createCatalogRepository(database) {
           input.address,
           input.rating,
           input.imageUrl,
+          input.amenities,
         ],
       );
       return mapHotel(result.rows[0]);
@@ -109,10 +112,10 @@ export function createCatalogRepository(database) {
       const result = await database.query(
         `UPDATE hotels
          SET name = $1, description = $2, city = $3, address = $4,
-             rating = $5, image_url = $6
-         WHERE id = $7 AND is_active = true
+             rating = $5, image_url = $6, amenities = $7
+         WHERE id = $8 AND is_active = true
          RETURNING id::text, name, description, city, address, rating,
-                   image_url, is_active, created_at`,
+                   image_url, amenities, is_active, created_at`,
         [
           input.name,
           input.description,
@@ -120,6 +123,7 @@ export function createCatalogRepository(database) {
           input.address,
           input.rating,
           input.imageUrl,
+          input.amenities,
           id,
         ],
       );

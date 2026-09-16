@@ -54,7 +54,7 @@ When complete stay criteria are present, results contain only hotels with at lea
 
 Without dates, the route supports browsing and reports the lowest active room-type price without claiming date availability. City matching is case-insensitive, whitespace-trimmed, and exact. Results are ordered by city and hotel name.
 
-Returns `{ "hotels": HotelSummary[] }`. A hotel summary contains decimal-string `id`, `name`, `description`, `city`, `address`, one-decimal-string `rating`, `imageUrl`, `isActive`, ISO 8601 `createdAt`, and two-decimal-string `startingPrice`.
+Returns `{ "hotels": HotelSummary[] }`. A hotel summary contains decimal-string `id`, `name`, `description`, `city`, `address`, one-decimal-string `rating`, `imageUrl`, a string array `amenities`, `isActive`, ISO 8601 `createdAt`, and two-decimal-string `startingPrice`.
 
 ### GET `/hotels/:id`
 
@@ -62,7 +62,9 @@ Public. Returns `{ "hotel": Hotel }` for an active hotel. It does not claim avai
 
 ### POST `/hotels`
 
-Administrator only. Accepts exactly `name`, `description`, `city`, `address`, `rating`, and `imageUrl`. Creates a hotel and returns HTTP 201 with `{ "hotel": Hotel }`. A duplicate hotel name within the same city returns HTTP 409.
+Administrator only. Accepts exactly `name`, `description`, `city`, `address`, `rating`, `imageUrl`, and an optional `amenities` array. Creates a hotel and returns HTTP 201 with `{ "hotel": Hotel }`. A duplicate hotel name within the same city returns HTTP 409.
+
+`amenities` is a list of up to 12 short non-empty strings (each 1 to 60 characters). It defaults to an empty list when omitted.
 
 `imageUrl` accepts a same-origin managed asset path such as `/images/hotel.jpg`. A remote image is accepted only when it is HTTPS, carries no embedded credentials, and its host appears in the server-configured `CATALOG_IMAGE_HOST_ALLOWLIST`. The allowlist is empty by default, so arbitrary remote origins are rejected with HTTP 400.
 

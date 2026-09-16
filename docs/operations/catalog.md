@@ -45,6 +45,10 @@ Use future dates when running this example after October 2026.
 
 `PUT` uses replacement semantics. Send every editable field, not a partial patch. Unknown fields are rejected so accidental or privileged values cannot be silently accepted.
 
+### Hotel amenities
+
+Hotel create and replace requests accept an optional `amenities` array of up to 12 short labels. The administrator form takes a comma-separated list and sends a trimmed, de-duplicated array. Amenities are stored per hotel and shown on the customer search and hotel detail pages, so administrator-created hotels display their own amenities rather than a name-based guess.
+
 ### Hotel image origins
 
 `imageUrl` accepts a same-origin managed asset path such as `/images/hotel.jpg`. A remote image is accepted only when it uses HTTPS, has no embedded credentials, and its host is listed in `CATALOG_IMAGE_HOST_ALLOWLIST` (comma-separated hosts, empty by default). Insecure HTTP, credentialed URLs, and unapproved remote hosts are rejected with HTTP 400. The seeded catalog uses same-origin paths. If a managed CDN is introduced for T11, add its exact HTTPS host to the allowlist and set a matching production `img-src` and `Referrer-Policy`. Do not invent a CDN host.

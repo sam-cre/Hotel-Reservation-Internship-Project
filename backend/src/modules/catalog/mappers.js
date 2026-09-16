@@ -14,6 +14,7 @@ export function mapHotel(row) {
     address: row.address,
     rating: Number(row.rating).toFixed(1),
     imageUrl: row.image_url,
+    amenities: row.amenities ?? [],
     isActive: row.is_active,
     createdAt: new Date(row.created_at).toISOString(),
   };
