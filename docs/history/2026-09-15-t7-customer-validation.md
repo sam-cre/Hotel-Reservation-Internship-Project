@@ -72,7 +72,7 @@ Result:
 
 The five locally skipped backend tests already passed against PostgreSQL 17 in the T6 pull-request workflow. The original 27-test T2 browser suite also passed after the connected application was added.
 
-The initial T7 pull-request workflow completed all PostgreSQL and frontend tests and the production build, then timed out while closing the temporary verification servers. GitHub marked the job cancelled, but GitHub CLI returned exit code 0 and the owner's scripted merge continued. A first corrective run proved that Vite retained an internal Linux file watcher after its HTTP connections closed. The final cleanup requests graceful shutdown, closes all HTTP connections, closes the API normally, and explicitly exits the one-shot verification subprocess only when that Vite watcher exceeds its cleanup deadline. The workflow must report all 105 backend tests with no skip and all customer browser journeys passing.
+The initial T7 pull-request workflow completed all PostgreSQL and frontend tests and the production build, then timed out while closing the temporary verification servers. GitHub marked the job cancelled, but GitHub CLI returned exit code 0 and the owner's scripted merge continued. A first corrective run proved that Vite retained an internal Linux file watcher after its HTTP connections closed. The final cleanup requests graceful shutdown, closes all HTTP connections, closes the API normally, and explicitly exits the one-shot verification subprocess only when that Vite watcher exceeds its cleanup deadline. Pull request 8 then passed the complete PostgreSQL, frontend, production-build, proxy, dependency, and customer-browser gate in 2 minutes 36 seconds.
 
 ## Visual review
 

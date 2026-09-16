@@ -4,9 +4,9 @@ A hotel reservation application for the internship assignment, using React, Expr
 
 ## Current state
 
-The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, reservation APIs, and connected customer application are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, secure account sessions, public hotel search, room availability, protected reservation review, transaction-safe booking, confirmation, reservation history, guest-information pages, consent controls, and automated verification.
+The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, reservation APIs, and connected customer and administrator applications are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, secure account sessions, public hotel search, room availability, protected reservation review, transaction-safe booking, confirmation, reservation history, hotel and room management, reservation administration, guest-information pages, consent controls, and automated verification.
 
-The Harbor Quiet design foundation is validated and owner-approved. The production frontend root now serves the connected customer experience. The connected administrator interface, weather, and deployment work remain planned. This repository is not ready to accept production bookings.
+The Harbor Quiet design foundation is validated and owner-approved. The production frontend serves the connected customer experience and the role-protected administrator workspace. Weather and deployment work remain planned. This repository is not ready to accept production bookings.
 
 ## Design previews
 
@@ -54,10 +54,10 @@ Database variables are documented in [database operations](docs/operations/datab
 ## Verification
 
 ```powershell
-npm run verify:customer
+npm run verify:admin
 ```
 
-This checks formatting, linting, backend and frontend component tests, the production build, Git exclusions, the live frontend-to-API proxy, dependency advisories, and the customer Playwright journey. `npm run verify` runs this complete current gate.
+This checks formatting, linting, backend and frontend component tests, the production build, Git exclusions, the live frontend-to-API proxy, dependency advisories, and all connected customer and administrator Playwright journeys. `npm run verify` runs this complete current gate.
 
 The complete design check also runs Chromium browser tests:
 
@@ -74,6 +74,7 @@ Additional commands:
 - `npm run test --workspace frontend -- design-system`: focused design component tests
 - `npm run test:design-browser`: browser checks against local development and the most recent production build; run `npm run build` first
 - `npm run test:e2e -- customer-journey`: connected customer browser journeys with mocked network boundaries
+- `npm run test:e2e -- admin-journey`: connected administrator browser journeys with mocked network boundaries
 - `npm run lint`: source checks
 - `npm run format`: apply formatting
 - `npm run build`: create `frontend/dist`
@@ -126,6 +127,16 @@ T7 provides hotel search, URL-preserved stay criteria, hotel and room details, r
 npm --workspace frontend test -- customer
 npm run test:e2e -- customer-journey
 npm run verify:customer
+```
+
+## Administrator application
+
+T8 provides role-protected administrator navigation, reservation filtering and cancellation, hotel management, room management, destructive confirmations, and conflict-preserving forms. React blocks customer accounts before administrator data calls, while Express remains the authoritative role boundary. See [administrator application operations](docs/operations/administrator-application.md).
+
+```powershell
+npm --workspace frontend test -- admin
+npm run test:e2e -- admin-journey
+npm run verify:admin
 ```
 
 ## Structure

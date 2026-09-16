@@ -61,3 +61,36 @@ export const reservationApi = {
     return (await api.get(`/reservations/${id}`, { signal })).data.reservation;
   },
 };
+
+export const adminApi = {
+  async reservations(status, signal) {
+    return (
+      await api.get('/admin/reservations', {
+        params: status && status !== 'all' ? { status } : undefined,
+        signal,
+      })
+    ).data.reservations;
+  },
+  async updateReservationStatus(id, status) {
+    return (await api.put(`/admin/reservations/${id}/status`, { status })).data
+      .reservation;
+  },
+  async createHotel(input) {
+    return (await api.post('/hotels', input)).data.hotel;
+  },
+  async updateHotel(id, input) {
+    return (await api.put(`/hotels/${id}`, input)).data.hotel;
+  },
+  async deactivateHotel(id) {
+    await api.delete(`/hotels/${id}`);
+  },
+  async createRoom(hotelId, input) {
+    return (await api.post(`/hotels/${hotelId}/rooms`, input)).data.room;
+  },
+  async updateRoom(id, input) {
+    return (await api.put(`/rooms/${id}`, input)).data.room;
+  },
+  async deactivateRoom(id) {
+    await api.delete(`/rooms/${id}`);
+  },
+};

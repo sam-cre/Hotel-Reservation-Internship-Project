@@ -42,5 +42,5 @@ jobs:
         run: npm ci
       - name: Install Chromium
         run: npx playwright install --with-deps chromium
-      - name: Run the complete customer gate
-        run: npm run verify:customer
+      - name: Run the complete administrator gate
+        run: npm run verify:admin

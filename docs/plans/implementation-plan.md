@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 through T6 merged, T7 validated and awaiting the project owner's Git checkpoint, T8 through T12 planned
+Status: Approved; T1 through T7 merged, T8 validated and awaiting the project owner's Git checkpoint, T9 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -103,6 +103,8 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T8. Administrator application
 
+- Status: Validated locally; pull-request gate required before merge
+- Evidence: Five focused component tests cover customer-role exclusion, cancellation confirmation, visible reservation conflicts, typed hotel submission, pending-state duplicate prevention, and conflict-preserving room edits. Three administrator Chromium journeys cover every assignment management action, customer blocking, 320px containment, and an axe accessibility scan. The complete gate passes 100 local backend tests, 20 frontend tests, the production build, proxy verification, the dependency audit, and all six connected customer and administrator browser journeys.
 - Satisfies: R6, R9, R10
 - Depends on: T2, T4, T5, T6
 - Deliver: protected administration, hotel forms, room forms, reservation table, status updates, and destructive confirmations
