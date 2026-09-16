@@ -4,9 +4,9 @@ A hotel reservation application for the internship assignment, using React, Expr
 
 ## Current state
 
-The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, and reservation APIs are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, customer registration and login, secure cookie sessions, current-role authorization, request protections, public catalog search, administrator catalog management, transaction-safe booking, idempotent retries, price snapshots, ownership, cancellation, and automated verification.
+The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, reservation APIs, and connected customer application are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, secure account sessions, public hotel search, room availability, protected reservation review, transaction-safe booking, confirmation, reservation history, guest-information pages, consent controls, and automated verification.
 
-The Harbor Quiet design foundation is validated and owner-approved, with local guest, administrator, and component previews. Connected customer-interface, connected administrator-interface, weather, and deployment work remains planned. This repository is not ready to accept production bookings.
+The Harbor Quiet design foundation is validated and owner-approved. The production frontend root now serves the connected customer experience. The connected administrator interface, weather, and deployment work remain planned. This repository is not ready to accept production bookings.
 
 ## Design previews
 
@@ -16,7 +16,7 @@ After starting local development, open:
 - [Administrator reservations preview](http://127.0.0.1:5173/design/admin)
 - [Shared controls and states](http://127.0.0.1:5173/design/components)
 
-The previews use fictional sample records. Search and sort update the URL; administrator changes exist only in browser memory and reset on reload. Booking is disabled. These routes are gated by Vite's development mode, and the production build retains the initial landing page until real application features are connected.
+The previews use fictional sample records. Search and sort update the URL; administrator changes exist only in browser memory and reset on reload. Booking remains disabled in preview routes. These routes are gated by Vite's development mode and remain separate from the connected customer application.
 
 Fonts and photos are served locally. See [asset credits](docs/design/asset-credits.md) for provenance and licenses.
 
@@ -54,10 +54,10 @@ Database variables are documented in [database operations](docs/operations/datab
 ## Verification
 
 ```powershell
-npm run verify:foundation
+npm run verify:customer
 ```
 
-This checks formatting, linting, backend and frontend component tests, the frontend production build, Git exclusions, and live frontend-to-API proxy behavior on temporary local ports. `npm run verify` runs the complete current T6 gate, including reservation tests and the dependency advisory check.
+This checks formatting, linting, backend and frontend component tests, the production build, Git exclusions, the live frontend-to-API proxy, dependency advisories, and the customer Playwright journey. `npm run verify` runs this complete current gate.
 
 The complete design check also runs Chromium browser tests:
 
@@ -73,6 +73,7 @@ Additional commands:
 - `npm test`: backend and frontend component tests
 - `npm run test --workspace frontend -- design-system`: focused design component tests
 - `npm run test:design-browser`: browser checks against local development and the most recent production build; run `npm run build` first
+- `npm run test:e2e -- customer-journey`: connected customer browser journeys with mocked network boundaries
 - `npm run lint`: source checks
 - `npm run format`: apply formatting
 - `npm run build`: create `frontend/dist`
@@ -115,6 +116,16 @@ T6 provides authenticated booking, server-authoritative price snapshots, determi
 ```powershell
 npm --workspace backend test -- reservations
 npm run verify:reservations
+```
+
+## Customer application
+
+T7 provides hotel search, URL-preserved stay criteria, hotel and room details, registration and sign-in, protected reservation review, booking confirmation, My Reservations, substantive guest-information pages, and reopenable cookie preferences. The browser uses relative `/api` routes and never supplies a booking price or role. See [customer application operations](docs/operations/customer-application.md).
+
+```powershell
+npm --workspace frontend test -- customer
+npm run test:e2e -- customer-journey
+npm run verify:customer
 ```
 
 ## Structure

@@ -1,6 +1,6 @@
 # Quality and Security Strategy
 
-Status: Authentication, catalog, and reservation safeguards implemented; later quality gates remain planned
+Status: Authentication, catalog, reservation, and customer application safeguards implemented; later quality gates remain planned
 
 ## Quality gates
 
@@ -56,6 +56,8 @@ The complete local verification command will run:
 - Stale search responses cannot replace results for newer URL state
 - Administrator controls remain unavailable to customers
 - Form errors are associated with their fields
+
+T7 provides focused component coverage for protected routing, URL state, server-returned prices, strict booking payloads, reservation history, policies, and consent controls. Playwright covers the complete customer journey plus automated axe and 320px overflow checks.
 
 ### End-to-end journeys
 

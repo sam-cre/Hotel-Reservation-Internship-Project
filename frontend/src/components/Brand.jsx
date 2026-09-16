@@ -1,13 +1,9 @@
 import { Link } from 'react-router-dom';
 import styles from './Brand.module.css';
 
-export function Brand({ compact = false }) {
+export function Brand({ compact = false, to = '/' }) {
   return (
-    <Link
-      to="/design/customer"
-      className={styles.brand}
-      aria-label="Stillwater Hotels home"
-    >
+    <Link to={to} className={styles.brand} aria-label="Stillwater Hotels home">
       <svg
         width="38"
         height="38"

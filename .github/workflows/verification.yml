@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   verify:
-    name: Node and PostgreSQL verification
+    name: Node, PostgreSQL, and browser verification
     runs-on: ubuntu-latest
     timeout-minutes: 15
     services:
@@ -40,5 +40,7 @@ jobs:
           cache: npm
       - name: Install locked dependencies
         run: npm ci
-      - name: Run the complete reservation gate
-        run: npm run verify:reservations
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run the complete customer gate
+        run: npm run verify:customer

@@ -1,6 +1,6 @@
 # Implementation Plan
 
-Status: Approved; T1 through T5 merged, T6 portable gate passed with PostgreSQL pull-request verification pending, T7 through T12 planned
+Status: Approved; T1 through T6 merged, T7 validated and awaiting the project owner's Git checkpoint, T8 through T12 planned
 
 The canonical machine-readable plan is `/plan.json`. If this summary and the JSON disagree, the JSON is authoritative.
 
@@ -82,8 +82,8 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T6. Transaction-safe reservation engine
 
-- Status: Portable gate passed on `feature/reservation-engine`; normal PostgreSQL pull-request gate pending
-- Evidence: Nineteen portable reservation tests cover creation, overlap boundaries, multiple units, capacity, inactive resources, strict fields, exact-decimal price snapshots, idempotency, ownership, administrator access, cancellation, and inventory release. The complete portable gate passes with 100 backend tests, 10 frontend tests, formatting, linting, production build, environment checks, API proxy checks, and zero npm advisories. Pull-request CI runs the five conditional normal PostgreSQL tests, including four synchronized concurrency races, before merge.
+- Status: Merged through pull request 5 as commit `e4b8ba8`
+- Evidence: Nineteen portable reservation tests cover creation, overlap boundaries, multiple units, capacity, inactive resources, strict fields, exact-decimal price snapshots, idempotency, ownership, administrator access, cancellation, and inventory release. Pull-request CI passed 105 backend tests with no skips, including five normal PostgreSQL tests and four synchronized concurrency races. Ten frontend regression tests, formatting, linting, production build, environment checks, API proxy checks, and the dependency audit also passed.
 - Satisfies: R4, R5, R6, R7, R10, R14
 - Depends on: T5
 - Deliver: universal inventory locking, overlap counting, multi-unit inventory, nightly and total price snapshots, idempotent creation, ownership, listing, and confirmed-to-cancelled status changes
@@ -93,6 +93,8 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 ### T7. Customer application
 
+- Status: Validated on `feature/customer-application`; owner Git checkpoint pending
+- Evidence: Five focused component tests and three Playwright journeys cover URL-preserved criteria, live search results, hotel and room details, protected routing, registration, server-provided totals, price-field exclusion, idempotency headers, booking confirmation, reservation history, policy content, cookie reopening, axe accessibility, and 320px overflow. Desktop and mobile visual inspection passed.
 - Satisfies: R2, R3, R4, R5, R9, R10
 - Depends on: T2, T4, T5, T6
 - Deliver: home, search results, hotel details, authentication, reservation review, confirmation, My Reservations, structured footer navigation, guest-support links, and cookie-preference controls

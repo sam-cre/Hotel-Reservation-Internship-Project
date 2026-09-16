@@ -1,24 +1,25 @@
 # Engineering Handoff
 
-Status: T5 merged; T6 portable gate passed and PostgreSQL pull-request gate pending
+Status: T1 through T6 merged; T7 validated and awaiting the project owner's Git checkpoint
 
 Last verified: September 15, 2026
 
 ## Product
 
-Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified foundation, approved design previews, PostgreSQL infrastructure, backend authentication, catalog APIs, and an implemented reservation engine. The production customer and administrator interfaces are not yet connected to the APIs.
+Stillwater Hotels is a React, Express, and PostgreSQL reservation application for the internship assignment. The assignment PDF controls product scope. The current repository contains a verified foundation, approved design previews, PostgreSQL infrastructure, backend authentication, catalog APIs, a transaction-safe reservation engine, and the connected customer application. The administrator interface and weather integration remain planned.
 
 ## Current task state
 
-| Task           | Status               | Evidence                               |
-| -------------- | -------------------- | -------------------------------------- |
-| T1             | Committed and pushed | Commit `97e3229` on private `main`     |
-| T2             | Merged               | Pull request 1, merge commit `c2d0061` |
-| T3             | Merged               | Pull request 2, merge commit `b5d12e1` |
-| T4             | Merged               | Pull request 3, merge commit `b13fb8b` |
-| T5             | Merged               | Pull request 4, merge commit `b3e2522` |
-| T6             | Locally validated    | 110 portable tests; PostgreSQL CI next |
-| T7 through T12 | Planned              | See the implementation plan            |
+| Task           | Status               | Evidence                                          |
+| -------------- | -------------------- | ------------------------------------------------- |
+| T1             | Committed and pushed | Commit `97e3229` on private `main`                |
+| T2             | Merged               | Pull request 1, merge commit `c2d0061`            |
+| T3             | Merged               | Pull request 2, merge commit `b5d12e1`            |
+| T4             | Merged               | Pull request 3, merge commit `b13fb8b`            |
+| T5             | Merged               | Pull request 4, merge commit `b3e2522`            |
+| T6             | Merged               | Pull request 5, merge commit `e4b8ba8`            |
+| T7             | Validated            | Complete local gate passed; owner checkpoint next |
+| T8 through T12 | Planned              | See the implementation plan                       |
 
 ## Start here
 
@@ -31,6 +32,7 @@ Stillwater Hotels is a React, Express, and PostgreSQL reservation application fo
 7. Read [authentication operations](operations/authentication.md) before running the backend.
 8. Read [catalog operations](operations/catalog.md) before changing hotel or room data.
 9. Read [reservation operations](operations/reservations.md) before changing booking transactions or statuses.
+10. Read [customer application operations](operations/customer-application.md) before changing routes, sessions, or booking presentation.
 
 ## Development commands
 
@@ -46,7 +48,7 @@ The Vite frontend uses `http://localhost:5173`. The Express API uses `http://loc
 Run the complete current verification:
 
 ```powershell
-npm run verify:reservations
+npm run verify:customer
 ```
 
 ## Architecture boundaries
@@ -75,6 +77,6 @@ npm run verify:reservations
 
 ## Current and next implementation tasks
 
-T6 implements authenticated reservation creation, idempotent retry behavior, transaction-safe inventory checks, price snapshots, customer ownership, administrator listing, and confirmed-to-cancelled status changes. T7 will connect the customer React application to the implemented authentication, catalog, availability, and reservation APIs.
+T7 connects the customer React application to authentication, catalog, availability, and reservation APIs. It includes URL-preserved hotel search, hotel and room details, account creation and sign-in, protected review, idempotent booking, confirmation, reservation history, guest-information pages, and cookie preferences. T8 builds the connected administrator interface.
 
 The detailed acceptance criteria and verification command live in the [implementation plan](plans/implementation-plan.md) and `plan.json`.
