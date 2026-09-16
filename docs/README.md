@@ -1,10 +1,10 @@
 # Stillwater Hotels Documentation
 
-Status: T1 through T6 merged; T7 validated and awaiting the project owner's Git checkpoint
+Status: T1 through T7 merged; T8 validated and awaiting the project owner's Git checkpoint
 
 Stillwater Hotels is a multi-property hotel reservation application built for the internship assignment. This documentation distinguishes assignment requirements, engineering safeguards, and optional enhancements.
 
-Start with the [engineering handoff](HANDOFF.md) for current status and safe commands. The [root README](../README.md) describes the runnable application and sample design previews. PostgreSQL infrastructure, backend authentication, catalog APIs, reservation APIs, and the connected customer application are implemented. The administrator application and weather behavior remain planned.
+Start with the [engineering handoff](HANDOFF.md) for current status and safe commands. The [root README](../README.md) describes the runnable application and sample design previews. PostgreSQL infrastructure, backend authentication, catalog APIs, reservation APIs, and the connected customer and administrator applications are implemented. Weather behavior remains planned.
 
 ## Reading path
 
@@ -22,9 +22,10 @@ Start with the [engineering handoff](HANDOFF.md) for current status and safe com
 12. [Catalog operations](operations/catalog.md)
 13. [Reservation operations](operations/reservations.md)
 14. [Customer application operations](operations/customer-application.md)
-15. [Architecture decisions](decisions/README.md)
-16. [T2 design review reconciliation](decisions/t2-design-review.md)
-17. [Implementation plan](plans/implementation-plan.md)
+15. [Administrator application operations](operations/administrator-application.md)
+16. [Architecture decisions](decisions/README.md)
+17. [T2 design review reconciliation](decisions/t2-design-review.md)
+18. [Implementation plan](plans/implementation-plan.md)
 
 ## Validation history
 
@@ -34,6 +35,7 @@ Start with the [engineering handoff](HANDOFF.md) for current status and safe com
 - [T5 catalog validation](history/2026-09-15-t5-catalog-validation.md)
 - [T6 reservation validation](history/2026-09-15-t6-reservation-validation.md)
 - [T7 customer application validation](history/2026-09-15-t7-customer-validation.md)
+- [T8 administrator application validation](history/2026-09-15-t8-administrator-validation.md)
 
 ## Status vocabulary
 

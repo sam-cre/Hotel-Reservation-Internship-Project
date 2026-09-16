@@ -19,7 +19,7 @@
     "format:check": "prettier --check .",
     "test": "npm run test --workspace backend && npm run test --workspace frontend",
     "test:design-browser": "playwright test --config playwright.design.config.js",
-    "test:e2e": "playwright test --config playwright.customer.config.js",
+    "test:e2e": "playwright test --config playwright.application.config.js",
     "test:database": "npm run test:database --workspace backend",
     "verify:design": "npm run verify:foundation && npm run test:design-browser",
     "verify:database": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js",
@@ -27,8 +27,9 @@
     "verify:catalog": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high",
     "verify:reservations": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high",
     "verify:customer": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high && npm run test:e2e -- customer-journey",
+    "verify:admin": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js && npm audit --audit-level=high && npm run test:e2e",
     "verify:foundation": "npm run format:check && npm run lint && npm test && npm run build && node scripts/verify-foundation.js",
-    "verify": "npm run verify:customer"
+    "verify": "npm run verify:admin"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.13.0",

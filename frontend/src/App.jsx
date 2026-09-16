@@ -4,10 +4,19 @@ import { AdminPreview } from './features/design/AdminPreview.jsx';
 import { ControlsPreview } from './features/design/ControlsPreview.jsx';
 import { AuthProvider } from './features/customer/AuthContext.jsx';
 import { CustomerApplication } from './features/customer/CustomerApplication.jsx';
+import { AdminApplication } from './features/admin/AdminApplication.jsx';
 
 export default function App() {
   return (
     <Routes>
+      <Route
+        path="/admin/*"
+        element={
+          <AuthProvider>
+            <AdminApplication />
+          </AuthProvider>
+        }
+      />
       <Route
         path="/*"
         element={

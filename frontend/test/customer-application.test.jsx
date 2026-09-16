@@ -25,6 +25,16 @@ vi.mock('../src/services/api.js', () => ({
     mine: vi.fn(),
     one: vi.fn(),
   },
+  adminApi: {
+    reservations: vi.fn(),
+    updateReservationStatus: vi.fn(),
+    createHotel: vi.fn(),
+    updateHotel: vi.fn(),
+    deactivateHotel: vi.fn(),
+    createRoom: vi.fn(),
+    updateRoom: vi.fn(),
+    deactivateRoom: vi.fn(),
+  },
 }));
 
 const hotel = {

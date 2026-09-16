@@ -147,6 +147,8 @@ Security working artifacts belong in `.security-audit/` and remain uncommitted b
 - Automated axe checks plus manual keyboard review
 - `aria-live` announcements for availability, price, booking success, and meaningful asynchronous failures
 
+Administrator verification additionally requires customer-role exclusion before data requests, keyboard-accessible destructive confirmations, pending mutation controls, persistent server errors, and a labeled horizontal table region that retains its essential action at 320px.
+
 ## Privacy and guest-information checks
 
 - Essential storage is documented and contains no personal information.

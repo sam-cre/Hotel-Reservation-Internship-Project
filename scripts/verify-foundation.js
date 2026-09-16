@@ -106,6 +106,11 @@ try {
   );
   assert.equal(customer.status, 200);
   assert.match(await customer.text(), /Hotels worth arriving for/);
+  const administrator = await fetch(
+    `${origin}/src/features/admin/AdminApplication.jsx`,
+  );
+  assert.equal(administrator.status, 200);
+  assert.match(await administrator.text(), /Administrator access required/);
   const health = await fetch(`${origin}/api/health`);
   assert.equal(health.status, 200);
   assert.deepEqual(await health.json(), { status: 'ok' });
