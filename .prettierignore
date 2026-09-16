@@ -6,3 +6,4 @@ local-workspace/
 AGENTS.md
 .security-audit/
 *.pdf
+*.sarif

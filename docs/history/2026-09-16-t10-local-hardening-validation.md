@@ -81,4 +81,8 @@ Security working artifacts under `.security-audit/` remain uncommitted by design
 
 ## Post-merge correction
 
-The T10 pull request (number 11, merge commit `3445740`) was merged while its Verification run was red. The `gitleaks-action` step failed because it was not given a `GITHUB_TOKEN`, which the action requires to read a pull request's commits, so the run stopped before `npm run verify:local` and the PostgreSQL tests executed in CI. A follow-up change adds `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` to that step and grants `pull-requests: read`, restoring a green Verification run that exercises the secret scan and the full gate, including the PostgreSQL integration and concurrency tests that are skipped locally. The local `npm run verify:local` evidence recorded above was accurate; only the continuous integration secret-scan step needed the token.
+The T10 pull request (number 11, merge commit `3445740`) was merged while its Verification run was red, and two continuous-integration-only defects were then corrected in follow-up pull requests. The local `npm run verify:local` evidence recorded above was accurate throughout; only the continuous integration configuration needed these changes.
+
+1. Pull request 12 added `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}` to the `gitleaks-action` step and granted `pull-requests: read`. The action requires that token to read a pull request's commits, and without it the step failed before the rest of the gate ran.
+
+2. With the scan then running, `gitleaks-action` writes a `results.sarif` report into the workspace, which `prettier --check .` flagged as unformatted. A further change ignores `*.sarif` in `.prettierignore`, `.gitignore`, and the ESLint configuration, so the generated report no longer breaks the gate. This was reproduced locally by placing a `results.sarif` file in the working tree and confirming `npm run verify:local` passes.

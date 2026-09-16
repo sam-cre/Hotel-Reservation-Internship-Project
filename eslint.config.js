@@ -10,6 +10,7 @@ export default [
       '**/coverage/**',
       'local-workspace/**',
       '.security-audit/**',
+      '**/*.sarif',
     ],
   },
   js.configs.recommended,
