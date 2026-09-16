@@ -1,0 +1,113 @@
+import { useEffect, useState } from 'react';
+import { ArrowUpRight, RefreshCw } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '../../components/ui/Button.jsx';
+import { StatusBadge } from '../../components/ui/StatusBadge.jsx';
+import { apiMessage, reservationApi } from '../../services/api.js';
+import { money, shortDate } from './customer-utils.js';
+import styles from './Customer.module.css';
+
+export function ReservationsPage() {
+  const [reservations, setReservations] = useState([]);
+  const [reload, setReload] = useState(0);
+  const [state, setState] = useState({ loading: true, error: '' });
+  useEffect(() => {
+    const controller = new AbortController();
+    reservationApi
+      .mine(controller.signal)
+      .then((records) => {
+        setReservations(records);
+        setState({ loading: false, error: '' });
+      })
+      .catch((error) => {
+        if (error.code !== 'ERR_CANCELED')
+          setState({
+            loading: false,
+            error: apiMessage(error, 'We could not load your reservations.'),
+          });
+      });
+    return () => controller.abort();
+  }, [reload]);
+
+  return (
+    <main id="main-content" className={styles.main}>
+      <section className={styles.reservationsPage}>
+        <div className={styles.sectionHeading}>
+          <p className={styles.kicker}>Your Stillwater account</p>
+          <h1>My reservations.</h1>
+          <p className={styles.muted}>
+            Every current and previous stay connected to this account.
+          </p>
+        </div>
+        {state.loading && (
+          <div className={styles.statePanel} aria-live="polite">
+            <h2>Retrieving your stays.</h2>
+            <p>Your reservation history will appear here.</p>
+          </div>
+        )}
+        {state.error && (
+          <div className={styles.statePanel} role="alert">
+            <h2>Reservations are unavailable.</h2>
+            <p>{state.error}</p>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setState({ loading: true, error: '' });
+                setReload((value) => value + 1);
+              }}
+            >
+              <RefreshCw size={17} aria-hidden="true" />
+              Try again
+            </Button>
+          </div>
+        )}
+        {!state.loading && !state.error && reservations.length === 0 && (
+          <div className={styles.statePanel}>
+            <h2>Your first stay starts here.</h2>
+            <p>You have no reservations on this account.</p>
+            <Link className={styles.primaryLink} to="/">
+              Find a hotel
+            </Link>
+          </div>
+        )}
+        {!state.loading && !state.error && reservations.length > 0 && (
+          <div className={styles.reservationList}>
+            {reservations.map((reservation) => (
+              <article key={reservation.id} className={styles.reservationRow}>
+                <div>
+                  <p className={styles.reservationReference}>
+                    Reservation {reservation.id}
+                  </p>
+                  <h2>{reservation.hotel.name}</h2>
+                  <p>
+                    {reservation.room.name} in {reservation.hotel.city}
+                  </p>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Arrival</dt>
+                    <dd>{shortDate(reservation.checkIn)}</dd>
+                  </div>
+                  <div>
+                    <dt>Departure</dt>
+                    <dd>{shortDate(reservation.checkOut)}</dd>
+                  </div>
+                  <div>
+                    <dt>Total</dt>
+                    <dd>{money(reservation.totalPrice)}</dd>
+                  </div>
+                </dl>
+                <div className={styles.reservationStatus}>
+                  <StatusBadge status={reservation.status} />
+                  <Link to={`/reservations/${reservation.id}`}>
+                    View details <ArrowUpRight size={16} aria-hidden="true" />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}

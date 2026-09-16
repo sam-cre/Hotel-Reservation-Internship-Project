@@ -1,34 +1,20 @@
-import { Link, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { CustomerPreview } from './features/design/CustomerPreview.jsx';
 import { AdminPreview } from './features/design/AdminPreview.jsx';
 import { ControlsPreview } from './features/design/ControlsPreview.jsx';
-
-function Home() {
-  return (
-    <main>
-      <p className="eyebrow">Stillwater Hotels</p>
-      <h1>Hotels worth arriving for.</h1>
-      <p>Our reservation experience is coming soon.</p>
-    </main>
-  );
-}
-
-function NotFound() {
-  return (
-    <main>
-      <h1>Page not found</h1>
-      <p>This page is unavailable.</p>
-      <Link to="/">Return home</Link>
-    </main>
-  );
-}
+import { AuthProvider } from './features/customer/AuthContext.jsx';
+import { CustomerApplication } from './features/customer/CustomerApplication.jsx';
 
 export default function App() {
   return (
     <Routes>
       <Route
-        path="/"
-        element={import.meta.env.DEV ? <CustomerPreview /> : <Home />}
+        path="/*"
+        element={
+          <AuthProvider>
+            <CustomerApplication />
+          </AuthProvider>
+        }
       />
       {import.meta.env.DEV && (
         <>
@@ -37,7 +23,6 @@ export default function App() {
           <Route path="/design/components" element={<ControlsPreview />} />
         </>
       )}
-      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

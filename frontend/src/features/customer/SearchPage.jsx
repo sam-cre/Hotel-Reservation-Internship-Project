@@ -1,0 +1,229 @@
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowUpRight, Check, MapPin, RefreshCw, Star } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Button } from '../../components/ui/Button.jsx';
+import { apiMessage, catalogApi } from '../../services/api.js';
+import { SearchForm } from './SearchForm.jsx';
+import { StayLine } from './StayLine.jsx';
+import {
+  money,
+  stayFromParams,
+  stayQuery,
+  validateStay,
+} from './customer-utils.js';
+import styles from './Customer.module.css';
+
+const hotelDetails = {
+  'The Battery': ['Rooftop terrace', 'Harbor dining', '24-hour concierge'],
+  'The Calhoun': [
+    'Interior courtyard',
+    'Signature restaurant',
+    'Valet parking',
+  ],
+  'The Forsyth': ['Park setting', 'Full-service hotel', 'Concierge'],
+};
+
+function HotelRow({ hotel, stay, eager }) {
+  return (
+    <article className={styles.hotelRow} aria-labelledby={`hotel-${hotel.id}`}>
+      <div className={styles.hotelImage}>
+        <img
+          src={hotel.imageUrl}
+          alt={`${hotel.name} in ${hotel.city}`}
+          width="1200"
+          height="800"
+          loading={eager ? 'eager' : 'lazy'}
+        />
+        <span>
+          <MapPin size={14} aria-hidden="true" />
+          {hotel.city}
+        </span>
+      </div>
+      <div className={styles.hotelContent}>
+        <div className={styles.hotelTitle}>
+          <h3 id={`hotel-${hotel.id}`}>{hotel.name}</h3>
+          <span className={styles.rating}>
+            <Star size={14} aria-hidden="true" />
+            {hotel.rating}
+            <span className="srOnly"> out of 5</span>
+          </span>
+        </div>
+        <p className={styles.hotelDescription}>{hotel.description}</p>
+        <ul className={styles.features}>
+          {(
+            hotelDetails[hotel.name] || [
+              'Destination service',
+              'Thoughtful rooms',
+            ]
+          ).map((feature) => (
+            <li key={feature}>
+              <Check size={15} aria-hidden="true" />
+              {feature}
+            </li>
+          ))}
+        </ul>
+        <div className={styles.hotelBottom}>
+          <div>
+            <p className={styles.price}>
+              {hotel.startingPrice == null ? (
+                'Rates unavailable'
+              ) : (
+                <>
+                  From <strong>{money(hotel.startingPrice)}</strong>
+                  <span> / night</span>
+                </>
+              )}
+            </p>
+            <p className={styles.priceNote}>
+              Final stay total is confirmed from live room availability.
+            </p>
+          </div>
+          <Link
+            className={styles.primaryLink}
+            to={`/hotels/${hotel.id}?${stayQuery(stay)}`}
+          >
+            View rooms <ArrowUpRight size={17} aria-hidden="true" />
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export function SearchPage() {
+  const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const stay = useMemo(() => stayFromParams(params), [params]);
+  const requestKey = stayQuery(stay);
+  const invalid = Object.keys(validateStay(stay)).length > 0;
+  const [cities, setCities] = useState([]);
+  const [hotels, setHotels] = useState([]);
+  const [state, setState] = useState({ key: '', error: '' });
+  const loading = !invalid && state.key !== requestKey;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    catalogApi
+      .hotels({}, controller.signal)
+      .then((records) => {
+        setCities([...new Set(records.map((hotel) => hotel.city))].sort());
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (invalid) return undefined;
+    const controller = new AbortController();
+    catalogApi
+      .hotels(stay, controller.signal)
+      .then((records) => {
+        setHotels(records);
+        setState({ key: requestKey, error: '' });
+      })
+      .catch((error) => {
+        if (error.code !== 'ERR_CANCELED')
+          setState({
+            key: requestKey,
+            error: apiMessage(error, 'We could not load hotels for this stay.'),
+          });
+      });
+    return () => controller.abort();
+  }, [invalid, requestKey, stay]);
+
+  const displayError = invalid
+    ? 'These stay details are invalid. Update the dates and try again.'
+    : state.key === requestKey
+      ? state.error
+      : '';
+
+  function search(next) {
+    navigate(`/search?${stayQuery(next)}`);
+  }
+
+  return (
+    <main id="main-content" className={styles.main}>
+      <section className={styles.intro} aria-labelledby="search-title">
+        <p className={styles.kicker}>The Stillwater collection</p>
+        <h1 id="search-title">Hotels worth arriving for.</h1>
+        <p className={styles.introSummary}>
+          Distinctive destination hotels, shaped by their cities and supported
+          by considered service.
+        </p>
+      </section>
+      <section
+        id="stay-search"
+        className={styles.searchSection}
+        aria-label="Search hotels"
+      >
+        <SearchForm
+          stay={stay}
+          cities={cities}
+          onSearch={search}
+          busy={loading}
+        />
+      </section>
+      <section
+        className={styles.resultsSection}
+        aria-labelledby="results-title"
+      >
+        <div className={styles.resultsHeading}>
+          <div>
+            <p className={styles.breadcrumb}>The collection / {stay.city}</p>
+            <h2 id="results-title">Stay in {stay.city}.</h2>
+            <p className={styles.muted}>
+              {loading
+                ? 'Checking live room inventory.'
+                : `${hotels.length} ${hotels.length === 1 ? 'hotel' : 'hotels'} match this stay.`}
+            </p>
+          </div>
+        </div>
+        <StayLine stay={stay} />
+        {displayError && (
+          <div className={styles.statePanel} role="alert">
+            <h3>We could not complete that search.</h3>
+            <p>{displayError}</p>
+            <Button variant="secondary" onClick={() => search(stay)}>
+              <RefreshCw size={17} aria-hidden="true" />
+              Try again
+            </Button>
+          </div>
+        )}
+        {!displayError && loading && (
+          <div className={styles.statePanel} aria-live="polite">
+            <h3>Finding your stay.</h3>
+            <p>We are checking current room availability and rates.</p>
+          </div>
+        )}
+        {!displayError && !loading && hotels.length === 0 && (
+          <div className={styles.statePanel}>
+            <h3>A different stay is waiting.</h3>
+            <p>
+              No hotels have qualifying rooms for these dates and guests. Try
+              another date or destination.
+            </p>
+          </div>
+        )}
+        {!displayError && !loading && hotels.length > 0 && (
+          <div className={styles.hotelList}>
+            {hotels.map((hotel, index) => (
+              <HotelRow
+                key={hotel.id}
+                hotel={hotel}
+                stay={stay}
+                eager={index === 0}
+              />
+            ))}
+          </div>
+        )}
+        <div className={styles.closingNote}>
+          <p>
+            Independent in character. Consistent in service.{' '}
+            <span>Stillwater Hotels.</span>
+          </p>
+          <span>All rates in USD</span>
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -15,7 +15,7 @@ export default [
   js.configs.recommended,
   { files: ['**/*.js'], languageOptions: { globals: globals.node } },
   {
-    files: ['tests/design/**/*.js', 'frontend/test/**/*.{js,jsx}'],
+    files: ['tests/**/*.js', 'frontend/test/**/*.{js,jsx}'],
     languageOptions: {
       globals: { ...globals.node, ...globals.browser },
       parserOptions: { ecmaFeatures: { jsx: true } },
