@@ -253,4 +253,12 @@ describe('customer application', () => {
 
     await waitFor(() => expect(reservationApi.mine).toHaveBeenCalled());
   });
+
+  it('sets a descriptive, route-specific browser title', async () => {
+    renderApp(
+      '/search?city=Charleston&checkIn=2026-10-10&checkOut=2026-10-13&guests=2',
+    );
+    await screen.findByRole('heading', { name: 'The Battery' });
+    expect(document.title).toBe('Search hotels | Stillwater Hotels');
+  });
 });

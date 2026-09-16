@@ -1,6 +1,6 @@
 # Git and Deployment Workflow
 
-Status: Git workflow and continuous integration active; deployment planned for T11
+Status: Git workflow and continuous integration active; deployment procedure documented in [production deployment](./production-deployment.md)
 
 ## Ownership
 
@@ -81,19 +81,19 @@ chore/hardening-deployment
 ## Deployment selection
 
 - Frontend: Vercel
-- API: Render free web service
-- Database: Neon free PostgreSQL
+- API: Railway web service
+- Database: Neon PostgreSQL
 - External API: Open-Meteo
 
-Render is selected because the assignment recommends it and it currently provides a free Node.js web service. The free service sleeps after inactivity, so the UI must handle a cold start gracefully. Neon is used instead of Render PostgreSQL because Render's free PostgreSQL expires after 30 days, while Neon provides an ongoing free plan and pooled connections.
+Railway is selected because the owner already runs a paid Railway account, so the API stays warm with no free-tier cold-start delay. Neon provides the managed PostgreSQL with an ongoing free plan and pooled connections. The full step-by-step procedure lives in [production deployment](./production-deployment.md).
 
 ## Deployment order
 
 1. Local application and tests pass.
 2. Neon project is created and migrations are applied.
-3. Render API is deployed with a health check and secrets.
-4. The public Render API URL is tested directly.
-5. Vercel frontend is deployed with the API rewrite destination configured.
+3. The Vercel project is created first to reserve its public domain, which the API needs for its allowed origin.
+4. The Railway API is deployed with a health check and secrets, using the Vercel domain as its allowed origin.
+5. `vercel.json` is finalized with the Railway public URL, and `robots.txt` and `sitemap.xml` are finalized with the Vercel domain, in a reviewed pull request.
 6. Cookie, origin, cache, and HTTPS behavior are verified in production.
 7. The Vercel rewrite is verified to preserve every authentication `Set-Cookie` attribute.
 8. Complete customer and administrator smoke tests run against public URLs.
@@ -108,14 +108,13 @@ Render is selected because the assignment recommends it and it currently provide
 - Secure cookies
 - Production logging with secret redaction
 - No debug stack traces
-- `Cache-Control: private, no-store` for authenticated responses
-- No caching for mutation responses
+- `Cache-Control: no-store` for authenticated and mutation responses
 - Health checks contain no sensitive data
-- Render filesystem is treated as ephemeral
+- Railway filesystem is treated as ephemeral
 
-## Cold-start experience
+## Availability
 
-The first API request after Render has been idle may be slow. Current Vercel limits allow an external rewrite request up to 120 seconds, so the proxy is not expected to fail before a normal Render free-tier wake-up completes. The frontend shows a clear loading state. It may offer one user-triggered retry for safe reads, but it never automatically retries a reservation mutation without its idempotency key. Documentation explains the free-tier limitation honestly.
+The Railway service runs on the owner's paid plan and stays warm, so there is no free-tier idle sleep or cold-start delay to design around. The frontend still shows clear loading states for every network request, and it never automatically retries a reservation mutation without its idempotency key. A readiness endpoint at `/api/ready` confirms live database connectivity separately from the liveness check at `/api/health`.
 
 ## Continuous integration
 
@@ -138,5 +137,5 @@ gitleaks detect --source . --config .gitleaks.toml --redact
 
 - Vercel proxied-request limits: <https://vercel.com/docs/limits>
 - Vercel external rewrites: <https://vercel.com/docs/routing/rewrites>
-- Render free-instance behavior: <https://render.com/docs/free>
+- Railway deployment guides: <https://docs.railway.com/>
 - Neon plans: <https://neon.com/pricing>

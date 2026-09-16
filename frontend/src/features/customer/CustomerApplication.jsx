@@ -1,4 +1,11 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import {
+  matchPath,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from 'react-router-dom';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useAuth } from './useAuth.js';
 import { CustomerShell } from './CustomerShell.jsx';
 import { SearchPage } from './SearchPage.jsx';
@@ -49,7 +56,28 @@ function NotFound() {
   );
 }
 
+const CUSTOMER_TITLES = [
+  ['/', 'Find your stay'],
+  ['/search', 'Search hotels'],
+  ['/hotels/:hotelId', 'Hotel details'],
+  ['/login', 'Sign in'],
+  ['/register', 'Create your account'],
+  ['/reserve', 'Review your stay'],
+  ['/reservations', 'Your reservations'],
+  ['/reservations/:reservationId', 'Reservation confirmed'],
+  ['/information/:topic', 'Guest information'],
+];
+
+function resolveCustomerTitle(pathname) {
+  for (const [pattern, title] of CUSTOMER_TITLES) {
+    if (matchPath({ path: pattern, end: true }, pathname)) return title;
+  }
+  return null;
+}
+
 export function CustomerApplication() {
+  const location = useLocation();
+  useDocumentTitle(resolveCustomerTitle(location.pathname));
   return (
     <CustomerShell>
       <Routes>

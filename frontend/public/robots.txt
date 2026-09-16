@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /search
+Disallow: /login
+Disallow: /register
+Disallow: /reserve
+Disallow: /reservations
+Disallow: /admin
+
+Sitemap: https://REPLACE_WITH_VERCEL_DOMAIN/sitemap.xml

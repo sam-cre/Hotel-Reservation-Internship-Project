@@ -30,6 +30,16 @@ export function createApp({
   });
   app.use(express.json({ limit: '16kb' }));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
+  if (database) {
+    app.get('/api/ready', async (_req, res) => {
+      try {
+        await database.query('SELECT 1');
+        res.json({ status: 'ready' });
+      } catch {
+        res.status(503).json({ status: 'unavailable' });
+      }
+    });
+  }
   const auth = authentication ? createAuthModule(authentication) : null;
   if (auth) {
     app.locals.authenticate = auth.authenticate;
