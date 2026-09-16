@@ -11,6 +11,7 @@ export function createApp({
   logError = console.error,
   database,
   authentication,
+  catalog,
   catalogNow,
   configureRoutes,
   reservationNow,
@@ -43,6 +44,7 @@ export function createApp({
         authenticate: auth.authenticate,
         authorizeAdmin: auth.authorizeAdmin,
         now: catalogNow,
+        imageHostAllowlist: catalog?.imageHostAllowlist,
       }),
     );
     app.use(

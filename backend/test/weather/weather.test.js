@@ -2,6 +2,22 @@ import request from 'supertest';
 import { describe, expect, it, vi } from 'vitest';
 import { createApp } from '../../src/app.js';
 import { readWeatherEnvironment } from '../../src/config/weather.js';
+import { createWeatherService } from '../../src/modules/weather/service.js';
+
+const serviceConfig = (overrides = {}) => ({
+  timeoutMs: 1000,
+  cacheTtlMs: 60000,
+  geocodingUrl: 'https://geocoding.example/search',
+  forecastUrl: 'https://forecast.example/forecast',
+  ...overrides,
+});
+
+const routeFetcher = () =>
+  vi
+    .fn()
+    .mockImplementation(async (url) =>
+      json(String(url).includes('geocoding') ? location : forecast),
+    );
 
 const location = {
   results: [
@@ -48,6 +64,10 @@ function testContext(overrides = {}) {
       config: {
         timeoutMs: overrides.timeoutMs ?? 100,
         cacheTtlMs: overrides.cacheTtlMs ?? 1000,
+        maxInFlight: overrides.maxInFlight,
+        maxCacheEntries: overrides.maxCacheEntries,
+        rateLimitWindowMs: overrides.rateLimitWindowMs,
+        rateLimitMax: overrides.rateLimitMax,
         geocodingUrl: 'https://geocoding.example/search',
         forecastUrl: 'https://forecast.example/forecast',
       },
@@ -61,6 +81,10 @@ describe('weather API', () => {
     expect(readWeatherEnvironment({})).toEqual({
       timeoutMs: 4000,
       cacheTtlMs: 600000,
+      maxInFlight: 4,
+      maxCacheEntries: 500,
+      rateLimitWindowMs: 60000,
+      rateLimitMax: 60,
       geocodingUrl: 'https://geocoding-api.open-meteo.com/v1/search',
       forecastUrl: 'https://api.open-meteo.com/v1/forecast',
     });
@@ -193,5 +217,92 @@ describe('weather API', () => {
     expect(response.body.error.code).toBe('VALIDATION_ERROR');
     expect(response.body.error.details.fields).toContain('city');
     expect(context.fetcher).not.toHaveBeenCalled();
+  });
+
+  it('caps concurrent provider work across distinct cities', async () => {
+    let active = 0;
+    let maxActive = 0;
+    let release;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    const fetcher = vi.fn(async (url) => {
+      active += 1;
+      maxActive = Math.max(maxActive, active);
+      await gate;
+      active -= 1;
+      return json(String(url).includes('geocoding') ? location : forecast);
+    });
+    const service = createWeatherService({
+      fetcher,
+      now: () => 1000,
+      config: serviceConfig({ maxInFlight: 3 }),
+    });
+
+    const work = Array.from({ length: 12 }, (_, index) =>
+      service.current(`distinct-city-${index}`),
+    );
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(maxActive).toBeLessThanOrEqual(3);
+    release();
+    await Promise.all(work);
+  });
+
+  it('bounds the cache to its configured size with first-in eviction', async () => {
+    const fetcher = routeFetcher();
+    const service = createWeatherService({
+      fetcher,
+      now: () => 1000,
+      config: serviceConfig({ maxInFlight: 5, maxCacheEntries: 2 }),
+    });
+
+    await service.current('alpha');
+    await service.current('bravo');
+    await service.current('charlie');
+    const callsWhenFull = fetcher.mock.calls.length;
+
+    await service.current('charlie');
+    expect(fetcher.mock.calls.length).toBe(callsWhenFull);
+
+    // alpha was evicted when charlie was cached, so it must be fetched again.
+    await service.current('alpha');
+    expect(fetcher.mock.calls.length).toBe(callsWhenFull + 2);
+  });
+
+  it('discards expired cache entries before serving them', async () => {
+    let clock = 1000;
+    const fetcher = routeFetcher();
+    const service = createWeatherService({
+      fetcher,
+      now: () => clock,
+      config: serviceConfig({ cacheTtlMs: 100 }),
+    });
+
+    await service.current('Charleston');
+    expect(fetcher.mock.calls.length).toBe(2);
+    clock = 1101;
+    await service.current('Charleston');
+    expect(fetcher.mock.calls.length).toBe(4);
+  });
+
+  it('rate limits public weather requests before provider work', async () => {
+    const context = testContext({ rateLimitMax: 2, rateLimitWindowMs: 60000 });
+    context.fetcher.mockImplementation(async (url) =>
+      json(String(url).includes('geocoding') ? location : forecast),
+    );
+
+    await context.request
+      .get('/api/weather')
+      .query({ city: 'Alpha' })
+      .expect(200);
+    await context.request
+      .get('/api/weather')
+      .query({ city: 'Bravo' })
+      .expect(200);
+    const limited = await context.request
+      .get('/api/weather')
+      .query({ city: 'Charlie' })
+      .expect(429);
+    expect(limited.body.error.code).toBe('RATE_LIMITED');
   });
 });

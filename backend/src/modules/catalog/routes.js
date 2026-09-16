@@ -4,8 +4,8 @@ import { parseRequest } from '../../http/validation.js';
 import { createCatalogService } from './service.js';
 import {
   availabilitySchema,
+  createHotelMutationSchema,
   hotelIdParamsSchema,
-  hotelMutationSchema,
   hotelSearchSchema,
   idParamsSchema,
   roomListSchema,
@@ -17,8 +17,10 @@ export function createCatalogRouter({
   authenticate,
   authorizeAdmin,
   now,
+  imageHostAllowlist = new Set(),
 }) {
   const service = createCatalogService({ database, now });
+  const hotelMutationSchema = createHotelMutationSchema(imageHostAllowlist);
   const router = Router();
   const admin = [authenticate, authorizeAdmin];
 

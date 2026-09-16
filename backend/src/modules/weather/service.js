@@ -59,13 +59,66 @@ function locationName(location) {
     .join(', ');
 }
 
+// Runs at most `max` tasks concurrently. Distinct city keys are queued rather
+// than all contacting the provider at once, which bounds sockets, memory, and
+// provider quota under an unauthenticated request burst.
+function createConcurrencyLimiter(max) {
+  let active = 0;
+  const waiting = [];
+  const runNext = () => {
+    if (active >= max || waiting.length === 0) return;
+    active += 1;
+    const { task, resolve, reject } = waiting.shift();
+    Promise.resolve()
+      .then(task)
+      .then(resolve, reject)
+      .finally(() => {
+        active -= 1;
+        runNext();
+      });
+  };
+  return (task) =>
+    new Promise((resolve, reject) => {
+      waiting.push({ task, resolve, reject });
+      runNext();
+    });
+}
+
 export function createWeatherService({
   fetcher = fetch,
   config,
   now = () => Date.now(),
 }) {
+  const maxInFlight = config.maxInFlight ?? 4;
+  const maxCacheEntries = config.maxCacheEntries ?? 500;
+  const limit = createConcurrencyLimiter(maxInFlight);
   const cache = new Map();
   const pending = new Map();
+
+  function readCache(key) {
+    const cached = cache.get(key);
+    if (!cached) return undefined;
+    if (cached.expiresAt <= now()) {
+      cache.delete(key);
+      return undefined;
+    }
+    return cached.value;
+  }
+
+  function writeCache(key, value) {
+    // Drop expired entries and hold the map to its configured size using
+    // first-in eviction so a stream of distinct cities cannot grow it without
+    // bound. Map preserves insertion order, so the first key is the oldest.
+    for (const [existingKey, entry] of cache) {
+      if (entry.expiresAt <= now()) cache.delete(existingKey);
+    }
+    cache.delete(key);
+    cache.set(key, { value, expiresAt: now() + config.cacheTtlMs });
+    while (cache.size > maxCacheEntries) {
+      const oldest = cache.keys().next().value;
+      cache.delete(oldest);
+    }
+  }
 
   async function load(city) {
     const geocodingUrl = buildUrl(config.geocodingUrl, {
@@ -117,16 +170,16 @@ export function createWeatherService({
   return {
     async current(city) {
       const key = city.trim().toLocaleLowerCase('en-US');
-      const cached = cache.get(key);
-      if (cached && cached.expiresAt > now()) return cached.value;
+      const cached = readCache(key);
+      if (cached !== undefined) return cached;
       if (pending.has(key)) return pending.get(key);
 
-      const work = load(city)
+      // Register the shared work before entering the concurrency queue so
+      // concurrent requests for the same city still coalesce onto one call
+      // while distinct keys wait for an available slot.
+      const work = limit(() => load(city))
         .then((value) => {
-          cache.set(key, {
-            value,
-            expiresAt: now() + config.cacheTtlMs,
-          });
+          writeCache(key, value);
           return value;
         })
         .finally(() => pending.delete(key));

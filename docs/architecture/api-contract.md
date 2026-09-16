@@ -1,6 +1,6 @@
 # API Contract
 
-Status: Authentication, catalog, and reservation routes implemented; weather route planned
+Status: Authentication, catalog, reservation, and weather routes implemented
 
 All routes are rooted at `/api`. JSON request bodies use `Content-Type: application/json`. Protected routes require the secure authentication cookie.
 
@@ -63,6 +63,8 @@ Public. Returns `{ "hotel": Hotel }` for an active hotel. It does not claim avai
 ### POST `/hotels`
 
 Administrator only. Accepts exactly `name`, `description`, `city`, `address`, `rating`, and `imageUrl`. Creates a hotel and returns HTTP 201 with `{ "hotel": Hotel }`. A duplicate hotel name within the same city returns HTTP 409.
+
+`imageUrl` accepts a same-origin managed asset path such as `/images/hotel.jpg`. A remote image is accepted only when it is HTTPS, carries no embedded credentials, and its host appears in the server-configured `CATALOG_IMAGE_HOST_ALLOWLIST`. The allowlist is empty by default, so arbitrary remote origins are rejected with HTTP 400.
 
 ### PUT `/hotels/:id`
 
@@ -132,7 +134,7 @@ Administrator only. Accepts exactly `{ "status": "cancelled" }`. A confirmed res
 
 ### GET `/weather`
 
-Public. Requires one trimmed `city` query string from 1 through 120 characters. Unknown fields and control characters are rejected. The backend geocodes the city and requests current weather from Open-Meteo. The frontend never calls the external provider directly.
+Public and rate limited. Requires one trimmed `city` query string from 1 through 120 characters. Unknown fields and control characters are rejected. The backend geocodes the city and requests current weather from Open-Meteo. The frontend never calls the external provider directly. Requests beyond the configured per-client rate limit return HTTP 429 with `RATE_LIMITED` before any provider work.
 
 Successful response:
 
@@ -158,7 +160,7 @@ Successful response:
 - `WEATHER_UPSTREAM_UNAVAILABLE`, HTTP 503: the provider failed or returned a non-success status.
 - `WEATHER_UPSTREAM_INVALID`, HTTP 503: the provider response did not match the validated contract.
 
-Successful results use a normalized, short-lived in-memory city cache. Concurrent requests for the same normalized city share one external lookup. Failures are not cached. External bodies, URLs, and low-level errors are never forwarded to the browser. The hotel page loads weather independently, so any weather error produces a quiet unavailable state without hiding hotel or room data.
+Successful results use a normalized, short-lived in-memory city cache that is bounded in size with first-in eviction and drops expired entries. Concurrent requests for the same normalized city share one external lookup, and distinct cities are processed through a bounded concurrency limit so an unauthenticated request burst cannot start unlimited provider work. Failures are not cached. External bodies, URLs, and low-level errors are never forwarded to the browser. The hotel page loads weather independently, so any weather error produces a quiet unavailable state without hiding hotel or room data.
 
 ## Health
 

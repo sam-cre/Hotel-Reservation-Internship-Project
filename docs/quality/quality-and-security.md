@@ -1,6 +1,6 @@
 # Quality and Security Strategy
 
-Status: Authentication, catalog, reservation, and customer application safeguards implemented; later quality gates remain planned
+Status: Authentication, catalog, reservation, customer, administrator, and weather safeguards implemented; T10 defensive audit and remediation complete and locally validated; production configuration review remains for T11
 
 ## Quality gates
 
@@ -93,7 +93,8 @@ T7 provides focused component coverage for protected routing, URL state, server-
 - `SameSite=Lax` cookie
 - Security headers appropriate to the frontend and API
 - React output escaping remains enabled
-- External URLs are validated before storage
+- External hotel image URLs are validated before storage against an HTTPS host allowlist that is empty by default, so arbitrary remote origins are rejected and same-origin asset paths remain valid
+- Post-login redirect destinations are canonicalized against the application origin and accepted only when they resolve to a same-origin local path, so a crafted login link cannot forward an authenticated guest to an external site
 - Authenticated responses use `Cache-Control: private, no-store`
 
 ### Database
@@ -116,6 +117,7 @@ T7 provides focused component coverage for protected routing, URL state, server-
 - `.env` and environment variants are ignored
 - `.env.example` contains names and safe placeholders only
 - Deployment secrets live in provider secret stores
+- The pull-request gate runs a pinned Gitleaks secret scan over full history, and `scripts/verify-foundation.js` asserts no `.env` variant, key, or certificate is tracked and that the scanner ruleset is active through a sentinel canary rule
 - Logs redact cookies, authorization headers, passwords, JWTs, and database URLs
 - Production errors omit stacks and SQL details
 - No credentials appear in screenshots, documentation, fixtures, or seed data
@@ -127,15 +129,20 @@ T7 provides focused component coverage for protected routing, URL state, server-
 - Provider base URLs come only from validated backend configuration.
 - External response bodies are parsed against narrow schemas and reduced to an internal contract.
 - Timeouts bound external work, and only successful responses enter the short-lived cache.
+- The public weather route is rate limited before any provider work, distinct-city lookups pass through a bounded concurrency limit, and the success cache is size-bounded with first-in eviction and expiry cleanup, so an unauthenticated request burst cannot start unlimited provider work or grow memory without bound.
 - Safe API errors omit provider bodies and transport details.
 - Weather failure cannot suppress hotel, inventory, price, or reservation information.
+
+### Accepted risks
+
+- SEC-300, registration account enumeration: public registration returns HTTP 409 with `EMAIL_ALREADY_REGISTERED` for an already-registered email, which allows bounded account discovery. A sound indistinguishable registration response depends on email verification, which is explicitly out of scope for this assignment. Registration rate limiting, generic login failures, and Argon2id hashing constrain follow-on abuse. This low risk is accepted for the current scope and will be reopened if email verification is added. Behavior is unchanged.
 
 ## Security-audit schedule
 
 1. Architecture threat-model review before implementation approval
-2. Focused authentication review completed during T4; repeat after reservations are implemented
-3. Full local audit before deployment
-4. Production configuration review without penetration testing third-party infrastructure
+2. Focused authentication review completed during T4; repeated after reservations were implemented
+3. Full local defensive audit completed in T10. It reviewed source, ran local proofs against mocks and direct functions only, and contacted no external target. `npm audit` reported zero advisories and a bounded redacted history scan found no real credential; the two credentialed strings in history were synthetic localhost test values. Four confirmed findings were remediated (SEC-100, SEC-200, SEC-201, SEC-400) and one was accepted (SEC-300).
+4. Production configuration review remains for T11, without penetration testing third-party infrastructure.
 
 Remote scanning is out of scope unless the user separately confirms authorization for a specific host and test plan.
 

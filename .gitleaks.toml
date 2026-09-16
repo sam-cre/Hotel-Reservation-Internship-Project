@@ -1,0 +1,25 @@
+title = "Stillwater Hotels secret scan"
+
+# Use the maintained default ruleset and add a project-specific canary rule.
+[extend]
+useDefault = true
+
+# Canary rule: proves the scanner configuration is loaded and non-vacuous. The
+# accompanying self-test asserts this pattern matches its sentinel fixture token
+# so a silently misconfigured or empty ruleset cannot pass the gate unnoticed.
+[[rules]]
+id = "stillwater-canary"
+description = "Sentinel token used to verify the secret scanner is active"
+regex = '''SENTINEL_LEAKED_TOKEN_[0-9A-F]{16}'''
+keywords = ["SENTINEL_LEAKED_TOKEN_"]
+
+[allowlist]
+description = "Documented non-secret fixtures and synthetic test credentials"
+paths = [
+  '''\.env\.example$''',
+  '''\.gitleaks\.toml$''',
+]
+regexes = [
+  # Synthetic PostgreSQL credentials for disposable local and CI test databases.
+  '''test-only-password''',
+]

@@ -1,6 +1,6 @@
 # Requirements and Scope
 
-Status: Planning
+Status: Assignment features A01 through A18, A20, and the S01 through S15 safeguards implemented and locally validated through T10; A19 deployment and A21 explanation demonstration remain for T11 and T12. See the [assignment traceability matrix](assignment-traceability.md).
 
 ## Product objective
 
@@ -92,5 +92,5 @@ The original assignment PDF remains local and excluded from Git. This document i
 - The server snapshots the nightly price and calculates and stores the total from that snapshot.
 - Retrying the same reservation request with the same idempotency key returns the original result instead of creating another reservation.
 - Public registration always creates a customer.
-- Hotel images use validated HTTP or HTTPS URLs. File uploads are out of scope.
+- Hotel images use a validated same-origin asset path or an HTTPS URL whose host is on the server-configured allowlist, which is empty by default. Insecure HTTP, credentialed URLs, and unapproved remote hosts are rejected. File uploads are out of scope.
 - Hotels and room types are deactivated instead of destructively deleted; inactive records stay available to historical reservations and are excluded from public browsing.

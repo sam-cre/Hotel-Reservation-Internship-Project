@@ -1,6 +1,6 @@
 # Git and Deployment Workflow
 
-Status: Planning
+Status: Git workflow and continuous integration active; deployment planned for T11
 
 ## Ownership
 
@@ -119,7 +119,20 @@ The first API request after Render has been idle may be slow. Current Vercel lim
 
 ## Continuous integration
 
-GitHub Actions runs formatting, linting, builds, and tests on pull requests and `main`. PostgreSQL integration tests use an ephemeral service container in CI. Docker remains optional for local development because it is not required by the assignment and is not currently installed on the development machine.
+The `.github/workflows/verification.yml` workflow runs on pull requests targeting `main`. It has no separate `push` trigger: `main` advances only through a pull request whose checks pass, so the pull-request run already gates every change that reaches `main`. The workflow declares `contents: read` permissions, cancels superseded runs for the same ref through a concurrency group, and pins every action to an exact commit SHA.
+
+Each run checks out the repository with `persist-credentials: false` and full history, runs a pinned Gitleaks secret scan, installs locked dependencies with `npm ci`, installs Chromium, and runs the canonical `npm run verify:local` gate. That gate covers formatting, linting, backend and frontend tests, the production build, foundation and secret-scan configuration checks, the dependency audit, and the Playwright journeys. PostgreSQL integration and concurrency tests run against an ephemeral `postgres:17-alpine` service container using synthetic test-only credentials; those specific tests are skipped locally when `TEST_DATABASE_URL` is absent. Docker remains optional for local development because it is not required by the assignment and is not currently installed on the development machine.
+
+### Secret scanning
+
+- The pull-request gate runs `gitleaks/gitleaks-action` pinned to commit `e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e` (v3.0.0). No `GITLEAKS_LICENSE` is required because the repository belongs to a personal account; a license would be required only if the repository moved under a GitHub organization.
+- `.gitleaks.toml` extends the maintained default ruleset, adds a canary rule, and narrowly allowlists `.env.example`, the config file itself, and the synthetic `test-only-password` used by disposable test databases.
+- `scripts/verify-foundation.js` runs in every gate and asserts, without any scanner binary, that CI pins the verified action commit, that no `.env` variant, private key, or certificate is tracked, and that the canary rule matches its sentinel token but not benign text. This proves the ruleset is active rather than silently empty.
+- Owner-side history scan (optional, requires the Gitleaks binary installed locally):
+
+```powershell
+gitleaks detect --source . --config .gitleaks.toml --redact
+```
 
 ## Platform references
 
