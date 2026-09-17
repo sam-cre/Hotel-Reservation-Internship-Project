@@ -6,7 +6,7 @@ A hotel reservation application for the internship assignment, using React, Expr
 
 The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, reservation APIs, connected customer and administrator applications, and weather integration are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, secure account sessions, public hotel search, room availability, protected reservation review, transaction-safe booking, confirmation, reservation history, hotel and room management, reservation administration, guest-information pages, consent controls, current hotel-city conditions, and automated verification.
 
-The Harbor Quiet design foundation is validated and owner-approved. The production frontend serves the connected customer experience and the role-protected administrator workspace. Deployment work remains planned. This repository is not ready to accept production bookings.
+The Harbor Quiet design foundation is validated and owner-approved. The application is deployed to production: the frontend on Vercel, the API on Railway, and PostgreSQL on Neon. The frontend proxies `/api` requests to the API so the whole site is served from one origin. Payments are out of scope, so this is a demonstration deployment rather than a commercial booking service.
 
 ## Design previews
 
@@ -88,7 +88,7 @@ Additional commands:
 - `npm run preview --workspace frontend`: preview the static build locally; API integration uses the development server until deployment routing is configured
 - `npm start --workspace backend`: start the API without the file watcher
 
-`/api/health` checks process liveness only. Database readiness will be added with PostgreSQL integration.
+`/api/health` checks process liveness. `/api/ready` additionally confirms database connectivity and is used for deployment health checks.
 
 ## Database foundation
 
@@ -166,8 +166,12 @@ npm run verify:weather
 
 ## Deployment
 
-Frontend URL: not deployed.
+The application is live in production:
 
-API URL: not deployed.
+- Frontend (Vercel): <https://hotel-reservation-internship-projec-six.vercel.app>
+- API health, via the frontend proxy: <https://hotel-reservation-internship-projec-six.vercel.app/api/health>
+- API readiness, which confirms database connectivity: <https://hotel-reservation-internship-projec-six.vercel.app/api/ready>
+
+Vercel serves the built frontend and proxies `/api` requests to the Express API on Railway, which connects to PostgreSQL on Neon. Serving the frontend and API under one origin keeps the authentication cookie first-party and the cross-site request defenses intact. The step-by-step procedure and post-launch operations are documented in [production deployment](docs/operations/production-deployment.md).
 
 See the [documentation index](docs/README.md) and [implementation plan](docs/plans/implementation-plan.md) for scope, decisions, and remaining milestones.
