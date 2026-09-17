@@ -56,7 +56,7 @@ Use Vitest, Supertest, React Testing Library, Playwright, and real PostgreSQL in
 
 ## ADR-012: Deployment
 
-Use Vercel for the frontend, Render for the API, and Neon for PostgreSQL. Keep the GitHub repository private. Treat free-tier cold starts as an operational limitation that the UI and README explain.
+Use Vercel for the frontend, Railway for the API, and Neon for PostgreSQL. Serve the frontend and API under one origin by proxying `/api/*` from Vercel to Railway, which keeps the authentication cookie first-party and the cross-site request defenses intact. Keep the GitHub repository private. The Railway service runs on the owner's paid plan and stays warm, so there is no free-tier cold start.
 
 ## ADR-013: Human-owned Git history
 

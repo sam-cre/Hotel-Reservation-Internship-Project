@@ -86,6 +86,6 @@ npm run verify:local
 
 T10 completes the local hardening and defensive security audit of the owner's own code. It bounds unauthenticated weather work, enforces same-origin post-login redirects, constrains catalog image origins to an allowlist, and adds a pinned secret scanner to the pull-request gate. Registration account enumeration (SEC-300) is recorded as an accepted low risk for the no-email scope. See the [security remediation record](history/2026-09-16-t10-local-hardening-validation.md), the [assignment traceability matrix](project/assignment-traceability.md), and the [explanation readiness guide](project/explanation-readiness.md).
 
-T11 is production deployment (Neon, Render, Vercel). It has not started. This repository is not deployed.
+T11 production deployment is complete. The application is deployed with the Vercel frontend, the Railway API, and the Neon database, served under one origin so `/api/*` is proxied from Vercel to Railway. See the [production deployment runbook](operations/production-deployment.md).
 
 The detailed acceptance criteria and verification command live in the [implementation plan](plans/implementation-plan.md) and `plan.json`.

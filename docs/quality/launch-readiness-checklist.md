@@ -1,6 +1,6 @@
 # Launch Readiness Checklist
 
-Status: Evidence-backed through T10 local hardening; deployment items pending T11
+Status: Evidence-backed through T12; production deployment is live and verified against the public URL
 
 This checklist supplements the internship assignment. The assignment PDF remains authoritative. The checklist adapts objective checks from the owner's VORA Health project to a hotel reservation service and excludes clothing-commerce requirements that do not apply.
 
@@ -13,53 +13,53 @@ This checklist supplements the internship assignment. The assignment PDF remains
 
 ## Status legend
 
-- Validated: implemented with local evidence from the current test suites or source, as of T10.
-- Pending T11: depends on production deployment, hosting configuration, or a live public URL.
+- Validated: implemented with evidence from the current test suites, source, or live production checks.
+- Deferred: a recognized enhancement beyond the assignment's required scope, typically SEO or performance polish, not implemented.
 - Owner review: needs the owner's judgment or qualified review, typically legal, policy, or editorial content.
 - Accepted risk: a documented decision not to change current behavior for this assignment scope.
 - N/A: out of scope, with the reason recorded.
 
-Every item below is prefixed with its current status. Items are re-confirmed in T11 and T12 before release.
+Every item below is prefixed with its current status. Items are re-confirmed before final submission.
 
 ## Site integrity and security
 
-- Pending T11: The frontend and API return successful responses over HTTPS.
-- Pending T11: HTTP redirects permanently to the matching HTTPS URL without a loop or excessive chain.
-- Pending T11: The production domain resolves correctly and uses the approved custom domain when one is available.
-- Pending T11: Strict Transport Security is enabled after HTTPS behavior is verified.
-- Pending T11: Content Security Policy, frame protection, MIME sniffing protection, and an appropriate referrer policy are present. Helmet sets baseline API headers today; the production frontend CSP, including `img-src` for any approved image host and `Referrer-Policy`, is configured in T11.
-- Pending T11: No page loads insecure scripts, fonts, images, or API calls. Fonts and seeded images are same-origin today; this is re-verified against the deployed origin.
+- Validated: The frontend and API return successful responses over HTTPS. The live site returns HTTP 200 over HTTPS, and `/api/health` and `/api/ready` succeed through the Vercel-to-Railway proxy.
+- Validated: HTTP redirects permanently to the matching HTTPS URL. The production domain returns a 308 permanent redirect from `http` to `https`.
+- Validated: The production domain resolves correctly. The site is served at `https://hotel-reservation-internship-projec-six.vercel.app`; a custom domain is not in scope.
+- Validated: Strict Transport Security is enabled. Responses carry `Strict-Transport-Security: max-age=31536000; includeSubDomains`.
+- Deferred: A tuned frontend Content Security Policy and `Referrer-Policy` are present. Helmet sets baseline API headers and Vercel sets MIME-sniffing protection today; a tuned frontend CSP is a post-launch hardening task.
+- Validated: No page loads insecure scripts, fonts, images, or API calls. Fonts and seeded images are same-origin and the site loads entirely over HTTPS.
 - Validated: The viewport and UTF-8 character encoding are declared in `frontend/index.html`.
 - Validated: The browser console has no uncaught application errors during critical journeys. The six Playwright journeys exercise the full customer and administrator flows and pass.
 - Validated: Public error pages do not expose stack traces, SQL, credentials, or internal paths. The `backend/src/app.js` error middleware returns only a stable code, safe message, and request ID; authentication and weather tests assert sanitized errors.
-- Validated locally: Internal links and required policy links return successful responses. `tests/customer/customer-journey.spec.js` exercises policy pages and cookie reopening. Production reachability is re-verified in T11.
+- Validated: Internal links and required policy links return successful responses. `tests/customer/customer-journey.spec.js` exercises policy pages and cookie reopening, and the live production journeys pass.
 
 ## Search visibility and metadata
 
 - Validated: Every public page has a descriptive, route-specific title. The `useDocumentTitle` hook sets a distinct title per customer and administrator route (`frontend/src/hooks/useDocumentTitle.js`, applied in the application shells), covered by a component test. A per-route meta description remains a T11 addition; `frontend/index.html` sets the default description today.
-- Pending T11: Canonical URLs identify the preferred public URL.
-- Pending T11: Open Graph and social-card metadata produce a valid share preview.
-- Pending T11: The social preview image is reachable, appropriately sized, and contains no private data.
-- Pending T11: Public hotel pages use suitable `Hotel` or `LodgingBusiness` structured data.
+- Deferred: Canonical URLs identify the preferred public URL. Not configured; a post-launch SEO task.
+- Deferred: Open Graph and social-card metadata produce a valid share preview. Not configured; a post-launch SEO task.
+- Deferred: The social preview image is reachable, appropriately sized, and contains no private data. Not configured; a post-launch SEO task.
+- Deferred: Public hotel pages use suitable `Hotel` or `LodgingBusiness` structured data. Not configured; a post-launch SEO task.
 - Validated: Public pages have one clear H1 and a logical heading hierarchy. Design-system and axe checks assert heading structure.
-- Validated locally: `robots.txt` permits intended public pages and blocks no public content by accident. `frontend/public/robots.txt` allows the search pages and disallows the account, booking, and administrator routes. Live reachability over HTTPS is re-verified in T11 once the Vercel domain is filled in.
-- Validated locally: `sitemap.xml` lists intended public pages and is referenced from `robots.txt`. `frontend/public/sitemap.xml` lists the home and search pages; the domain placeholder is finalized during deployment.
-- Validated locally: Customer account and administrator pages are excluded from search indexing. `robots.txt` disallows `/login`, `/register`, `/reserve`, `/reservations`, and `/admin`.
-- Pending T11: Search Console verification is configured only after a production domain exists.
+- Validated: `robots.txt` permits intended public pages and blocks no public content by accident. `frontend/public/robots.txt` allows the search pages, disallows the account, booking, and administrator routes, and serves live at the production domain.
+- Validated: `sitemap.xml` lists intended public pages and is referenced from `robots.txt`. `frontend/public/sitemap.xml` lists the home and search pages and serves live at the production domain.
+- Validated: Customer account and administrator pages are excluded from search indexing. `robots.txt` disallows `/login`, `/register`, `/reserve`, `/reservations`, and `/admin`.
+- Deferred: Search Console verification. Optional and not configured.
 
 ## Performance and assets
 
-- Pending T11: Text responses use Brotli or gzip compression. This is host and CDN configuration.
-- Pending T11: Static assets use long-lived cache headers with content-hashed filenames. The Vite build already emits content-hashed asset filenames; the cache headers are host configuration.
+- Validated: Text responses use Brotli or gzip compression. The live site serves assets with `Content-Encoding: br`.
+- Validated: Static assets use long-lived cache headers with content-hashed filenames. The Vite build emits content-hashed filenames, and `vercel.json` serves everything under `/assets` with `Cache-Control: public, max-age=31536000, immutable`.
 - Validated: Authenticated and mutation responses are not stored by shared caches. `backend/src/app.js` sets `Cache-Control: no-store` on API responses.
 - Validated: JavaScript and CSS are minified. The production build emits minified, hashed bundles. Unused-code review continues before release.
-- Pending T11: Images use WebP or AVIF where practical, with JPEG or PNG fallbacks only when justified. Seeded hotel images are currently JPEG at roughly 340 to 360 KB each; format conversion is a T11 performance task.
-- Pending T11: Responsive `srcset` and `sizes` prevent phones from downloading desktop-sized hotel images. Images currently set explicit `width` and `height` but no `srcset`.
+- Deferred: Images use WebP or AVIF where practical, with JPEG or PNG fallbacks only when justified. Seeded hotel images are currently JPEG at roughly 340 to 360 KB each; format conversion is a post-launch performance task.
+- Deferred: Responsive `srcset` and `sizes` prevent phones from downloading desktop-sized hotel images. Images currently set explicit `width` and `height` but no `srcset`; a post-launch performance task.
 - Validated: Every content image reserves its layout space. Hotel images set explicit `width` and `height` attributes in `SearchPage.jsx` and `HotelPage.jsx`.
 - Validated: Above-the-fold imagery receives appropriate loading priority and below-the-fold imagery is lazy-loaded. `SearchPage.jsx` marks the first result eager and the rest lazy.
 - Owner review: No delivered image exceeds the documented size budget without an approved reason. Current JPEGs are roughly 340 to 360 KB; the owner sets and approves the budget in T11.
-- Pending T11: Largest Contentful Paint, Cumulative Layout Shift, and interaction responsiveness meet the agreed mobile budgets. Measured against the deployed site.
-- Validated: The API stays warm on the owner's paid Railway plan, so there is no free-tier cold start to recover from. The frontend still shows loading states and never auto-retries a booking mutation; a `/api/ready` endpoint confirms live database connectivity. Live behavior is re-verified in T11.
+- Deferred: Largest Contentful Paint, Cumulative Layout Shift, and interaction responsiveness meet the agreed mobile budgets. To be measured against the deployed site.
+- Validated: The API stays warm on the owner's paid Railway plan, so there is no free-tier cold start to recover from. The frontend still shows loading states and never auto-retries a booking mutation; a `/api/ready` endpoint confirms live database connectivity, verified against the deployed site.
 
 ## Hotel and room information
 
@@ -123,10 +123,10 @@ Every item below is prefixed with its current status. Items are re-confirmed in 
 
 - Validated: Formatting, lint, unit, integration, concurrency, component, accessibility, and end-to-end tests pass. `npm run verify:local` passes locally; PostgreSQL integration and concurrency tests run in the pull-request workflow.
 - Validated: Dependency and secret scans report no unresolved high-confidence release blockers. `npm audit` reports zero advisories and the pinned Gitleaks scan plus foundation assertions cover secrets.
-- Pending T11: Production customer and administrator journeys pass using synthetic records. Local journeys pass; the production run is a T11 task.
-- Pending T11: Authentication cookies, cross-site request defenses, cache controls, and authorization are verified against public URLs. Verified locally today; re-verified against the deployed origin in T11.
+- Validated: Production customer and administrator journeys pass. The owner completed both live journeys against the public URL: booking a room and retrieving it, and administrator sign-in with hotel, room, and reservation management.
+- Validated: Authentication cookies, cross-site request defenses, cache controls, and authorization work against the public URL. The live login-and-book and administrator journeys succeed through the same-origin proxy, and API responses carry `Cache-Control: no-store`.
 - Validated: Database migrations, administrator provisioning, and rollback steps are documented in [database operations](../operations/database.md). Production backup expectations are finalized in T11.
-- Validated locally: Health checks and logs expose no guest data or secrets. The liveness check at `/api/health` returns a fixed status, and the readiness check at `/api/ready` reports only `ready` or `unavailable` without leaking connection details, asserted in `backend/test/foundation.test.js`. Production operational alerts are configured in T11.
+- Validated: Health checks and logs expose no guest data or secrets. The liveness check at `/api/health` returns a fixed status, and the readiness check at `/api/ready` reports only `ready` or `unavailable` without leaking connection details, asserted in `backend/test/foundation.test.js` and confirmed live. Production operational alerting remains a post-launch operations task.
 - Validated: A fresh setup follows the README with `npm ci` without undocumented local state. A formal fresh-checkout verification is re-run in T12.
 
 ## VORA checks intentionally excluded

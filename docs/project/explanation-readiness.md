@@ -61,5 +61,5 @@ The assignment is evaluated primarily on understanding. This guide is a study ai
 ## 10. Deployment architecture (planned for T11)
 
 - Where: [git and deployment](../operations/git-and-deployment.md).
-- Key idea: The intended architecture is the Vercel frontend calling the Render API over HTTPS, with Neon PostgreSQL for persistence. The Vercel rewrite must preserve every authentication cookie attribute, and the free Render instance sleeps, so the UI handles a cold start gracefully. This is not deployed yet.
-- Be ready to answer: Why Neon instead of Render PostgreSQL? Render's free database expires after 30 days, while Neon offers an ongoing free plan with pooled connections.
+- Key idea: The architecture serves the Vercel frontend and the Railway API under one origin. Vercel serves the built site and rewrites `/api/*` to the Railway API, which uses Neon PostgreSQL. Same-origin serving keeps the authentication cookie first-party and the cross-site request defenses intact. The application is deployed and live.
+- Be ready to answer: Why Railway for the API and Neon for the database? Railway runs the Node API on a paid plan that stays warm, so there is no free-tier cold start, and Neon provides managed PostgreSQL with an ongoing free plan and pooled connections.

@@ -24,7 +24,7 @@ This record reconciles the independent architecture and design review with the a
 - Use synchronized parallel requests for concurrency tests. `Promise.all` may launch the calls, but a test barrier ensures both transactions contend for the same final unit.
 - Retain npm workspaces. Two small packages, one lockfile, and root verification commands improve reproducibility without creating runtime architecture.
 - Retain shared CSS tokens and components, but do not create a separately versioned design-system package.
-- Keep a bounded in-memory authentication rate limit. A distributed database-backed limiter is unnecessary for one free Render instance and is documented as resetting when the process restarts.
+- Keep a bounded in-memory authentication rate limit. A distributed database-backed limiter is unnecessary for a single API instance and is documented as resetting when the process restarts.
 - Preserve the ledger idea only in the stay line, tabular numerals, booking folio, and administrator tables. Harbor Quiet remains the approved visual direction.
 
 ## Rejected

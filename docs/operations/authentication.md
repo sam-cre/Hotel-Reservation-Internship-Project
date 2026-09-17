@@ -69,7 +69,7 @@ The shared frontend Axios client sends credentials and the CSRF header on relati
 - Registration is limited by client IP address.
 - Login is limited independently by client IP and by a hash of normalized email plus IP.
 - Responses use standard rate-limit headers and return HTTP 429 with a stable public error.
-- The current store is process-local and resets when the API restarts. It is appropriate for the planned single Render instance. Horizontal scaling would require a shared store before adding instances.
+- The current store is process-local and resets when the API restarts. It is appropriate for the single Railway instance. Horizontal scaling would require a shared store before adding instances.
 
 ## Endpoint outcomes
 

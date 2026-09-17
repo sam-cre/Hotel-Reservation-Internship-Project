@@ -45,7 +45,7 @@ The URL overrides support controlled test environments and provider migrations. 
 - The success cache holds at most `WEATHER_MAX_CACHE_ENTRIES`. Expired entries are dropped and the oldest entry is evicted first, so the cache cannot grow without bound.
 - Provider and parsing failures are never cached.
 - The cache is process-local and intentionally non-authoritative.
-- Multiple Render instances may perform separate lookups, which is acceptable for supplemental weather.
+- Multiple API instances may perform separate lookups, which is acceptable for supplemental weather.
 - API error responses contain a stable code, safe message, and request identifier, not the provider body.
 
 ## Verification
