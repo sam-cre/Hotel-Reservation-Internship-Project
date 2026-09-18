@@ -29,6 +29,7 @@
   padding: 10px 2px;
   color: #d8e0de;
   font: 500 14px var(--font-body);
+  white-space: nowrap;
   text-decoration: none;
   background: none;
   border: 0;
