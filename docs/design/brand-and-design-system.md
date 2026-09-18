@@ -112,7 +112,7 @@ Every button has default, hover, focus-visible, pressed, loading, and disabled s
 - Search inputs, selects, and the primary action share a 52px minimum height and baseline
 - Custom select menus preserve keyboard, focus, and screen-reader behavior while using the approved palette
 - Validation appears next to the affected field
-- Date fields remain keyboard operable
+- Check-in and check-out use a themed calendar popover (not the browser's native date control); it keeps the shared 52px trigger height and supports arrow-key, Home/End, and Page Up/Down navigation with Escape to close and focus returning to the trigger
 - Reservation validation is repeated by the server
 - Password fields support show and hide controls with accessible labels
 
@@ -126,6 +126,8 @@ Every button has default, hover, focus-visible, pressed, loading, and disabled s
 - The stay line remains visible during reservation review
 - Confirmation resembles a refined booking folio, not a novelty ticket
 - Availability and calculated-price changes use concise `aria-live` announcements without narrating decorative updates
+- The header carries a single "Find a hotel" entry and an account control on the right: a signed-in guest sees an initials avatar that opens a menu (My reservations, Sign out), and a signed-out guest sees a "Sign in" action; on small screens both collapse into the navigation menu
+- The cookie panel names each category (Essential, always on; Analytics, off) and states plainly that no analytics service is connected, so nothing is collected
 - The footer groups exploration, guest support, legal information, and reopenable cookie preferences
 
 ## Administrator layout

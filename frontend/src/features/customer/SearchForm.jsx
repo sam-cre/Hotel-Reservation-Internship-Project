@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '../../components/ui/Button.jsx';
-import { Field, SelectField } from '../../components/ui/Field.jsx';
+import { DatePicker } from '../../components/ui/DatePicker.jsx';
+import { SelectField } from '../../components/ui/Field.jsx';
 import { isoDate, validateStay } from './customer-utils.js';
 import styles from './Customer.module.css';
 
@@ -51,25 +52,21 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
           </option>
         ))}
       </SelectField>
-      <Field
+      <DatePicker
         label="Check-in"
         name="checkIn"
-        type="date"
         value={values.checkIn}
         min={isoDate(new Date())}
         error={errors.checkIn}
         onChange={change}
-        required
       />
-      <Field
+      <DatePicker
         label="Check-out"
         name="checkOut"
-        type="date"
         value={values.checkOut}
         min={values.checkIn}
         error={errors.checkOut}
         onChange={change}
-        required
       />
       <SelectField
         label="Guests"

@@ -159,6 +159,97 @@
   right: 12px;
   display: inline-flex;
 }
+.selectPlaceholder {
+  color: var(--color-muted);
+}
+.calendarPanel {
+  z-index: 100;
+  width: 300px;
+  padding: 14px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1px solid var(--color-control-border);
+  border-radius: var(--radius-control);
+  box-shadow: 0 16px 36px #112d3326;
+}
+.calHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.calNav {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--color-ink);
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+.calNav:hover {
+  background: var(--color-soft);
+}
+.calNav:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.calTitle {
+  font: 600 15px var(--font-heading);
+}
+.calWeekdays,
+.calGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+.calWeekdays {
+  margin-bottom: 4px;
+}
+.calWeekdays span {
+  padding: 6px 0;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+.calGrid {
+  gap: 2px;
+}
+.calDay {
+  display: inline-grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 38px;
+  color: var(--color-ink);
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font: 500 13px var(--font-body);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+.calDay:hover:not(:disabled) {
+  background: var(--color-soft);
+}
+.calDay:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.calDay[data-today] {
+  border-color: var(--color-border);
+}
+.calDay[data-selected] {
+  color: white;
+  background: var(--color-action);
+  border-color: var(--color-action);
+}
+.calDay:disabled {
+  color: #b3bbb9;
+  cursor: not-allowed;
+}
 .field input[aria-invalid='true'] {
   border-color: var(--color-error);
 }
