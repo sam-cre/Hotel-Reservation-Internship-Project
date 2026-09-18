@@ -13,6 +13,7 @@ The administrator application connects the approved Harbor Quiet workspace to th
 | `/admin`              | Administrator | Redirect to the reservation register                        |
 | `/admin/reservations` | Administrator | Search and filter reservations, inspect details, and cancel |
 | `/admin/hotels`       | Administrator | Add, edit, and deactivate hotels and room types             |
+| `/admin/analytics`    | Administrator | Read-only summary of reservation activity                   |
 
 `AuthProvider` restores the current account through `/api/auth/me`. The administrator route waits for restoration before rendering. An unauthenticated visitor returns to sign-in with a safe internal destination. A customer account receives an access-required page before any administrator data request is made.
 
@@ -25,6 +26,13 @@ The browser role check improves navigation and avoids unnecessary requests. Expr
 - Details show the server-returned guest, hotel, room, dates, guest count, status, and snapshotted total.
 - Cancellation requires a second explicit confirmation and sends only `{ "status": "cancelled" }`.
 - Cancellation is terminal. A conflict response remains visible and directs the operator to refresh the register.
+
+## Analytics
+
+- The analytics view retrieves the full register with `GET /api/admin/reservations` and aggregates it in the browser. It adds no new endpoint and issues no additional request beyond the one the register already makes.
+- Figures shown: total, confirmed, and cancelled reservation counts; confirmed booking value (the sum of confirmed reservation totals); average nightly rate across confirmed reservations; and a per-hotel count of confirmed bookings rendered as a proportional bar list.
+- Cancelled reservations are counted but excluded from booking value and average rate, so the money figures reflect only active bookings.
+- The view is read-only. It never mutates reservations and never sends a client-calculated figure to the server.
 
 ## Hotel and room workflow
 

@@ -783,6 +783,21 @@
   gap: 24px;
   margin-top: 32px;
 }
+.reservationDetail {
+  padding: 4px 0 8px;
+}
+.reservationDetail h1 {
+  margin: 8px 0 8px;
+  font-size: clamp(40px, 5vw, 60px);
+  font-weight: 450;
+  letter-spacing: -0.03em;
+}
+.detailStatus {
+  margin: 16px 0 4px;
+}
+.reservationDetail .pageActions {
+  justify-content: flex-start;
+}
 .reservationsPage {
   padding: 72px 0 96px;
 }

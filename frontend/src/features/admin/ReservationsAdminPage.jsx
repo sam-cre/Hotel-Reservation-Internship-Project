@@ -84,7 +84,7 @@ export function ReservationsAdminPage() {
     <main id="admin-content" className={styles.main}>
       <div className={styles.pageHeading}>
         <div>
-          <p className={styles.kicker}>Collection operations</p>
+          <p className={styles.kicker}>Hotel operations</p>
           <h1>Reservations</h1>
           <p>Review stays and release inventory when a booking is cancelled.</p>
         </div>
