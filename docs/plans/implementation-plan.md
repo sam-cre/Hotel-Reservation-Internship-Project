@@ -135,7 +135,7 @@ Build, verify, document, and deploy the Stillwater Hotels internship application
 
 - Satisfies: R1, R2, R8, R11, R13
 - Depends on: T10
-- Deliver: Neon database, Render API, Vercel frontend, migrations, administrator, secrets, rewrites, HTTPS and security headers, robots and sitemap behavior, public metadata, and cold-start, CSRF, consent, cookie, cache, and broken-link smoke tests
+- Deliver: Neon database, Railway API, Vercel frontend, migrations, administrator, secrets, rewrites, HTTPS and security headers, robots and sitemap behavior, public metadata, and CSRF, consent, cookie, cache, and broken-link smoke tests
 - Verify: `npm run smoke:production`
 - Estimate: 240 minutes
 

@@ -2,7 +2,7 @@
 
 Status: Current through T11 production deployment on `main`; T12 requirement audit complete
 
-This matrix maps every mandatory requirement from the assignment PDF to its implementation, its automated evidence, and its documentation. The requirement identifiers match the [requirements and scope](requirements-and-scope.md) derivation of the PDF. Status values follow the [documentation vocabulary](../README.md): Validated means complete verification has passed locally; Pending T11 or Pending T12 means the work is scheduled for deployment or final documentation.
+This matrix maps every mandatory requirement from the assignment PDF to its implementation, its automated evidence, and its documentation. The requirement identifiers match the [requirements and scope](requirements-and-scope.md) derivation of the PDF. Status values follow the [documentation vocabulary](../README.md): Validated means verification has passed, locally or against the live deployment; Pending T12 means the item is scheduled for the final owner walkthrough.
 
 Backend database tests run in-process on PGlite. The tests that need a real PostgreSQL server (`backend/test/database/postgres-integration.test.js` and `backend/test/reservations/postgres-concurrency.test.js`) are skipped locally when `TEST_DATABASE_URL` is absent and run in the pull-request workflow against an ephemeral `postgres:17-alpine` service.
 

@@ -15,14 +15,14 @@ React and Vite frontend on Vercel
   |
   | /api/* external rewrite
   v
-Node.js and Express API on Render
+Node.js and Express API on Railway
   |                         |
   | pooled TLS connection   | bounded HTTPS request
   v                         v
 Neon PostgreSQL          Open-Meteo
 ```
 
-Vercel presents the frontend and API path as one browser origin. Express remains independently reachable through its public Render URL, as required by the assignment.
+Vercel presents the frontend and API path as one browser origin. Express remains independently reachable through its public Railway URL, as required by the assignment.
 
 ## Technology choices
 
