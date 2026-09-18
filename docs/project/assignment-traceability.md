@@ -65,4 +65,4 @@ The S01 through S15 safeguards from [requirements and scope](requirements-and-sc
 
 ## Optional enhancements delivered
 
-The PDF lists these as optional. The project includes: a responsive mobile UI, automated tests across unit, integration, concurrency, component, accessibility, and end-to-end layers, improved validation, and reservation history. Payments, email confirmation, cancellation flow, pagination, Docker, and analytics remain intentionally out of scope.
+The PDF lists these as optional. The project includes: a responsive mobile UI, automated tests across unit, integration, concurrency, component, accessibility, and end-to-end layers, improved validation, reservation history, and a basic administrator analytics view. Payments, email confirmation, cancellation flow, pagination, and Docker remain intentionally out of scope.

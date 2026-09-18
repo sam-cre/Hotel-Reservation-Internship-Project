@@ -6,13 +6,19 @@ The hotels and guests in the previews are fictional. Images depict imagined Stil
 
 ## Property imagery
 
-| Local file                                   | Use                                       |
-| -------------------------------------------- | ----------------------------------------- |
-| `frontend/public/images/hero-harbor.jpg`     | Home hero background (with WebP)          |
-| `frontend/public/images/battery-terrace.jpg` | The Battery search result                 |
-| `frontend/public/images/calhoun-lobby.jpg`   | The Calhoun and The Forsyth search result |
+| Local file                                    | Use                                                 |
+| --------------------------------------------- | --------------------------------------------------- |
+| `frontend/public/images/hero-harbor.jpg`      | Home hero background (with WebP)                    |
+| `frontend/public/images/battery-terrace.jpg`  | The Battery (Charleston)                            |
+| `frontend/public/images/calhoun-lobby.jpg`    | The Calhoun (Charleston) and The Forsyth (Savannah) |
+| `frontend/public/images/aoyama-tokyo.jpg`     | The Aoyama (Tokyo)                                  |
+| `frontend/public/images/marunouchi-tokyo.jpg` | The Marunouchi (Tokyo)                              |
+| `frontend/public/images/kamogawa-kyoto.jpg`   | The Kamogawa (Kyoto)                                |
+| `frontend/public/images/bund-shanghai.jpg`    | The Bund (Shanghai)                                 |
+| `frontend/public/images/marais-paris.jpg`     | The Marais (Paris)                                  |
+| `frontend/public/images/gramercy-nyc.jpg`     | The Gramercy (New York)                             |
 
-These fictional property images were generated for this project with OpenAI image generation. They contain no embedded text or third-party marks. Local copies are used so the site does not make runtime image-service requests. The Calhoun image is reused for the Savannah sample property until each seeded hotel receives final approved photography.
+These fictional property images were generated for this project with OpenAI image generation to a shared editorial style. They contain no embedded text or third-party marks. Local copies are used so the site does not make runtime image-service requests. The Calhoun image is reused for The Forsyth in Savannah until that property receives its own approved photography.
 
 ## Image optimization (WebP)
 
@@ -22,8 +28,10 @@ WebP conversion is a one-time build step, not a runtime pipeline. The current fi
 
 ```
 npm install sharp --no-save
-node -e "const s=require('sharp');['battery-terrace','calhoun-lobby'].forEach(n=>s('frontend/public/images/'+n+'.jpg').webp({quality:80}).toFile('frontend/public/images/'+n+'.webp'))"
+node -e "const s=require('sharp');['hero-harbor','battery-terrace','calhoun-lobby','aoyama-tokyo','marunouchi-tokyo','kamogawa-kyoto','bund-shanghai','marais-paris','gramercy-nyc'].forEach(n=>s('frontend/public/images/'+n+'.jpg').webp({quality:80}).toFile('frontend/public/images/'+n+'.webp'))"
 ```
+
+The six worldwide-property images were generated at 1536x1024, then resized to the site standard 1200x800 and written as both `.jpg` (quality 82) and `.webp` (quality 80).
 
 `sharp` is intentionally not a project dependency, so it never runs during the Vercel or CI build.
 
