@@ -8,7 +8,7 @@ The hotels and guests in the previews are fictional. Images depict imagined Stil
 
 | Local file                                   | Use                                       |
 | -------------------------------------------- | ----------------------------------------- |
-| `frontend/public/images/hero-harbor.jpg`     | Home hero background (with WebP)           |
+| `frontend/public/images/hero-harbor.jpg`     | Home hero background (with WebP)          |
 | `frontend/public/images/battery-terrace.jpg` | The Battery search result                 |
 | `frontend/public/images/calhoun-lobby.jpg`   | The Calhoun and The Forsyth search result |
 
