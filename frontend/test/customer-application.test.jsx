@@ -137,6 +137,34 @@ describe('customer application', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows the destinations menu and top-level navigation', async () => {
+    renderApp('/');
+
+    expect(
+      await screen.findByRole('button', { name: /destinations/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Our hotels' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Help' })).toBeInTheDocument();
+  });
+
+  it('lists the full hotel collection grouped by city', async () => {
+    renderApp('/hotels');
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'The Stillwater collection.',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'The Battery' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Charleston' }),
+    ).toBeInTheDocument();
+  });
+
   it('loads live search results and preserves stay criteria in the hotel link', async () => {
     renderApp(
       '/search?city=Charleston&checkIn=2026-10-10&checkOut=2026-10-13&guests=2',
