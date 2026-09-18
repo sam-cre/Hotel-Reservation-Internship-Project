@@ -211,7 +211,7 @@ describe('development seed', () => {
     const rooms = await database.query(
       'SELECT count(*)::integer AS count FROM rooms',
     );
-    expect(hotels.rows[0].count).toBe(3);
-    expect(rooms.rows[0].count).toBe(6);
+    expect(hotels.rows[0].count).toBe(9);
+    expect(rooms.rows[0].count).toBe(18);
   });
 });
