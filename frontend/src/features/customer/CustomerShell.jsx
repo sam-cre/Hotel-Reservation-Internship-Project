@@ -212,7 +212,7 @@ export function CustomerShell({ children }) {
         <div className={styles.footerMain}>
           <div className={styles.footerIdentity}>
             <Brand />
-            <p>Book hotels in select cities.</p>
+            <p>Book hotels in cities around the world.</p>
           </div>
           <nav aria-labelledby="footer-explore">
             <h2 id="footer-explore">Explore</h2>
