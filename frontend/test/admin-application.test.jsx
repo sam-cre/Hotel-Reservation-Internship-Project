@@ -268,4 +268,22 @@ describe('administrator application', () => {
     ).toBeInTheDocument();
     expect(inventory).toHaveValue(1);
   });
+
+  it('summarizes reservation activity on the analytics dashboard', async () => {
+    renderApp('/admin/analytics');
+
+    // The heading renders before the register resolves, so gate on a figure
+    // that only appears once the reservation data has loaded.
+    expect(
+      await screen.findByText('Confirmed booking value'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Analytics' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('$1,395')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Confirmed bookings by hotel' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('The Battery')).toBeInTheDocument();
+  });
 });

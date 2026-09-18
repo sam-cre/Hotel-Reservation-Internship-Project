@@ -1,4 +1,10 @@
-import { Building2, CalendarDays, ExternalLink, LogOut } from 'lucide-react';
+import {
+  BarChart3,
+  Building2,
+  CalendarDays,
+  ExternalLink,
+  LogOut,
+} from 'lucide-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Brand } from '../../components/Brand.jsx';
 import { Button, ButtonLink } from '../../components/ui/Button.jsx';
@@ -38,6 +44,13 @@ export function AdminShell({ children }) {
             >
               <Building2 size={19} aria-hidden="true" />
               Hotels and rooms
+            </NavLink>
+            <NavLink
+              to="/admin/analytics"
+              className={({ isActive }) => (isActive ? styles.activeNav : '')}
+            >
+              <BarChart3 size={19} aria-hidden="true" />
+              Analytics
             </NavLink>
           </nav>
           <div className={styles.sidebarBottom}>

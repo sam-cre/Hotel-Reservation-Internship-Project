@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, RefreshCw } from 'lucide-react';
 import {
   Link,
+  useLocation,
   useNavigate,
   useParams,
   useSearchParams,
@@ -10,10 +11,17 @@ import { Button } from '../../components/ui/Button.jsx';
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx';
 import { apiMessage, catalogApi, reservationApi } from '../../services/api.js';
 import { StayLine } from './StayLine.jsx';
-import { money, stayFromParams, stayQuery } from './customer-utils.js';
+import {
+  money,
+  nightsBetween,
+  stayFromParams,
+  stayQuery,
+} from './customer-utils.js';
 import styles from './Customer.module.css';
 
 function Confirmation({ id }) {
+  const location = useLocation();
+  const justBooked = Boolean(location.state?.justBooked);
   const [reservation, setReservation] = useState(null);
   const [error, setError] = useState('');
   useEffect(() => {
@@ -39,7 +47,11 @@ function Confirmation({ id }) {
   if (!reservation)
     return (
       <section className={styles.statePanel} aria-live="polite">
-        <h1>Preparing your confirmation.</h1>
+        <h1>
+          {justBooked
+            ? 'Preparing your confirmation.'
+            : 'Loading your reservation.'}
+        </h1>
         <p>We are retrieving the booking record.</p>
       </section>
     );
@@ -48,36 +60,87 @@ function Confirmation({ id }) {
     checkOut: reservation.checkOut,
     guests: String(reservation.guests),
   };
+
+  // Just-booked arrivals see a confirmation; opening an existing reservation
+  // from the account list sees a neutral detail record, so a past or cancelled
+  // stay is never framed as a fresh booking.
+  if (justBooked) {
+    return (
+      <section className={styles.confirmation}>
+        <div className={styles.confirmationMark}>
+          <Check aria-hidden="true" />
+        </div>
+        <p className={styles.kicker}>Reservation confirmed</p>
+        <h1>Your room is waiting.</h1>
+        <p className={styles.confirmationReference}>
+          Reservation <strong>{reservation.id}</strong>
+        </p>
+        <StayLine stay={stay} total={reservation.totalPrice} />
+        <div className={styles.folio}>
+          <div>
+            <span>Hotel</span>
+            <strong>{reservation.hotel.name}</strong>
+            <small>{reservation.hotel.city}</small>
+          </div>
+          <div>
+            <span>Room</span>
+            <strong>{reservation.room.name}</strong>
+            <small>{money(reservation.pricePerNight)} per night</small>
+          </div>
+          <div>
+            <span>Status</span>
+            <StatusBadge status={reservation.status} />
+          </div>
+        </div>
+        <div className={styles.pageActions}>
+          <Link className={styles.primaryLink} to="/reservations">
+            View all reservations
+          </Link>
+          <Link to="/">Plan another stay</Link>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className={styles.confirmation}>
-      <div className={styles.confirmationMark}>
-        <Check aria-hidden="true" />
-      </div>
-      <p className={styles.kicker}>Reservation confirmed</p>
-      <h1>Your room is waiting.</h1>
-      <p className={styles.confirmationReference}>
-        Reservation <strong>{reservation.id}</strong>
+    <section className={styles.reservationDetail}>
+      <p className={styles.kicker}>Reservation {reservation.id}</p>
+      <h1>{reservation.hotel.name}</h1>
+      <p className={styles.muted}>
+        {reservation.room.name} in {reservation.hotel.city}
+      </p>
+      <p className={styles.detailStatus}>
+        <StatusBadge status={reservation.status} />
       </p>
       <StayLine stay={stay} total={reservation.totalPrice} />
       <div className={styles.folio}>
         <div>
-          <span>Hotel</span>
-          <strong>{reservation.hotel.name}</strong>
-          <small>{reservation.hotel.city}</small>
+          <span>Room rate</span>
+          <strong>{money(reservation.pricePerNight)}</strong>
+          <small>per night</small>
         </div>
         <div>
-          <span>Room</span>
-          <strong>{reservation.room.name}</strong>
-          <small>{money(reservation.pricePerNight)} per night</small>
+          <span>Length of stay</span>
+          <strong>
+            {nightsBetween(reservation.checkIn, reservation.checkOut)} nights
+          </strong>
+          <small>
+            {reservation.guests}{' '}
+            {Number(reservation.guests) === 1 ? 'guest' : 'guests'}
+          </small>
         </div>
         <div>
-          <span>Status</span>
-          <StatusBadge status={reservation.status} />
+          <span>Total</span>
+          <strong>{money(reservation.totalPrice)}</strong>
+          <small>Rate confirmed at booking</small>
         </div>
       </div>
+      <p className={styles.muted}>
+        Changes and cancellations are handled by guest services.
+      </p>
       <div className={styles.pageActions}>
         <Link className={styles.primaryLink} to="/reservations">
-          View all reservations
+          All reservations
         </Link>
         <Link to="/">Plan another stay</Link>
       </div>
@@ -154,7 +217,10 @@ export function ReservationPage({ confirmation = false }) {
         },
         idempotencyKey.current,
       );
-      navigate(`/reservations/${reservation.id}`, { replace: true });
+      navigate(`/reservations/${reservation.id}`, {
+        replace: true,
+        state: { justBooked: true },
+      });
     } catch (error) {
       setState((current) => ({
         ...current,

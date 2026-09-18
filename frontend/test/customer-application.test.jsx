@@ -241,6 +241,23 @@ describe('customer application', () => {
     );
   });
 
+  it('opens an existing reservation as a neutral detail, not a fresh confirmation', async () => {
+    authApi.current.mockResolvedValue({ id: '1', role: 'customer' });
+    renderApp('/reservations/31');
+
+    expect(
+      await screen.findByRole('heading', { name: 'The Battery' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Changes and cancellations are handled by guest services.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Your room is waiting.' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('renders loading, empty, and error states for reservation history', async () => {
     authApi.current.mockResolvedValue({ id: '1', role: 'customer' });
     reservationApi.mine.mockResolvedValue([]);

@@ -4,9 +4,16 @@ import { ButtonLink } from '../../components/ui/Button.jsx';
 import { Brand } from '../../components/Brand.jsx';
 import { useAuth } from '../customer/useAuth.js';
 import { AdminShell } from './AdminShell.jsx';
+import { AnalyticsAdminPage } from './AnalyticsAdminPage.jsx';
 import { HotelsAdminPage } from './HotelsAdminPage.jsx';
 import { ReservationsAdminPage } from './ReservationsAdminPage.jsx';
 import styles from './Admin.module.css';
+
+function adminSectionTitle(pathname) {
+  if (pathname.endsWith('/hotels')) return 'Hotels and rooms';
+  if (pathname.endsWith('/analytics')) return 'Analytics';
+  return 'Reservations';
+}
 
 function AccessPage({ title, children }) {
   return (
@@ -25,9 +32,7 @@ function AccessPage({ title, children }) {
 export function AdminApplication() {
   const { user, loading } = useAuth();
   const location = useLocation();
-  const adminTitle = location.pathname.endsWith('/hotels')
-    ? 'Hotels and rooms'
-    : 'Reservations';
+  const adminTitle = adminSectionTitle(location.pathname);
   useDocumentTitle(`Operations: ${adminTitle}`);
 
   if (loading) {
@@ -61,6 +66,7 @@ export function AdminApplication() {
         <Route index element={<Navigate to="reservations" replace />} />
         <Route path="reservations" element={<ReservationsAdminPage />} />
         <Route path="hotels" element={<HotelsAdminPage />} />
+        <Route path="analytics" element={<AnalyticsAdminPage />} />
         <Route path="*" element={<Navigate to="reservations" replace />} />
       </Routes>
     </AdminShell>

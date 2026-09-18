@@ -124,6 +124,7 @@ Every button has default, hover, focus-visible, pressed, loading, and disabled s
 - Hotel results use varied image rhythm rather than identical floating cards, with a restrained image zoom on hover
 - Room options use structured rows containing capacity, availability, price, and action
 - The stay line remains visible during reservation review
+- A newly booked reservation shows a confirmation; opening an existing reservation from the account list shows a neutral detail record, so a past or cancelled stay is never framed as a fresh booking
 - Confirmation resembles a refined booking folio, not a novelty ticket
 - Availability and calculated-price changes use concise `aria-live` announcements without narrating decorative updates
 - The header carries a single "Find a hotel" entry and an account control on the right: a signed-in guest sees an initials avatar that opens a menu (My reservations, Sign out), and a signed-out guest sees a "Sign in" action; on small screens both collapse into the navigation menu
@@ -138,6 +139,8 @@ Every button has default, hover, focus-visible, pressed, loading, and disabled s
 - Forms use the same controls as customer pages
 - Status is communicated with both text and color
 - Destructive actions require explicit confirmation
+- A read-only analytics view summarizes total, confirmed, and cancelled reservation counts, confirmed booking value, average nightly rate, and confirmed bookings per hotel; every figure is derived from the reservation register the workspace already loads, so no separate reporting endpoint is required
+- Navigation items, content panels, and imagery share the corner radius and soft elevation used on the guest site, so the operations surface reads as the same product
 
 The independent review's ledger concept is retained only where it improves comprehension: the connected stay line, tabular numerals, booking folio, and operational administrator tables. The overall visual direction remains Harbor Quiet so the customer experience stays calm and place-oriented.
 
