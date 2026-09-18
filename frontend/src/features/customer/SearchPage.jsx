@@ -1,6 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowUpRight, Check, MapPin, RefreshCw, Star } from 'lucide-react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 import { Button } from '../../components/ui/Button.jsx';
 import { Photo } from '../../components/ui/Photo.jsx';
 import { apiMessage, catalogApi } from '../../services/api.js';
@@ -81,13 +86,16 @@ function HotelRow({ hotel, stay, eager }) {
 export function SearchPage() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const stay = useMemo(() => stayFromParams(params), [params]);
   const requestKey = stayQuery(stay);
-  const invalid = Object.keys(validateStay(stay)).length > 0;
+  const hasCity = Boolean(stay.city);
+  const canSearch = Object.keys(validateStay(stay)).length === 0;
   const [cities, setCities] = useState([]);
   const [hotels, setHotels] = useState([]);
   const [state, setState] = useState({ key: '', error: '' });
-  const loading = !invalid && state.key !== requestKey;
+  const loading = canSearch && state.key !== requestKey;
+  const resultsRef = useRef(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -100,8 +108,24 @@ export function SearchPage() {
     return () => controller.abort();
   }, []);
 
+  // A completed search navigates here with a flag so the results scroll into
+  // view. On phones the search widget sits below a tall hero, so without this
+  // the guest would be left looking at the hero after pressing Find rooms.
   useEffect(() => {
-    if (invalid) return undefined;
+    if (!location.state?.scrollToResults) return;
+    const node = resultsRef.current;
+    if (!node) return;
+    const reduceMotion = window.matchMedia?.(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    node.scrollIntoView({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      block: 'start',
+    });
+  }, [location.state]);
+
+  useEffect(() => {
+    if (!canSearch) return undefined;
     const controller = new AbortController();
     catalogApi
       .hotels(stay, controller.signal)
@@ -117,16 +141,20 @@ export function SearchPage() {
           });
       });
     return () => controller.abort();
-  }, [invalid, requestKey, stay]);
+  }, [canSearch, requestKey, stay]);
 
-  const displayError = invalid
-    ? 'These stay details are invalid. Update the dates and try again.'
+  const displayError = !canSearch
+    ? hasCity
+      ? 'These stay details are invalid. Update the dates and try again.'
+      : ''
     : state.key === requestKey
       ? state.error
       : '';
 
   function search(next) {
-    navigate(`/search?${stayQuery(next)}`);
+    navigate(`/search?${stayQuery(next)}`, {
+      state: { scrollToResults: true },
+    });
   }
 
   return (
@@ -180,21 +208,37 @@ export function SearchPage() {
           </ul>
         </section>
         <section
+          ref={resultsRef}
           className={styles.resultsSection}
           aria-labelledby="results-title"
         >
           <div className={styles.resultsHeading}>
             <div>
-              <h2 id="results-title">Hotels in {stay.city}.</h2>
+              <h2 id="results-title">
+                {hasCity
+                  ? `Hotels in ${stay.city}.`
+                  : 'Where would you like to go?'}
+              </h2>
               <p className={styles.muted}>
-                {loading
-                  ? 'Checking live room inventory.'
-                  : `${hotels.length} ${hotels.length === 1 ? 'hotel' : 'hotels'} match this stay.`}
+                {!hasCity
+                  ? 'Choose a destination and dates above to see hotels with live availability.'
+                  : loading
+                    ? 'Checking live room inventory.'
+                    : `${hotels.length} ${hotels.length === 1 ? 'hotel' : 'hotels'} match this stay.`}
               </p>
             </div>
           </div>
-          <StayLine stay={stay} />
-          {displayError && (
+          {hasCity && <StayLine stay={stay} />}
+          {!hasCity && (
+            <div className={styles.statePanel}>
+              <h3>Start with a destination.</h3>
+              <p>
+                Pick a city and your dates to see available hotels and their
+                live nightly rates.
+              </p>
+            </div>
+          )}
+          {hasCity && displayError && (
             <div className={styles.statePanel} role="alert">
               <h3>We could not complete that search.</h3>
               <p>{displayError}</p>
@@ -204,13 +248,13 @@ export function SearchPage() {
               </Button>
             </div>
           )}
-          {!displayError && loading && (
+          {hasCity && !displayError && loading && (
             <div className={styles.statePanel} aria-live="polite">
               <h3>Finding your stay.</h3>
               <p>We are checking current room availability and rates.</p>
             </div>
           )}
-          {!displayError && !loading && hotels.length === 0 && (
+          {hasCity && !displayError && !loading && hotels.length === 0 && (
             <div className={styles.statePanel}>
               <h3>A different stay is waiting.</h3>
               <p>
@@ -219,7 +263,7 @@ export function SearchPage() {
               </p>
             </div>
           )}
-          {!displayError && !loading && hotels.length > 0 && (
+          {hasCity && !displayError && !loading && hotels.length > 0 && (
             <div className={styles.hotelList}>
               {hotels.map((hotel, index) => (
                 <HotelRow
