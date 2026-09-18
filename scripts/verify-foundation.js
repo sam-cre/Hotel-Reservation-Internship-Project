@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { once } from 'node:events';
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
 import { createApp } from '../backend/src/app.js';
@@ -123,6 +123,31 @@ assert(
   'The canary rule must not match benign text',
 );
 console.info('secret-scan configuration and canary verified');
+
+// The deployed bundle must be a React production build. A development build
+// ships the jsxDEV runtime and its comments, which would then be visible in the
+// browser. This guards against an ambient NODE_ENV making the build emit them.
+const assetsDir = new URL('../frontend/dist/assets/', import.meta.url);
+let bundles;
+try {
+  bundles = (await readdir(assetsDir)).filter((name) => name.endsWith('.js'));
+} catch {
+  throw new Error(
+    'Run "npm run build" before verify-foundation: no frontend/dist/assets found',
+  );
+}
+assert(
+  bundles.length > 0,
+  'The production build must emit at least one script bundle',
+);
+for (const name of bundles) {
+  const code = await readFile(new URL(name, assetsDir), 'utf8');
+  assert(
+    !code.includes('jsxDEV('),
+    `Production bundle ${name} contains the development JSX runtime; build with NODE_ENV=production`,
+  );
+}
+console.info('production bundle is a React production build');
 
 const api = createApp().listen(0, '127.0.0.1');
 await once(api, 'listening');
