@@ -18,7 +18,7 @@ The assignment is evaluated primarily on understanding. This guide is a study ai
 
 ## 3. Authentication and authorization
 
-- Where: `backend/src/modules/auth/`, [authentication operations](../operations/authentication.md).
+- Where: `backend/src/modules/auth/`, [authentication operations](../features/authentication.md).
 - Key idea: Passwords are hashed with Argon2id. Login issues a short-lived JWT stored in an HttpOnly cookie. On every protected request the middleware verifies the token's algorithm, issuer, audience, and expiry, then loads the current user and role from PostgreSQL rather than trusting a role claim in the token. Public registration always creates a customer.
 - Be ready to answer: Why load the role from the database on each request? So a role change or a revoked account takes effect immediately and a client cannot forge a privileged role in the token.
 
@@ -42,7 +42,7 @@ The assignment is evaluated primarily on understanding. This guide is a study ai
 
 ## 7. Weather (third-party) integration
 
-- Where: `backend/src/modules/weather/`, [weather operations](../operations/weather.md).
+- Where: `backend/src/modules/weather/`, [weather operations](../features/weather.md).
 - Key idea: The flow is React to the Node API to Open-Meteo and back, never browser to provider. Express validates the city, geocodes it, fetches current conditions, validates both provider responses against narrow schemas, and returns one internal shape. Weather is supplemental, so any failure leaves hotel and room data intact. T10 added a per-client rate limit, a bounded concurrency limit for distinct cities, and a size-bounded cache.
 - Be ready to answer: Why route weather through your backend? To keep one internal contract, hide provider details and errors, apply timeouts and limits, and satisfy the required React to Node to external API flow.
 

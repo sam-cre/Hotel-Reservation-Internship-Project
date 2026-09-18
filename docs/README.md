@@ -1,53 +1,48 @@
 # Stillwater Hotels Documentation
 
-Status: T1 through T9 merged; T10 local hardening implemented and locally validated, awaiting the project owner's Git checkpoint
+Stillwater Hotels is a multi-property hotel reservation application: a React frontend, an Express API, and PostgreSQL, deployed to production on Vercel, Railway, and Neon. This documentation is organized by area so any reader can find a subject quickly.
 
-Stillwater Hotels is a multi-property hotel reservation application built for the internship assignment. This documentation distinguishes assignment requirements, engineering safeguards, and optional enhancements.
+The [root README](../README.md) covers running the application and the live deployment. Start here for how the system is built and why.
 
-Start with the [engineering handoff](HANDOFF.md) for current status and safe commands. The [root README](../README.md) describes the runnable application and sample design previews. PostgreSQL infrastructure, backend authentication, catalog APIs, reservation APIs, the connected customer and administrator applications, and weather behavior are implemented.
+## Architecture
 
-## Reading path
+System-wide design, contracts, and data rules.
 
-1. [Engineering handoff](HANDOFF.md)
-2. [Requirements and scope](project/requirements-and-scope.md)
-3. [Architecture overview](architecture/overview.md)
-4. [Data model and reservation rules](architecture/data-model-and-reservations.md)
-5. [API contract](architecture/api-contract.md)
-6. [Brand and design system](design/brand-and-design-system.md)
-7. [Quality and security strategy](quality/quality-and-security.md)
-8. [Launch readiness checklist](quality/launch-readiness-checklist.md)
-9. [Git and deployment workflow](operations/git-and-deployment.md)
-10. [Database operations](operations/database.md)
-11. [Authentication operations](operations/authentication.md)
-12. [Catalog operations](operations/catalog.md)
-13. [Reservation operations](operations/reservations.md)
-14. [Customer application operations](operations/customer-application.md)
-15. [Administrator application operations](operations/administrator-application.md)
-16. [Weather integration operations](operations/weather.md)
-17. [Architecture decisions](decisions/README.md)
-18. [T2 design review reconciliation](decisions/t2-design-review.md)
-19. [Assignment traceability matrix](project/assignment-traceability.md)
-20. [Explanation readiness guide](project/explanation-readiness.md)
-21. [Implementation plan](plans/implementation-plan.md)
+- [Overview](architecture/overview.md): components, boundaries, and request flow
+- [API contract](architecture/api-contract.md): every endpoint, its shape, and its rules
+- [Data model and reservation rules](architecture/data-model-and-reservations.md): schema, price snapshots, and the availability lock
 
-## Validation history
+## Features
 
-- [T2 design validation](history/2026-09-15-t2-design-validation.md)
-- [T3 database validation](history/2026-09-15-t3-database-validation.md)
-- [T4 authentication validation](history/2026-09-15-t4-authentication-validation.md)
-- [T5 catalog validation](history/2026-09-15-t5-catalog-validation.md)
-- [T6 reservation validation](history/2026-09-15-t6-reservation-validation.md)
-- [T7 customer application validation](history/2026-09-15-t7-customer-validation.md)
-- [T8 administrator application validation](history/2026-09-15-t8-administrator-validation.md)
-- [T9 weather integration validation](history/2026-09-16-t9-weather-validation.md)
-- [T10 local hardening validation](history/2026-09-16-t10-local-hardening-validation.md)
+One guide per product capability, each covering behavior, boundaries, and limitations.
 
-## Status vocabulary
+- [Authentication](features/authentication.md)
+- [Catalog](features/catalog.md): hotels, rooms, search, and availability
+- [Reservations](features/reservations.md)
+- [Customer application](features/customer-application.md)
+- [Administrator application](features/administrator-application.md)
+- [Weather](features/weather.md): the backend-integrated external service
 
-- Planned: approved intent with no implementation evidence yet
-- In progress: implementation has started but verification is incomplete
-- Implemented: code exists and targeted checks pass locally
-- Validated: complete verification has passed
-- Released: the validated behavior is deployed and production smoke tests pass
+## Design
 
-No document may describe a feature as implemented until code and verification evidence exist.
+- [Brand and design system](design/brand-and-design-system.md): identity, tokens, typography, and layout
+- [Asset credits](design/asset-credits.md): image provenance, optimization, and licenses
+
+## Operations
+
+Running, shipping, and maintaining the system.
+
+- [Database operations](operations/database.md): configuration, migrations, safety, and recovery
+- [Production deployment](operations/production-deployment.md): the deployment runbook and post-launch checks
+- [Git and deployment workflow](operations/git-and-deployment.md): branching, verification, and release flow
+
+## Project
+
+- [Requirements and scope](project/requirements-and-scope.md): assignment requirements and engineering safeguards
+- [Assignment traceability](project/assignment-traceability.md): requirement-to-code-to-test matrix
+- [Explanation readiness](project/explanation-readiness.md): concise walkthrough of each feature
+
+## Quality
+
+- [Quality and security](quality/quality-and-security.md): testing strategy and the security safeguard set
+- [Launch readiness checklist](quality/launch-readiness-checklist.md): evidence-backed release status

@@ -56,7 +56,7 @@ Copy `.env.example` to the ignored `.env` file at the repository root and provid
 | `WEATHER_RATE_LIMIT_MAX`       | `60`          | Public weather requests allowed per window per client       |
 | `CATALOG_IMAGE_HOST_ALLOWLIST` | (empty)       | Comma-separated HTTPS hosts allowed for remote hotel images |
 
-Database variables are documented in [database operations](docs/operations/database.md). JWT, cookie, origin, and rate-limit variables are documented in [authentication operations](docs/operations/authentication.md). Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both development processes after changing configuration. Never store secrets in a variable prefixed `VITE_`, which is intended for public frontend configuration.
+Database variables are documented in [database operations](docs/operations/database.md). JWT, cookie, origin, and rate-limit variables are documented in [authentication operations](docs/features/authentication.md). Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both development processes after changing configuration. Never store secrets in a variable prefixed `VITE_`, which is intended for public frontend configuration.
 
 ## Verification
 
@@ -101,7 +101,7 @@ npm run verify:database
 
 ## Authentication foundation
 
-T4 provides registration, login, logout, current-user restoration, secure JWT cookies, current-role authorization, browser mutation defenses, and bounded authentication attempts. See [authentication operations](docs/operations/authentication.md) for configuration, endpoint behavior, security boundaries, and limitations.
+T4 provides registration, login, logout, current-user restoration, secure JWT cookies, current-role authorization, browser mutation defenses, and bounded authentication attempts. See [authentication operations](docs/features/authentication.md) for configuration, endpoint behavior, security boundaries, and limitations.
 
 ```powershell
 npm --workspace backend test -- authentication authorization
@@ -110,7 +110,7 @@ npm run verify:authentication
 
 ## Hotel and room catalog APIs
 
-T5 provides public hotel browsing, exact city search, hotel details, room types, stay availability, server-computed starting prices, and administrator hotel and room management. Deletion deactivates records so reservation history can retain its references. See [catalog operations](docs/operations/catalog.md) and the [API contract](docs/architecture/api-contract.md).
+T5 provides public hotel browsing, exact city search, hotel details, room types, stay availability, server-computed starting prices, and administrator hotel and room management. Deletion deactivates records so reservation history can retain its references. See [catalog operations](docs/features/catalog.md) and the [API contract](docs/architecture/api-contract.md).
 
 ```powershell
 npm --workspace backend test -- catalog
@@ -119,7 +119,7 @@ npm run verify:catalog
 
 ## Reservation APIs
 
-T6 provides authenticated booking, server-authoritative price snapshots, deterministic idempotent retries, customer-owned reservation history, administrator reservation listing, and terminal cancellation. All availability-changing operations use the same room-type row lock. See [reservation operations](docs/operations/reservations.md) and the [reservation model](docs/architecture/data-model-and-reservations.md).
+T6 provides authenticated booking, server-authoritative price snapshots, deterministic idempotent retries, customer-owned reservation history, administrator reservation listing, and terminal cancellation. All availability-changing operations use the same room-type row lock. See [reservation operations](docs/features/reservations.md) and the [reservation model](docs/architecture/data-model-and-reservations.md).
 
 ```powershell
 npm --workspace backend test -- reservations
@@ -128,7 +128,7 @@ npm run verify:reservations
 
 ## Customer application
 
-T7 provides hotel search, URL-preserved stay criteria, hotel and room details, registration and sign-in, protected reservation review, booking confirmation, My Reservations, substantive guest-information pages, and reopenable cookie preferences. The browser uses relative `/api` routes and never supplies a booking price or role. See [customer application operations](docs/operations/customer-application.md).
+T7 provides hotel search, URL-preserved stay criteria, hotel and room details, registration and sign-in, protected reservation review, booking confirmation, My Reservations, substantive guest-information pages, and reopenable cookie preferences. The browser uses relative `/api` routes and never supplies a booking price or role. See [customer application operations](docs/features/customer-application.md).
 
 ```powershell
 npm --workspace frontend test -- customer
@@ -138,7 +138,7 @@ npm run verify:customer
 
 ## Administrator application
 
-T8 provides role-protected administrator navigation, reservation filtering and cancellation, hotel management, room management, destructive confirmations, and conflict-preserving forms. React blocks customer accounts before administrator data calls, while Express remains the authoritative role boundary. See [administrator application operations](docs/operations/administrator-application.md).
+T8 provides role-protected administrator navigation, reservation filtering and cancellation, hotel management, room management, destructive confirmations, and conflict-preserving forms. React blocks customer accounts before administrator data calls, while Express remains the authoritative role boundary. See [administrator application operations](docs/features/administrator-application.md).
 
 ```powershell
 npm --workspace frontend test -- admin
@@ -148,7 +148,7 @@ npm run verify:admin
 
 ## Weather integration
 
-T9 adds current hotel-city conditions through an Express-owned Open-Meteo adapter. The browser calls only the internal `/api/weather` route. The adapter validates provider responses, limits request duration, coalesces simultaneous city lookups, caches successful results briefly, and returns a stable internal shape. Weather remains supplemental, so provider failure leaves hotel and room details usable. See [weather operations](docs/operations/weather.md).
+T9 adds current hotel-city conditions through an Express-owned Open-Meteo adapter. The browser calls only the internal `/api/weather` route. The adapter validates provider responses, limits request duration, coalesces simultaneous city lookups, caches successful results briefly, and returns a stable internal shape. Weather remains supplemental, so provider failure leaves hotel and room details usable. See [weather operations](docs/features/weather.md).
 
 ```powershell
 npm --workspace backend test -- weather
@@ -161,8 +161,7 @@ npm run verify:weather
 - `frontend/`: React application and Vite configuration
 - `backend/`: Express application, server startup, configuration, and tests
 - `scripts/`: repository verification
-- `docs/`: requirements, architecture, design, quality, and deployment plans
-- `plan.json`: approved task queue
+- `docs/`: architecture, per-feature guides, design, operations, project, and quality documentation
 
 ## Deployment
 
@@ -174,4 +173,4 @@ The application is live in production:
 
 Vercel serves the built frontend and proxies `/api` requests to the Express API on Railway, which connects to PostgreSQL on Neon. Serving the frontend and API under one origin keeps the authentication cookie first-party and the cross-site request defenses intact. The step-by-step procedure and post-launch operations are documented in [production deployment](docs/operations/production-deployment.md).
 
-See the [documentation index](docs/README.md) and [implementation plan](docs/plans/implementation-plan.md) for scope, decisions, and remaining milestones.
+See the [documentation index](docs/README.md) for architecture, per-feature guides, and operations.
