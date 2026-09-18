@@ -29,7 +29,7 @@ afterAll(async () => {
 describe('public hotels', () => {
   it('lists active hotels with a server-computed starting price', async () => {
     const response = await context.request.get('/api/hotels').expect(200);
-    expect(response.body.hotels).toHaveLength(3);
+    expect(response.body.hotels).toHaveLength(9);
     expect(response.body.hotels[0]).toMatchObject({
       name: 'The Battery',
       city: 'Charleston',
