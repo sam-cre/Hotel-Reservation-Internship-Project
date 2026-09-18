@@ -73,6 +73,6 @@ describe.skipIf(!runIntegration)('PostgreSQL server integration', () => {
           (SELECT count(*)::integer FROM schema_migrations) AS migrations
       `),
     );
-    expect(result.rows[0]).toEqual({ hotels: 3, rooms: 6, migrations: 3 });
+    expect(result.rows[0]).toEqual({ hotels: 9, rooms: 18, migrations: 3 });
   });
 });
