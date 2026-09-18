@@ -118,8 +118,10 @@ Every button has default, hover, focus-visible, pressed, loading, and disabled s
 
 ## Customer layout
 
-- Search is prominent but does not cover a full-screen photograph
-- Hotel results use varied image rhythm rather than identical floating cards
+- The home page opens with a full-bleed property photograph under a dark-to-transparent scrim, with the page title and summary set over the lower third
+- The search panel is docked as an elevated card that overlaps the base of the hero, so the primary task stays immediately reachable without hiding the search behind the image
+- A short assurance row (live availability, instant confirmation, no booking fees) sits under the search fields as an honest, factual value statement
+- Hotel results use varied image rhythm rather than identical floating cards, with a restrained image zoom on hover
 - Room options use structured rows containing capacity, availability, price, and action
 - The stay line remains visible during reservation review
 - Confirmation resembles a refined booking folio, not a novelty ticket

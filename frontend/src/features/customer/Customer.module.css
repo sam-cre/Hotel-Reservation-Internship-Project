@@ -84,24 +84,72 @@
   margin: auto;
   padding: 72px 0 96px;
 }
-.intro {
-  padding: 56px 0 36px;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
-  column-gap: 72px;
-  align-items: end;
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(460px, 56vw, 660px);
+  overflow: hidden;
+  background: var(--color-night);
 }
-.intro h1 {
-  max-width: 11em;
-  margin: 8px 0 0;
-  font-size: clamp(46px, 5vw, 70px);
-  line-height: 1.02;
+.heroMedia {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.heroMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    #0f2a3033 0%,
+    #0f2a3033 42%,
+    #0f2a30d1 100%
+  );
+}
+.heroInner {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1408px;
+  margin: 0 auto;
+  padding: 0 64px clamp(52px, 7vw, 96px);
+  color: #f7f5ef;
+}
+.heroKicker {
+  margin: 0 0 18px;
+  color: #e6d6bf;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.heroTitle {
+  max-width: 14ch;
+  margin: 0;
+  font-size: clamp(50px, 6.4vw, 86px);
+  line-height: 1;
   font-weight: 450;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
+.heroSummary {
+  max-width: 46ch;
+  margin: 22px 0 0;
+  color: #dbe4e1;
+  font-size: clamp(15px, 1.4vw, 17px);
+  line-height: 1.7;
+}
 .kicker {
-  grid-column: 1 / -1;
   margin: 0;
   color: var(--color-action);
   font-size: 11px;
@@ -109,21 +157,39 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
-.introSummary {
-  max-width: 360px;
-  margin: 0 0 7px;
-  padding-left: 24px;
-  border-left: 2px solid var(--color-accent);
-  color: var(--color-muted);
-  font-size: 15px;
-  line-height: 1.75;
+.pageBody {
+  max-width: 1408px;
+  margin: auto;
+  padding: 0 64px;
 }
-.searchSection {
-  padding: 22px;
-  border: 1px solid #bfc7c4;
+.searchDock {
+  position: relative;
+  z-index: 3;
+  margin-top: clamp(-72px, -6vw, -44px);
+  padding: 22px 22px 18px;
+  border: 1px solid #d5dcd8;
   border-radius: var(--radius-surface);
   background: var(--color-surface);
-  box-shadow: 0 14px 34px #112d330d;
+  box-shadow: 0 24px 60px -28px #0f2a3066;
+}
+.searchAssurances {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 16px 4px 2px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--color-border);
+  list-style: none;
+}
+.searchAssurances li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-muted);
+  font-size: 12.5px;
+}
+.searchAssurances svg {
+  color: var(--color-action);
 }
 .searchForm {
   display: grid;
@@ -226,6 +292,16 @@
   height: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.hotelRow:hover .hotelImage img {
+  transform: scale(1.045);
+}
+.hotelRow:hover .hotelBottom .primaryLink svg {
+  transform: translate(2px, -2px);
+}
+.hotelBottom .primaryLink svg {
+  transition: transform 0.2s ease;
 }
 .hotelImage > span {
   position: absolute;
@@ -828,7 +904,11 @@
 
 @media (max-width: 959px) {
   .headerInner,
-  .main {
+  .main,
+  .pageBody {
+    padding-inline: 32px;
+  }
+  .heroInner {
     padding-inline: 32px;
   }
   .searchForm {
@@ -916,7 +996,8 @@
     padding: 12px;
     text-align: left;
   }
-  .main {
+  .main,
+  .pageBody {
     padding-inline: 16px;
   }
   .narrowPage,
@@ -925,19 +1006,18 @@
     width: calc(100% - 32px);
     padding-block: 48px 72px;
   }
-  .intro {
-    display: block;
-    padding: 28px 0;
+  .hero {
+    min-height: 78vh;
   }
-  .intro h1 {
-    font-size: 48px;
+  .heroInner {
+    padding-inline: 16px;
   }
-  .introSummary {
-    margin-top: 20px;
-    padding-left: 16px;
+  .heroTitle {
+    font-size: 52px;
   }
-  .searchSection {
-    padding: 20px 16px;
+  .searchDock {
+    margin-top: -40px;
+    padding: 20px 16px 16px;
   }
   .searchForm {
     gap: 16px 12px;
@@ -1090,5 +1170,12 @@
   .header *,
   .footer * {
     scroll-behavior: auto;
+  }
+  .hotelImage img,
+  .hotelBottom .primaryLink svg {
+    transition: none;
+  }
+  .hotelRow:hover .hotelImage img {
+    transform: none;
   }
 }
