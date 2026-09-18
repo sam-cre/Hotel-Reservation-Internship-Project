@@ -96,7 +96,7 @@ export function CustomerShell({ children }) {
         <div className={styles.footerMain}>
           <div className={styles.footerIdentity}>
             <Brand />
-            <p>Full-service destination hotels with a strong sense of place.</p>
+            <p>Book hotels in select cities.</p>
           </div>
           <nav aria-labelledby="footer-explore">
             <h2 id="footer-explore">Explore</h2>
@@ -118,8 +118,8 @@ export function CustomerShell({ children }) {
           </nav>
         </div>
         <div className={styles.footerBottom}>
-          <span>Stillwater Hotels</span>
-          <span>Fictional properties created for an internship project</span>
+          <span>&copy; {new Date().getFullYear()} Stillwater Hotels</span>
+          <span>Rooms and rates are subject to availability.</span>
         </div>
       </footer>
       <p className="srOnly" role="status">

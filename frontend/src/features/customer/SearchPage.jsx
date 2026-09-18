@@ -131,11 +131,10 @@ export function SearchPage() {
   return (
     <main id="main-content" className={styles.main}>
       <section className={styles.intro} aria-labelledby="search-title">
-        <p className={styles.kicker}>The Stillwater collection</p>
-        <h1 id="search-title">Hotels worth arriving for.</h1>
+        <h1 id="search-title">Find your stay.</h1>
         <p className={styles.introSummary}>
-          Distinctive destination hotels, shaped by their cities and supported
-          by considered service.
+          Search hotels by city and dates, check live availability, and book in
+          a few steps.
         </p>
       </section>
       <section
@@ -156,8 +155,7 @@ export function SearchPage() {
       >
         <div className={styles.resultsHeading}>
           <div>
-            <p className={styles.breadcrumb}>The collection / {stay.city}</p>
-            <h2 id="results-title">Stay in {stay.city}.</h2>
+            <h2 id="results-title">Hotels in {stay.city}.</h2>
             <p className={styles.muted}>
               {loading
                 ? 'Checking live room inventory.'
@@ -204,10 +202,6 @@ export function SearchPage() {
           </div>
         )}
         <div className={styles.closingNote}>
-          <p>
-            Independent in character. Consistent in service.{' '}
-            <span>Stillwater Hotels.</span>
-          </p>
           <span>All rates in USD</span>
         </div>
       </section>
