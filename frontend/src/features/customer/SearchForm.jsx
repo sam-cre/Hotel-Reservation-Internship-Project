@@ -10,6 +10,8 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
   const [values, setValues] = useState(stay);
   const [errors, setErrors] = useState({});
   const formRef = useRef(null);
+  const checkInRef = useRef(null);
+  const checkOutRef = useRef(null);
   function change(event) {
     setValues((current) => ({
       ...current,
@@ -24,7 +26,16 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
     setErrors(issues);
     const first = Object.keys(issues)[0];
     if (first) {
-      formRef.current.elements.namedItem(first)?.focus();
+      // The date fields are custom controls, so focus their trigger button by
+      // ref; native controls (city, guests) resolve through the form elements.
+      const dateTrigger =
+        first === 'checkIn'
+          ? checkInRef.current
+          : first === 'checkOut'
+            ? checkOutRef.current
+            : null;
+      const target = dateTrigger ?? formRef.current.elements.namedItem(first);
+      target?.focus();
       return;
     }
     onSearch(values);
@@ -59,6 +70,7 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
         min={isoDate(new Date())}
         error={errors.checkIn}
         onChange={change}
+        buttonRef={checkInRef}
       />
       <DatePicker
         label="Check-out"
@@ -67,6 +79,7 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
         min={values.checkIn}
         error={errors.checkOut}
         onChange={change}
+        buttonRef={checkOutRef}
       />
       <SelectField
         label="Guests"

@@ -162,9 +162,15 @@
 .selectPlaceholder {
   color: var(--color-muted);
 }
+.pickerAnchor {
+  position: relative;
+}
 .calendarPanel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
   z-index: 100;
-  width: 300px;
+  width: min(300px, calc(100vw - 32px));
   padding: 14px;
   color: var(--color-ink);
   background: var(--color-surface);
@@ -199,23 +205,23 @@
 .calTitle {
   font: 600 15px var(--font-heading);
 }
-.calWeekdays,
-.calGrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+.calTable {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
-.calWeekdays {
-  margin-bottom: 4px;
-}
-.calWeekdays span {
+.calTable th {
   padding: 6px 0;
   color: var(--color-muted);
   font-size: 11px;
   font-weight: 700;
   text-align: center;
 }
-.calGrid {
-  gap: 2px;
+.calTable th abbr {
+  text-decoration: none;
+}
+.calTable td {
+  padding: 1px;
 }
 .calDay {
   display: inline-grid;

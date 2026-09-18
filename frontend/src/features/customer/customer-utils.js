@@ -25,15 +25,26 @@ export function stayFromParams(params) {
   };
 }
 
+// An ISO string that matches the shape can still be an impossible calendar day
+// (for example 2026-02-31). Confirm the parsed date round-trips to the same
+// year, month, and day before treating it as valid.
+export function isRealIsoDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return (
+    date.getFullYear() === year &&
+    date.getMonth() === month - 1 &&
+    date.getDate() === day
+  );
+}
+
 export function validateStay(stay, today = isoDate(new Date())) {
   const errors = {};
   if (!stay.city) errors.city = 'Choose a destination.';
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(stay.checkIn) || stay.checkIn < today)
+  if (!isRealIsoDate(stay.checkIn) || stay.checkIn < today)
     errors.checkIn = 'Choose today or a future date.';
-  if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(stay.checkOut) ||
-    stay.checkOut <= stay.checkIn
-  )
+  if (!isRealIsoDate(stay.checkOut) || stay.checkOut <= stay.checkIn)
     errors.checkOut = 'Choose a date after check-in.';
   if (!/^[1-4]$/.test(String(stay.guests)))
     errors.guests = 'Choose between 1 and 4 guests.';
