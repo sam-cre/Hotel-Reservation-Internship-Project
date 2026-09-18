@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { ArrowLeft, Check, MapPin, RefreshCw, Star } from 'lucide-react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button.jsx';
+import { Photo } from '../../components/ui/Photo.jsx';
 import { apiMessage, catalogApi } from '../../services/api.js';
 import { StayLine } from './StayLine.jsx';
 import { WeatherSummary } from './WeatherSummary.jsx';
@@ -84,11 +85,12 @@ export function HotelPage() {
         <>
           <section className={styles.hotelHero}>
             <div className={styles.hotelHeroImage}>
-              <img
+              <Photo
                 src={hotel.imageUrl}
                 alt={`${hotel.name} in ${hotel.city}`}
                 width="1400"
                 height="900"
+                loading="eager"
               />
             </div>
             <div className={styles.hotelHeroCopy}>
