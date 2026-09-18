@@ -40,9 +40,12 @@ export function SelectField({
   defaultValue,
   name,
   disabled,
+  error,
+  hint,
   ...props
 }) {
   const id = useId();
+  const descriptionId = error || hint ? `${id}-description` : undefined;
   const options = Children.toArray(children).map((option) => ({
     disabled: Boolean(option.props.disabled),
     label: option.props.children,
@@ -73,7 +76,13 @@ export function SelectField({
         name={name}
         disabled={disabled}
       >
-        <ListboxButton id={id} className={styles.selectTrigger} {...props}>
+        <ListboxButton
+          id={id}
+          className={styles.selectTrigger}
+          aria-invalid={Boolean(error)}
+          aria-describedby={descriptionId}
+          {...props}
+        >
           <span>{selectedOption?.label}</span>
           <span className={styles.selectIcon}>
             <ChevronDown size={17} aria-hidden="true" />
@@ -107,6 +116,11 @@ export function SelectField({
           </div>
         </ListboxOptions>
       </Listbox>
+      {(error || hint) && (
+        <span id={descriptionId} className={error ? styles.error : styles.hint}>
+          {error || hint}
+        </span>
+      )}
     </div>
   );
 }

@@ -8,7 +8,9 @@ export function defaultStay() {
   const checkOut = new Date(checkIn);
   checkOut.setDate(checkOut.getDate() + 3);
   return {
-    city: 'Charleston',
+    // No destination is preselected: the guest chooses a city before searching,
+    // so the homepage opens on an invitation rather than an arbitrary default.
+    city: '',
     checkIn: isoDate(checkIn),
     checkOut: isoDate(checkOut),
     guests: '2',

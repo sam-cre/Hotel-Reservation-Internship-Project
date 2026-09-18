@@ -123,6 +123,20 @@ beforeEach(() => {
 });
 
 describe('customer application', () => {
+  it('opens the homepage on a destination prompt with nothing preselected', async () => {
+    renderApp('/');
+
+    expect(
+      await screen.findByRole('heading', {
+        name: 'Where would you like to go?',
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Start with a destination.')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'The Battery' }),
+    ).not.toBeInTheDocument();
+  });
+
   it('loads live search results and preserves stay criteria in the hotel link', async () => {
     renderApp(
       '/search?city=Charleston&checkIn=2026-10-10&checkOut=2026-10-13&guests=2',

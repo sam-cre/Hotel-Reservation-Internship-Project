@@ -1131,16 +1131,21 @@
     padding-block: 48px 72px;
   }
   .hero {
-    min-height: 78vh;
+    /* Shorter on phones so the search widget and its Find rooms button are
+       visible near the fold instead of sitting under a full-height image. */
+    min-height: min(52vh, 420px);
   }
   .heroInner {
     padding-inline: 16px;
   }
   .heroTitle {
-    font-size: 52px;
+    font-size: 46px;
+  }
+  .heroSummary {
+    margin-top: 14px;
   }
   .searchDock {
-    margin-top: -40px;
+    margin-top: -48px;
     padding: 20px 16px 16px;
   }
   .searchForm {

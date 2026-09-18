@@ -55,8 +55,12 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
         value={values.city}
         onChange={change}
         disabled={!cities.length}
+        error={errors.city}
+        hint="Required"
       >
-        {!cities.length && <option value={values.city}>{values.city}</option>}
+        <option value="" disabled>
+          Select a destination
+        </option>
         {cities.map((city) => (
           <option key={city} value={city}>
             {city}
