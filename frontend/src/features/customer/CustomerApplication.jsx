@@ -9,6 +9,7 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle.js';
 import { useAuth } from './useAuth.js';
 import { CustomerShell } from './CustomerShell.jsx';
 import { SearchPage } from './SearchPage.jsx';
+import { HotelsDirectoryPage } from './HotelsDirectoryPage.jsx';
 import { HotelPage } from './HotelPage.jsx';
 import { AuthenticationPage } from './AuthenticationPage.jsx';
 import { ReservationPage } from './ReservationPage.jsx';
@@ -59,6 +60,7 @@ function NotFound() {
 const CUSTOMER_TITLES = [
   ['/', 'Find your stay'],
   ['/search', 'Search hotels'],
+  ['/hotels', 'Our hotels'],
   ['/hotels/:hotelId', 'Hotel details'],
   ['/login', 'Sign in'],
   ['/register', 'Create your account'],
@@ -83,6 +85,7 @@ export function CustomerApplication() {
       <Routes>
         <Route path="/" element={<SearchPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/hotels" element={<HotelsDirectoryPage />} />
         <Route path="/hotels/:hotelId" element={<HotelPage />} />
         <Route path="/login" element={<AuthenticationPage mode="login" />} />
         <Route

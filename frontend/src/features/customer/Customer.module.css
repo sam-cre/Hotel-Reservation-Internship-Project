@@ -1023,7 +1023,122 @@
   gap: 8px;
 }
 
+.navDropdown {
+  display: inline-flex;
+  align-items: center;
+}
+.navMenuButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.navMenuButton[data-open] {
+  color: white;
+}
+
+.directoryPage {
+  max-width: 1408px;
+  margin: auto;
+  padding: 56px 64px 96px;
+}
+.directoryLede {
+  max-width: 640px;
+}
+.directoryLede h1 {
+  margin: 12px 0;
+  font-size: clamp(34px, 4vw, 48px);
+  font-weight: 450;
+  letter-spacing: -0.03em;
+}
+.cityGroup {
+  margin-top: 48px;
+}
+.cityGroup h2 {
+  margin: 0 0 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 22px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+}
+.hotelGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 28px;
+}
+.hotelCard {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-surface);
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+.hotelCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 44px -26px #0f2a3066;
+}
+.hotelCardImage {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: var(--color-soft);
+}
+.hotelCardImage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+.hotelCard:hover .hotelCardImage img {
+  transform: scale(1.045);
+}
+.hotelCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px 18px;
+}
+.hotelCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.hotelCardTop h3 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+}
+.hotelCardCity {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+.hotelCardCity svg {
+  color: var(--color-action);
+}
+.hotelCardPrice {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--color-ink);
+}
+.hotelCardPrice strong {
+  font-weight: 650;
+}
+
 @media (max-width: 959px) {
+  .directoryPage {
+    padding-inline: 32px;
+  }
   .headerInner,
   .main,
   .pageBody {
@@ -1157,6 +1272,12 @@
   }
   .resultsSection {
     padding-top: 36px;
+  }
+  .directoryPage {
+    padding: 40px 16px 72px;
+  }
+  .hotelGrid {
+    grid-template-columns: 1fr;
   }
   .stayLine {
     grid-template-columns: repeat(2, 1fr);

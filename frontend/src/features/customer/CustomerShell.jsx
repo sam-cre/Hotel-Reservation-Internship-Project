@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Menu as MenuDropdown,
@@ -6,9 +6,17 @@ import {
   MenuItem,
   MenuItems,
 } from '@headlessui/react';
-import { CalendarCheck, ChevronDown, LogOut, Menu, X } from 'lucide-react';
+import {
+  CalendarCheck,
+  ChevronDown,
+  LogOut,
+  MapPin,
+  Menu,
+  X,
+} from 'lucide-react';
 import { Brand } from '../../components/Brand.jsx';
 import { Button } from '../../components/ui/Button.jsx';
+import { catalogApi } from '../../services/api.js';
 import { useAuth } from './useAuth.js';
 import styles from './Customer.module.css';
 
@@ -35,8 +43,25 @@ export function CustomerShell({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cities, setCities] = useState([]);
   const [cookiesOpen, setCookiesOpen] = useState(() => !savedCookieChoice());
   const [cookieStatus, setCookieStatus] = useState('');
+
+  // The Destinations menu lists the cities that actually have hotels, drawn
+  // from the same public endpoint the search page uses. A failed lookup simply
+  // leaves the menu out rather than showing an error in the header.
+  useEffect(() => {
+    const controller = new AbortController();
+    catalogApi
+      .hotels({}, controller.signal)
+      .then((records) => {
+        setCities([...new Set(records.map((hotel) => hotel.city))].sort());
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, []);
+
+  const closeMenu = () => setMenuOpen(false);
 
   async function signOut() {
     await logout();
@@ -83,8 +108,40 @@ export function CustomerShell({ children }) {
             className={menuOpen ? styles.navOpen : ''}
             aria-label="Main navigation"
           >
-            <NavLink to="/" end onClick={() => setMenuOpen(false)}>
+            <NavLink to="/" end onClick={closeMenu}>
               Find a hotel
+            </NavLink>
+            {cities.length > 0 && (
+              <MenuDropdown as="div" className={styles.navDropdown}>
+                <MenuButton className={styles.navMenuButton}>
+                  Destinations
+                  <ChevronDown size={15} aria-hidden="true" />
+                </MenuButton>
+                <MenuItems
+                  className={styles.menuContent}
+                  anchor={{ to: 'bottom start', gap: 10 }}
+                  modal={false}
+                >
+                  {cities.map((city) => (
+                    <MenuItem key={city}>
+                      <Link
+                        className={styles.menuItem}
+                        to={`/search?city=${encodeURIComponent(city)}`}
+                        onClick={closeMenu}
+                      >
+                        <MapPin size={16} aria-hidden="true" />
+                        {city}
+                      </Link>
+                    </MenuItem>
+                  ))}
+                </MenuItems>
+              </MenuDropdown>
+            )}
+            <NavLink to="/hotels" onClick={closeMenu}>
+              Our hotels
+            </NavLink>
+            <NavLink to="/information/contact" onClick={closeMenu}>
+              Help
             </NavLink>
             <div className={styles.navMobileAccount}>
               {user ? (
