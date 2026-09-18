@@ -138,7 +138,7 @@ describe('administrator application', () => {
     expect(
       await screen.findByRole('heading', { name: 'Reservations' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Sam Guest')).toBeInTheDocument();
+    expect(await screen.findByText('Sam Guest')).toBeInTheDocument();
 
     await user.click(
       screen.getByRole('button', { name: 'View reservation 31' }),
