@@ -59,7 +59,7 @@ export function AdminShell({ children }) {
         </aside>
         <div className={styles.workspace}>
           <header className={styles.topbar}>
-            <span>Stillwater collection workspace</span>
+            <span>Stillwater operations</span>
             <ButtonLink to="/" variant="quiet">
               View guest site
               <ExternalLink size={16} aria-hidden="true" />

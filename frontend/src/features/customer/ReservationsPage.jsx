@@ -47,18 +47,26 @@ export function ReservationsPage() {
         )}
         {state.error && (
           <div className={styles.statePanel} role="alert">
-            <h2>Reservations are unavailable.</h2>
+            <h2>Please sign in to view your reservations.</h2>
             <p>{state.error}</p>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setState({ loading: true, error: '' });
-                setReload((value) => value + 1);
-              }}
-            >
-              <RefreshCw size={17} aria-hidden="true" />
-              Try again
-            </Button>
+            <div className={styles.statePanelActions}>
+              <Link
+                className={styles.primaryLink}
+                to="/login?returnTo=%2Freservations"
+              >
+                Sign in
+              </Link>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setState({ loading: true, error: '' });
+                  setReload((value) => value + 1);
+                }}
+              >
+                <RefreshCw size={17} aria-hidden="true" />
+                Try again
+              </Button>
+            </div>
           </div>
         )}
         {!state.loading && !state.error && reservations.length === 0 && (

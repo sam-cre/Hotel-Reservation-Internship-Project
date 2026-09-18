@@ -178,7 +178,7 @@ try {
     `${origin}/src/features/customer/SearchPage.jsx`,
   );
   assert.equal(customer.status, 200);
-  assert.match(await customer.text(), /Hotels worth arriving for/);
+  assert.match(await customer.text(), /Find your stay/);
   const administrator = await fetch(
     `${origin}/src/features/admin/AdminApplication.jsx`,
   );

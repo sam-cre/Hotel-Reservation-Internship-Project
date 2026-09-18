@@ -14,7 +14,7 @@
 }
 .brand small {
   display: block;
-  margin-top: 6px;
+  margin-top: 1px;
   font: 700 10px var(--font-body);
   letter-spacing: 0.24em;
   text-transform: uppercase;
