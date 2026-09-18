@@ -1,10 +1,25 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { ArrowUpRight, Menu, X } from 'lucide-react';
+import {
+  Menu as MenuDropdown,
+  MenuButton,
+  MenuItem,
+  MenuItems,
+} from '@headlessui/react';
+import { CalendarCheck, ChevronDown, LogOut, Menu, X } from 'lucide-react';
 import { Brand } from '../../components/Brand.jsx';
 import { Button } from '../../components/ui/Button.jsx';
 import { useAuth } from './useAuth.js';
 import styles from './Customer.module.css';
+
+function initialsOf(name) {
+  const parts = String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length === 0) return 'G';
+  return (parts[0][0] + (parts[1]?.[0] ?? '')).toUpperCase();
+}
 
 const COOKIE_KEY = 'stillwater-cookie-choice';
 
@@ -71,24 +86,68 @@ export function CustomerShell({ children }) {
             <NavLink to="/" end onClick={() => setMenuOpen(false)}>
               Find a hotel
             </NavLink>
-            {user && (
-              <NavLink to="/reservations" onClick={() => setMenuOpen(false)}>
-                My reservations
-              </NavLink>
-            )}
-            {user ? (
-              <button type="button" onClick={signOut}>
-                Sign out
-              </button>
-            ) : (
-              <NavLink to="/login" onClick={() => setMenuOpen(false)}>
-                Sign in
-              </NavLink>
-            )}
+            <div className={styles.navMobileAccount}>
+              {user ? (
+                <>
+                  <NavLink
+                    to="/reservations"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    My reservations
+                  </NavLink>
+                  <button type="button" onClick={signOut}>
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <NavLink to="/login" onClick={() => setMenuOpen(false)}>
+                  Sign in
+                </NavLink>
+              )}
+            </div>
           </nav>
-          <Link className={styles.headerAction} to="/#stay-search">
-            Book a stay <ArrowUpRight size={17} aria-hidden="true" />
-          </Link>
+          <div className={styles.account}>
+            {user ? (
+              <MenuDropdown>
+                <MenuButton className={styles.profileButton}>
+                  <span className={styles.avatar} aria-hidden="true">
+                    {initialsOf(user.name)}
+                  </span>
+                  <span className={styles.profileName}>
+                    {String(user.name || 'Guest').split(/\s+/)[0]}
+                  </span>
+                  <ChevronDown size={16} aria-hidden="true" />
+                  <span className="srOnly">Account menu</span>
+                </MenuButton>
+                <MenuItems
+                  className={styles.menuContent}
+                  anchor={{ to: 'bottom end', gap: 10 }}
+                  modal={false}
+                >
+                  <MenuItem>
+                    <Link className={styles.menuItem} to="/reservations">
+                      <CalendarCheck size={16} aria-hidden="true" />
+                      My reservations
+                    </Link>
+                  </MenuItem>
+                  <MenuItem>
+                    <button
+                      type="button"
+                      className={styles.menuItem}
+                      onClick={signOut}
+                    >
+                      <LogOut size={16} aria-hidden="true" />
+                      Sign out
+                    </button>
+                  </MenuItem>
+                </MenuItems>
+              </MenuDropdown>
+            ) : (
+              <Link className={styles.headerAction} to="/login">
+                Sign in
+              </Link>
+            )}
+          </div>
         </div>
       </header>
       {children}
@@ -130,10 +189,32 @@ export function CustomerShell({ children }) {
           <div>
             <h2 id="cookie-title">Your privacy choices</h2>
             <p>
-              Essential storage keeps your sign-in and privacy choice working.
-              Optional services remain off unless you allow them. No analytics
-              service is currently connected.
+              You control what this site stores. Here is exactly what each
+              choice covers.
             </p>
+            <dl className={styles.cookieDetails}>
+              <div>
+                <dt>
+                  Essential
+                  <span className={styles.cookieAlways}>Always on</span>
+                </dt>
+                <dd>
+                  Keeps you signed in and remembers this privacy choice. Never
+                  used to track you.
+                </dd>
+              </div>
+              <div>
+                <dt>
+                  Analytics
+                  <span className={styles.cookieOff}>Off</span>
+                </dt>
+                <dd>
+                  Would measure anonymous page views to improve the site. No
+                  analytics service is currently connected, so nothing is
+                  collected even if you allow it.
+                </dd>
+              </div>
+            </dl>
           </div>
           <div className={styles.cookieActions}>
             <Button

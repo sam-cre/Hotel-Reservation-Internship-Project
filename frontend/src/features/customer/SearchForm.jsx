@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Button } from '../../components/ui/Button.jsx';
-import { Field, SelectField } from '../../components/ui/Field.jsx';
+import { DatePicker } from '../../components/ui/DatePicker.jsx';
+import { SelectField } from '../../components/ui/Field.jsx';
 import { isoDate, validateStay } from './customer-utils.js';
 import styles from './Customer.module.css';
 
@@ -9,6 +10,8 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
   const [values, setValues] = useState(stay);
   const [errors, setErrors] = useState({});
   const formRef = useRef(null);
+  const checkInRef = useRef(null);
+  const checkOutRef = useRef(null);
   function change(event) {
     setValues((current) => ({
       ...current,
@@ -23,7 +26,16 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
     setErrors(issues);
     const first = Object.keys(issues)[0];
     if (first) {
-      formRef.current.elements.namedItem(first)?.focus();
+      // The date fields are custom controls, so focus their trigger button by
+      // ref; native controls (city, guests) resolve through the form elements.
+      const dateTrigger =
+        first === 'checkIn'
+          ? checkInRef.current
+          : first === 'checkOut'
+            ? checkOutRef.current
+            : null;
+      const target = dateTrigger ?? formRef.current.elements.namedItem(first);
+      target?.focus();
       return;
     }
     onSearch(values);
@@ -51,25 +63,23 @@ export function SearchForm({ stay, cities, onSearch, busy = false }) {
           </option>
         ))}
       </SelectField>
-      <Field
+      <DatePicker
         label="Check-in"
         name="checkIn"
-        type="date"
         value={values.checkIn}
         min={isoDate(new Date())}
         error={errors.checkIn}
         onChange={change}
-        required
+        buttonRef={checkInRef}
       />
-      <Field
+      <DatePicker
         label="Check-out"
         name="checkOut"
-        type="date"
         value={values.checkOut}
         min={values.checkIn}
         error={errors.checkOut}
         onChange={change}
-        required
+        buttonRef={checkOutRef}
       />
       <SelectField
         label="Guests"

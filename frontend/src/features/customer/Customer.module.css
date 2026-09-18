@@ -73,6 +73,76 @@
   min-width: 44px;
   min-height: 44px;
 }
+.account {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+.navMobileAccount {
+  display: none;
+}
+.profileButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 5px 12px 5px 6px;
+  color: #d8e0de;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 100px;
+  font: 500 14px var(--font-body);
+  cursor: pointer;
+}
+.profileButton:hover,
+.profileButton[data-open] {
+  color: white;
+  border-color: #3c5f65;
+}
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: white;
+  background: var(--color-action);
+  font-size: 12px;
+  font-weight: 700;
+}
+.menuContent {
+  z-index: 100;
+  min-width: 224px;
+  padding: 6px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1px solid var(--color-control-border);
+  border-radius: var(--radius-control);
+  box-shadow: 0 16px 36px #112d3326;
+}
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 3px;
+  color: var(--color-ink);
+  background: none;
+  border: 0;
+  font: 500 14px var(--font-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.menuItem[data-focus],
+.menuItem:hover {
+  background: var(--color-soft);
+}
+.menuItem svg {
+  color: var(--color-action);
+}
 .main {
   max-width: 1408px;
   margin: auto;
@@ -897,6 +967,42 @@
   font-size: 12px;
   line-height: 1.6;
 }
+.cookieDetails {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0 0;
+}
+.cookieDetails dt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.cookieDetails dd {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+.cookieAlways,
+.cookieOff {
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.cookieAlways {
+  color: var(--color-success);
+  background: #e5f0e8;
+}
+.cookieOff {
+  color: var(--color-muted);
+  background: var(--color-soft);
+}
 .cookieActions {
   display: flex;
   gap: 8px;
@@ -968,8 +1074,11 @@
     place-items: center;
     margin-left: auto;
   }
-  .headerAction {
+  .account {
     display: none;
+  }
+  .navMobileAccount {
+    display: contents;
   }
   .header nav {
     position: absolute;
