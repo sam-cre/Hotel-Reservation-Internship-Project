@@ -257,9 +257,49 @@ export function SearchPage() {
             </div>
           )}
           {hasCity && !displayError && loading && (
-            <div className={styles.statePanel} aria-live="polite">
-              <h3>Finding your stay.</h3>
-              <p>We are checking current room availability and rates.</p>
+            <div
+              className={styles.hotelList}
+              aria-live="polite"
+              aria-busy="true"
+              aria-label="Loading hotel availability"
+            >
+              <div className="srOnly" role="status">
+                Finding your stay. We are checking current room availability and
+                rates.
+              </div>
+              {[1, 2].map((key) => (
+                <div
+                  key={key}
+                  className={styles.skeletonCard}
+                  aria-hidden="true"
+                >
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonImage}`}
+                  />
+                  <div className={styles.skeletonLines}>
+                    <div
+                      className={`${styles.skeleton} ${styles.skeletonLine}`}
+                      style={{ width: '40%', height: '14px' }}
+                    />
+                    <div
+                      className={`${styles.skeleton} ${styles.skeletonLine}`}
+                      style={{ width: '75%', height: '32px' }}
+                    />
+                    <div
+                      className={`${styles.skeleton} ${styles.skeletonLine}`}
+                      style={{ width: '60%', height: '16px' }}
+                    />
+                    <div
+                      className={`${styles.skeleton} ${styles.skeletonLine}`}
+                      style={{
+                        width: '30%',
+                        height: '24px',
+                        marginTop: 'auto',
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           )}
           {hasCity && !displayError && !loading && hotels.length === 0 && (

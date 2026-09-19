@@ -39,23 +39,30 @@ function savedCookieChoice() {
   }
 }
 
+const DEFAULT_CITIES = ['Charleston', 'New York', 'Savannah'];
+let memoryCities = DEFAULT_CITIES;
+
 export function CustomerShell({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cities, setCities] = useState([]);
+  const [cities, setCities] = useState(memoryCities);
   const [cookiesOpen, setCookiesOpen] = useState(() => !savedCookieChoice());
   const [cookieStatus, setCookieStatus] = useState('');
 
   // The Destinations menu lists the cities that actually have hotels, drawn
-  // from the same public endpoint the search page uses. A failed lookup simply
-  // leaves the menu out rather than showing an error in the header.
+  // from the same public endpoint the search page uses. Prepopulating known
+  // destinations prevents layout shift on refresh, while live fetching keeps it current.
   useEffect(() => {
     const controller = new AbortController();
     catalogApi
       .hotels({}, controller.signal)
       .then((records) => {
-        setCities([...new Set(records.map((hotel) => hotel.city))].sort());
+        const unique = [...new Set(records.map((hotel) => hotel.city))].sort();
+        if (unique.length > 0) {
+          memoryCities = unique;
+          setCities(unique);
+        }
       })
       .catch(() => {});
     return () => controller.abort();
@@ -84,7 +91,7 @@ export function CustomerShell({ children }) {
   }
 
   return (
-    <>
+    <div className={styles.shell}>
       <a className="skipLink" href="#main-content">
         Skip to content
       </a>
@@ -207,7 +214,7 @@ export function CustomerShell({ children }) {
           </div>
         </div>
       </header>
-      {children}
+      <div className={styles.shellContent}>{children}</div>
       <footer className={styles.footer}>
         <div className={styles.footerMain}>
           <div className={styles.footerIdentity}>
@@ -286,6 +293,6 @@ export function CustomerShell({ children }) {
           </div>
         </section>
       )}
-    </>
+    </div>
   );
 }
