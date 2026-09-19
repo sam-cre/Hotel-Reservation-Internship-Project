@@ -24,6 +24,22 @@ const schema = z.object({
     .min(1)
     .max(100)
     .default(20),
+  // A per-account (email-keyed) ceiling that throttles password guessing
+  // against one account even when the attacker rotates source IPs. Kept
+  // generous and window-long so it soft-blocks abuse without letting an
+  // attacker lock a legitimate user out by exhausting a tight limit.
+  AUTH_ACCOUNT_RATE_LIMIT_WINDOW_MINUTES: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(1440)
+    .default(60),
+  AUTH_ACCOUNT_RATE_LIMIT_MAX_REQUESTS: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(1000)
+    .default(50),
 });
 
 function parseOrigins(value) {
@@ -75,5 +91,8 @@ export function readAuthenticationEnvironment(source = process.env) {
     allowedOrigins,
     rateLimitWindowMs: result.data.AUTH_RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
     rateLimitMax: result.data.AUTH_RATE_LIMIT_MAX_REQUESTS,
+    accountRateLimitWindowMs:
+      result.data.AUTH_ACCOUNT_RATE_LIMIT_WINDOW_MINUTES * 60 * 1000,
+    accountRateLimitMax: result.data.AUTH_ACCOUNT_RATE_LIMIT_MAX_REQUESTS,
   };
 }

@@ -9,6 +9,7 @@ vi.mock('../src/services/api.js', () => ({
   apiMessage(error, fallback) {
     return error?.response?.data?.error?.message || fallback;
   },
+  setUnauthorizedHandler() {},
   authApi: {
     current: vi.fn(),
     login: vi.fn(),

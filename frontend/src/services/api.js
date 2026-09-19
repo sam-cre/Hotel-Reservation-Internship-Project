@@ -14,6 +14,31 @@ export function apiMessage(
   return error?.response?.data?.error?.message || fallback;
 }
 
+// A 401 from an authenticated call means the session ended server-side (for
+// example the cookie expired). The auth endpoints handle their own 401s: a bad
+// login must not look like a dropped session, and /auth/me already drives the
+// initial state. Anything else clears the cached user so the app stops treating
+// the viewer as signed in and the sign-in page no longer bounces them back.
+export function shouldClearSession(error) {
+  const status = error?.response?.status;
+  const url = error?.config?.url ?? '';
+  return status === 401 && !url.startsWith('/auth/');
+}
+
+let unauthorizedHandler = null;
+
+export function setUnauthorizedHandler(handler) {
+  unauthorizedHandler = handler;
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (shouldClearSession(error) && unauthorizedHandler) unauthorizedHandler();
+    return Promise.reject(error);
+  },
+);
+
 export const authApi = {
   async current(signal) {
     return (await api.get('/auth/me', { signal })).data.user;

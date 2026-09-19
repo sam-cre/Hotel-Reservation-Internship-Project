@@ -37,6 +37,7 @@ export function createAuthModule({ database, config }) {
     '/login',
     limits.loginByIp,
     limits.loginByIdentity,
+    limits.loginByAccount,
     asyncHandler(async (req, res) => {
       const result = await service.login(parseRequest(loginSchema, req.body));
       res.set('Set-Cookie', createSessionCookie(result.token, config));

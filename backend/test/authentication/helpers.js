@@ -17,6 +17,8 @@ export function createTestAuthConfig(overrides = {}) {
     allowedOrigins: new Set([allowedOrigin]),
     rateLimitWindowMs: 60000,
     rateLimitMax: 20,
+    accountRateLimitWindowMs: 60000,
+    accountRateLimitMax: 20,
     ...overrides,
   };
 }

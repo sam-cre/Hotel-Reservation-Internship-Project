@@ -322,4 +322,31 @@ describe('browser mutation defenses and rate limits', () => {
     expect(limited.body.error.code).toBe('RATE_LIMITED');
     expect(limited.headers['ratelimit-policy']).toBeDefined();
   });
+
+  it('throttles repeated attempts against one account', async () => {
+    // The per-IP ceiling is set high so this exercises the account-level
+    // (email-keyed) limiter, which is what stops guessing that rotates IPs.
+    context = createAuthTestContext({
+      database,
+      config: createTestAuthConfig({
+        rateLimitMax: 100,
+        accountRateLimitMax: 3,
+      }),
+    });
+    const target = 'victim@example.com';
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await mutation(context.request, '/api/auth/login')
+        .send({ email: target, password: customerInput.password })
+        .expect(401);
+    }
+    const limited = await mutation(context.request, '/api/auth/login')
+      .send({ email: target, password: customerInput.password })
+      .expect(429);
+    expect(limited.body.error.code).toBe('RATE_LIMITED');
+    // The bucket is keyed on the email alone, so a different account on the
+    // same connection is tracked separately and is not collaterally blocked.
+    await mutation(context.request, '/api/auth/login')
+      .send({ email: 'other@example.com', password: customerInput.password })
+      .expect(401);
+  });
 });

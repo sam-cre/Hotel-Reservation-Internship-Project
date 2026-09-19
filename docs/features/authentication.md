@@ -6,17 +6,19 @@ The Express API owns account creation, credential verification, cookie sessions,
 
 ## Configuration
 
-| Variable                         | Required | Default              | Purpose                                                            |
-| -------------------------------- | -------- | -------------------- | ------------------------------------------------------------------ |
-| `JWT_SECRET`                     | Yes      | None                 | Unique signing secret with at least 32 characters                  |
-| `JWT_ISSUER`                     | No       | `stillwater-api`     | Identifies tokens created by this API                              |
-| `JWT_AUDIENCE`                   | No       | `stillwater-web`     | Restricts tokens to the Stillwater browser client                  |
-| `JWT_TTL_MINUTES`                | No       | `30`                 | Absolute token lifetime, limited to 5 through 60 minutes           |
-| `AUTH_COOKIE_NAME`               | No       | `stillwater_session` | Session-cookie name                                                |
-| `ALLOWED_ORIGINS`                | Yes      | None                 | Comma-separated exact browser origins                              |
-| `AUTH_RATE_LIMIT_WINDOW_MINUTES` | No       | `15`                 | Attempt-counting window, limited to 1 through 60 minutes           |
-| `AUTH_RATE_LIMIT_MAX_REQUESTS`   | No       | `20`                 | Requests allowed per limiter and window, limited to 1 through 100  |
-| `TRUST_PROXY_HOPS`               | No       | `0`                  | Known reverse proxies trusted for client IP detection, from 0 to 2 |
+| Variable                                 | Required | Default              | Purpose                                                             |
+| ---------------------------------------- | -------- | -------------------- | ------------------------------------------------------------------- |
+| `JWT_SECRET`                             | Yes      | None                 | Unique signing secret with at least 32 characters                   |
+| `JWT_ISSUER`                             | No       | `stillwater-api`     | Identifies tokens created by this API                               |
+| `JWT_AUDIENCE`                           | No       | `stillwater-web`     | Restricts tokens to the Stillwater browser client                   |
+| `JWT_TTL_MINUTES`                        | No       | `30`                 | Absolute token lifetime, limited to 5 through 60 minutes            |
+| `AUTH_COOKIE_NAME`                       | No       | `stillwater_session` | Session-cookie name                                                 |
+| `ALLOWED_ORIGINS`                        | Yes      | None                 | Comma-separated exact browser origins                               |
+| `AUTH_RATE_LIMIT_WINDOW_MINUTES`         | No       | `15`                 | Attempt-counting window, limited to 1 through 60 minutes            |
+| `AUTH_RATE_LIMIT_MAX_REQUESTS`           | No       | `20`                 | Requests allowed per limiter and window, limited to 1 through 100   |
+| `AUTH_ACCOUNT_RATE_LIMIT_WINDOW_MINUTES` | No       | `60`                 | Window for the per-account login limiter, 1 through 1440 minutes    |
+| `AUTH_ACCOUNT_RATE_LIMIT_MAX_REQUESTS`   | No       | `50`                 | Per-account (email-keyed) login attempts per window, 1 through 1000 |
+| `TRUST_PROXY_HOPS`                       | No       | `0`                  | Known reverse proxies trusted for client IP detection, from 0 to 2  |
 
 The backend has no fallback signing secret or allowed origin. Invalid configuration stops startup and reports only field names, never values.
 
@@ -55,7 +57,7 @@ Place a generated value in the ignored `.env` file for persistent local developm
 
 Every `POST`, `PUT`, `PATCH`, or `DELETE` API request must satisfy all of these checks:
 
-- `Content-Type` resolves to `application/json`.
+- When the request carries a body, its `Content-Type` resolves to `application/json`. Bodyless mutations such as logout and admin deletes are exempt from the content-type check.
 - `X-CSRF-Protection` equals `1`.
 - `Origin` exactly matches one configured allowed origin.
 - If `Sec-Fetch-Site` is present, it equals `same-origin`.
@@ -67,7 +69,7 @@ The shared frontend Axios client sends credentials and the CSRF header on relati
 ## Rate limits
 
 - Registration is limited by client IP address.
-- Login is limited independently by client IP and by a hash of normalized email plus IP.
+- Login is limited independently by client IP, by a hash of normalized email plus IP, and by the normalized email alone. The email-only limiter throttles distributed guessing against one account across rotating IPs; its window and ceiling are kept generous so an attacker cannot lock a legitimate user out.
 - Responses use standard rate-limit headers and return HTTP 429 with a stable public error.
 - The current store is process-local and resets when the API restarts. It is appropriate for the single Railway instance. Horizontal scaling would require a shared store before adding instances.
 
