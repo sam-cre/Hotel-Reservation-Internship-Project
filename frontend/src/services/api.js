@@ -82,6 +82,12 @@ export const adminApi = {
     return (await api.put(`/admin/reservations/${id}/status`, { status })).data
       .reservation;
   },
+  async hotels(signal) {
+    return (await api.get('/admin/hotels', { signal })).data.hotels;
+  },
+  async uploadImage(payload) {
+    return (await api.post('/admin/images', payload)).data.url;
+  },
   async createHotel(input) {
     return (await api.post('/hotels', input)).data.hotel;
   },

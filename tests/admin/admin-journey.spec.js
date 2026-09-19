@@ -91,6 +91,14 @@ async function mockAdminApi(page, { user = administrator } = {}) {
       };
       return json({ reservation: state.reservations[0] });
     }
+    if (path === '/api/admin/hotels' && method === 'GET') {
+      adminCalls += 1;
+      return json({ hotels: state.hotels });
+    }
+    if (path === '/api/admin/images' && method === 'POST') {
+      adminCalls += 1;
+      return json({ url: '/api/images/99' }, 201);
+    }
     if (path === '/api/hotels' && method === 'GET') {
       adminCalls += 1;
       return json({ hotels: state.hotels });
@@ -188,7 +196,15 @@ test('admin-journey manages reservations, hotels, and room inventory', async ({
     .getByLabel('Description')
     .fill('A city hotel with a central garden court.');
   await page.getByLabel('Rating').fill('4.6');
-  await page.getByLabel('Image URL').fill('/images/calhoun-lobby.jpg');
+  await page.getByLabel('Upload image').setInputFiles({
+    name: 'hotel.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from('89504e470d0a1a0a', 'hex'),
+  });
+  // The upload must resolve (button flips to "Replace image") before saving.
+  await expect(
+    page.getByRole('dialog').getByText('Replace image'),
+  ).toBeVisible();
   await page
     .getByRole('dialog')
     .getByRole('button', { name: 'Add hotel' })

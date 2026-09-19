@@ -66,7 +66,19 @@ Administrator only. Accepts exactly `name`, `description`, `city`, `address`, `r
 
 `amenities` is a list of up to 12 short non-empty strings (each 1 to 60 characters). It defaults to an empty list when omitted.
 
-`imageUrl` accepts a same-origin managed asset path such as `/images/hotel.jpg`. A remote image is accepted only when it is HTTPS, carries no embedded credentials, and its host appears in the server-configured `CATALOG_IMAGE_HOST_ALLOWLIST`. The allowlist is empty by default, so arbitrary remote origins are rejected with HTTP 400.
+`imageUrl` accepts a same-origin managed asset path such as `/images/hotel.jpg` or an uploaded image path such as `/api/images/12` (see `POST /admin/images`). A remote image is accepted only when it is HTTPS, carries no embedded credentials, and its host appears in the server-configured `CATALOG_IMAGE_HOST_ALLOWLIST`. The allowlist is empty by default, so arbitrary remote origins are rejected with HTTP 400. Relative paths containing a backslash are rejected because browsers normalize `/\` to `//`.
+
+### GET `/admin/hotels`
+
+Administrator only. Returns `{ "hotels": HotelSummary[] }` for every active hotel, including hotels that have no rooms yet (their `startingPrice` is `null`). The public `GET /hotels` inner-joins active rooms and therefore omits roomless hotels, so the admin dashboard uses this endpoint instead.
+
+### POST `/admin/images`
+
+Administrator only. Accepts exactly `contentType` (`image/jpeg`, `image/png`, or `image/webp`) and `data` (standard base64, no data-URL prefix). The decoded bytes must be at most 5 MB and must carry a magic-byte signature matching `contentType`, otherwise HTTP 400 `INVALID_IMAGE` is returned. On success returns HTTP 201 with `{ "url": "/api/images/:id" }`, suitable for a hotel `imageUrl`.
+
+### GET `/images/:id`
+
+Public. Serves the stored image bytes with the recorded `Content-Type` and a long-lived immutable `Cache-Control`. A missing image returns HTTP 404.
 
 ### PUT `/hotels/:id`
 

@@ -18,6 +18,12 @@ describe('catalog image URL validation', () => {
     expect(withAllowlist('not a url')).toBe(false);
   });
 
+  it('rejects backslash sequences that browsers normalize to another origin', () => {
+    // "/\\evil.example" is "/\evil.example"; browsers read "/\" as "//".
+    expect(withAllowlist('/\\evil.example/pixel.gif')).toBe(false);
+    expect(withAllowlist('/\\/evil.example/pixel.gif')).toBe(false);
+  });
+
   it('rejects arbitrary remote origins when the allowlist is empty', () => {
     expect(withoutAllowlist('https://tracker.example/pixel.gif')).toBe(false);
   });

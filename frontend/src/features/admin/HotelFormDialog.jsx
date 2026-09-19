@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ImagePlus, LoaderCircle, Upload } from 'lucide-react';
 import { Button } from '../../components/ui/Button.jsx';
 import { Dialog } from '../../components/ui/Dialog.jsx';
 import { Field } from '../../components/ui/Field.jsx';
@@ -6,6 +7,24 @@ import { adminApi, apiMessage } from '../../services/api.js';
 import { FormNotice, TextAreaField } from './AdminFields.jsx';
 import { emptyHotel, hotelInput } from './admin-utils.js';
 import styles from './Admin.module.css';
+
+const acceptedImageTypes = ['image/png', 'image/jpeg', 'image/webp'];
+const maxImageBytes = 5 * 1024 * 1024;
+
+// Reads the chosen file into standard base64 (without the data-URL prefix) so it
+// can be posted as JSON to the image upload endpoint.
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('The image could not be read.'));
+    reader.onload = () => {
+      const result = String(reader.result);
+      const comma = result.indexOf(',');
+      resolve(comma === -1 ? result : result.slice(comma + 1));
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 export function HotelFormDialog({ hotel, open, onClose, onSaved }) {
   const [values, setValues] = useState(() =>
@@ -22,6 +41,8 @@ export function HotelFormDialog({ hotel, open, onClose, onSaved }) {
       : emptyHotel,
   );
   const [error, setError] = useState('');
+  const [imageError, setImageError] = useState('');
+  const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const editing = Boolean(hotel);
 
@@ -32,8 +53,38 @@ export function HotelFormDialog({ hotel, open, onClose, onSaved }) {
     }));
   }
 
+  async function handleImage(event) {
+    const file = event.target.files?.[0];
+    // Clear the input so choosing the same file again still fires a change.
+    event.target.value = '';
+    if (!file) return;
+    if (!acceptedImageTypes.includes(file.type)) {
+      setImageError('Choose a PNG, JPEG, or WebP image.');
+      return;
+    }
+    if (file.size > maxImageBytes) {
+      setImageError('The image must be 5 MB or smaller.');
+      return;
+    }
+    setImageError('');
+    setUploading(true);
+    try {
+      const data = await fileToBase64(file);
+      const url = await adminApi.uploadImage({ contentType: file.type, data });
+      setValues((current) => ({ ...current, imageUrl: url }));
+    } catch (nextError) {
+      setImageError(apiMessage(nextError, 'The image could not be uploaded.'));
+    } finally {
+      setUploading(false);
+    }
+  }
+
   async function submit(event) {
     event.preventDefault();
+    if (!values.imageUrl) {
+      setImageError('Upload a hotel image before saving.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
@@ -97,27 +148,63 @@ export function HotelFormDialog({ hotel, open, onClose, onSaved }) {
           rows={5}
           required
         />
-        <div className={styles.formGrid}>
-          <Field
-            label="Rating"
-            name="rating"
-            type="number"
-            value={values.rating}
-            onChange={change}
-            min="0"
-            max="5"
-            step="0.1"
-            required
-          />
-          <Field
-            label="Image URL"
-            name="imageUrl"
-            value={values.imageUrl}
-            onChange={change}
-            maxLength={2048}
-            placeholder="/images/hotel.jpg"
-            required
-          />
+        <Field
+          label="Rating"
+          name="rating"
+          type="number"
+          value={values.rating}
+          onChange={change}
+          min="0"
+          max="5"
+          step="0.1"
+          required
+        />
+        <div className={styles.imageField}>
+          <span className={styles.imageFieldLabel}>Hotel image</span>
+          <div className={styles.imageUploader}>
+            {values.imageUrl ? (
+              <img
+                className={styles.imagePreview}
+                src={values.imageUrl}
+                alt=""
+              />
+            ) : (
+              <div className={styles.imagePlaceholder} aria-hidden="true">
+                <ImagePlus size={22} />
+              </div>
+            )}
+            <div className={styles.imageUploadControl}>
+              <label
+                className={`${styles.uploadButton} ${uploading ? styles.uploadButtonBusy : ''}`}
+              >
+                <input
+                  type="file"
+                  className="srOnly"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={handleImage}
+                  disabled={uploading || saving}
+                />
+                {uploading ? (
+                  <LoaderCircle
+                    size={17}
+                    className={styles.spinner}
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Upload size={17} aria-hidden="true" />
+                )}
+                {uploading
+                  ? 'Uploading...'
+                  : values.imageUrl
+                    ? 'Replace image'
+                    : 'Upload image'}
+              </label>
+              <p className={styles.fieldHint}>
+                PNG, JPEG, or WebP up to 5 MB. Recommended 1200x800.
+              </p>
+              {imageError && <p className={styles.fieldError}>{imageError}</p>}
+            </div>
+          </div>
         </div>
         <Field
           label="Amenities"
@@ -132,7 +219,7 @@ export function HotelFormDialog({ hotel, open, onClose, onSaved }) {
           <Button variant="secondary" onClick={onClose} disabled={saving}>
             Cancel
           </Button>
-          <Button type="submit" loading={saving}>
+          <Button type="submit" loading={saving} disabled={uploading}>
             {editing ? 'Save hotel' : 'Add hotel'}
           </Button>
         </div>

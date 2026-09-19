@@ -49,7 +49,7 @@ afterEach(async () => {
 });
 
 describe('initial PostgreSQL schema', () => {
-  it('creates the four assignment tables with the required extensions', async () => {
+  it('creates the core tables with the required extensions', async () => {
     const result = await database.query(`
       SELECT table_name
       FROM information_schema.tables
@@ -57,6 +57,7 @@ describe('initial PostgreSQL schema', () => {
       ORDER BY table_name
     `);
     expect(result.rows.map((row) => row.table_name)).toEqual([
+      'hotel_images',
       'hotels',
       'reservations',
       'rooms',

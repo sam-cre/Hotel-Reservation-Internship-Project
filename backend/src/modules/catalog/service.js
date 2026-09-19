@@ -3,6 +3,33 @@ import { HttpError } from '../../http/errors.js';
 import { dateOnlyToday, validateStayWindow } from './dates.js';
 import { createCatalogRepository } from './repository.js';
 
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
+// Signature checks so an admin cannot store a non-image (or a file whose real
+// type does not match the declared content type) that would later be served
+// back to guests with a misleading Content-Type.
+const imageSignatures = {
+  'image/jpeg': (bytes) =>
+    bytes.length >= 3 &&
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes[2] === 0xff,
+  'image/png': (bytes) =>
+    bytes.length >= 8 &&
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47 &&
+    bytes[4] === 0x0d &&
+    bytes[5] === 0x0a &&
+    bytes[6] === 0x1a &&
+    bytes[7] === 0x0a,
+  'image/webp': (bytes) =>
+    bytes.length >= 12 &&
+    bytes.toString('ascii', 0, 4) === 'RIFF' &&
+    bytes.toString('ascii', 8, 12) === 'WEBP',
+};
+
 function notFound(resource) {
   return new HttpError(404, 'NOT_FOUND', `${resource} was not found.`);
 }
@@ -41,6 +68,42 @@ export function createCatalogService({ database, now = () => new Date() }) {
       const hotel = await repository.findPublicHotel(id);
       if (!hotel) throw notFound('Hotel');
       return hotel;
+    },
+
+    async listAdminHotels() {
+      return repository.listActiveHotelsForAdmin();
+    },
+
+    async storeImage({ contentType, data }) {
+      const bytes = Buffer.from(data, 'base64');
+      if (bytes.length === 0 || bytes.length > MAX_IMAGE_BYTES)
+        throw new HttpError(
+          400,
+          'INVALID_IMAGE',
+          'The image must be between 1 byte and 5 MB.',
+        );
+      const matchesSignature = imageSignatures[contentType];
+      if (!matchesSignature || !matchesSignature(bytes))
+        throw new HttpError(
+          400,
+          'INVALID_IMAGE',
+          'The uploaded file is not a valid image of the declared type.',
+        );
+      const id = await repository.insertImage({
+        contentType,
+        byteSize: bytes.length,
+        bytes,
+      });
+      return { url: `/api/images/${id}` };
+    },
+
+    async getImage(id) {
+      const image = await repository.findImage(id);
+      if (!image) throw notFound('Image');
+      return {
+        contentType: image.content_type,
+        bytes: Buffer.from(image.bytes),
+      };
     },
 
     async createHotel(input) {

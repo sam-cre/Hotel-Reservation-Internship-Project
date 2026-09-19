@@ -23,10 +23,12 @@ describe('migration discovery', () => {
       '001',
       '002',
       '003',
+      '004',
     ]);
     expect(migrations[0].name).toBe('001_initial_schema.sql');
     expect(migrations[1].name).toBe('002_expand_reservation_total.sql');
     expect(migrations[2].name).toBe('003_add_hotel_amenities.sql');
+    expect(migrations[3].name).toBe('004_add_hotel_images.sql');
     for (const migration of migrations)
       expect(migration.checksum).toMatch(/^[0-9a-f]{64}$/);
   });
@@ -61,7 +63,7 @@ describe('migration discovery', () => {
       const migrations = await loadMigrations(migrationsDirectory);
       await expect(
         applyMigrations(database, migrations, { useAdvisoryLock: false }),
-      ).resolves.toBe(3);
+      ).resolves.toBe(4);
       await expect(
         applyMigrations(database, migrations, { useAdvisoryLock: false }),
       ).resolves.toBe(0);
@@ -80,6 +82,10 @@ describe('migration discovery', () => {
         expect.objectContaining({
           version: '003',
           name: '003_add_hotel_amenities.sql',
+        }),
+        expect.objectContaining({
+          version: '004',
+          name: '004_add_hotel_images.sql',
         }),
       ]);
       expect(applied.rows[0].checksum).toMatch(/^[0-9a-f]{64}$/);

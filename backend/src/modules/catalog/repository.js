@@ -67,6 +67,40 @@ export function createCatalogRepository(database) {
       return result.rows.map(mapHotel);
     },
 
+    async listActiveHotelsForAdmin() {
+      // The public search inner-joins active rooms, so a freshly created hotel
+      // with no rooms yet would be invisible. Administrators need every active
+      // property, so this left-joins rooms and reports a null starting price
+      // for hotels that have no priced inventory.
+      const result = await database.query(
+        `SELECT ${hotelColumns}, MIN(r.price_per_night) AS starting_price
+         FROM hotels h
+         LEFT JOIN rooms r ON r.hotel_id = h.id AND r.is_active = true
+         WHERE h.is_active = true
+         GROUP BY h.id
+         ORDER BY lower(h.city), lower(h.name), h.id`,
+      );
+      return result.rows.map(mapHotel);
+    },
+
+    async insertImage({ contentType, byteSize, bytes }) {
+      const result = await database.query(
+        `INSERT INTO hotel_images (content_type, byte_size, bytes)
+         VALUES ($1, $2, $3)
+         RETURNING id::text`,
+        [contentType, byteSize, bytes],
+      );
+      return result.rows[0].id;
+    },
+
+    async findImage(id) {
+      const result = await database.query(
+        'SELECT content_type, bytes FROM hotel_images WHERE id = $1',
+        [id],
+      );
+      return result.rows[0] ?? null;
+    },
+
     async findPublicHotel(id) {
       const result = await database.query(
         `SELECT ${hotelColumns}
