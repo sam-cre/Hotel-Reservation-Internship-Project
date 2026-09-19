@@ -58,10 +58,9 @@ export function stayQuery(stay) {
 }
 
 export function nightsBetween(start, end) {
-  return Math.round(
-    (Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`)) /
-      86400000,
-  );
+  const span =
+    Date.parse(`${end}T00:00:00Z`) - Date.parse(`${start}T00:00:00Z`);
+  return Number.isFinite(span) ? Math.round(span / 86400000) : 0;
 }
 
 export const money = (value) =>
@@ -71,13 +70,18 @@ export const money = (value) =>
     maximumFractionDigits: Number(value) % 1 ? 2 : 0,
   }).format(Number(value));
 
-export const shortDate = (value) =>
-  new Intl.DateTimeFormat('en-US', {
+export const shortDate = (value) => {
+  const date = new Date(`${value}T00:00:00Z`);
+  // A malformed date param (from a crafted or stale URL) must not crash the
+  // page; fall back to the raw value rather than formatting an invalid date.
+  if (Number.isNaN(date.getTime())) return String(value ?? '');
+  return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
     timeZone: 'UTC',
-  }).format(new Date(`${value}T00:00:00Z`));
+  }).format(date);
+};
 
 function currentOrigin() {
   return typeof window === 'undefined' ? undefined : window.location.origin;
