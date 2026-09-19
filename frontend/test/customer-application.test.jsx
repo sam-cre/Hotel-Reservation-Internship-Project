@@ -314,6 +314,79 @@ describe('customer application', () => {
     await waitFor(() => expect(reservationApi.mine).toHaveBeenCalled());
   });
 
+  it('allows sorting reservations by arrival date, total price, and hotel name', async () => {
+    const user = userEvent.setup();
+    authApi.current.mockResolvedValue({ id: '1', role: 'customer' });
+    reservationApi.mine.mockResolvedValue([
+      {
+        id: '2',
+        checkIn: '2026-10-07',
+        checkOut: '2026-10-31',
+        totalPrice: '21840.00',
+        status: 'confirmed',
+        hotel: { name: 'The Gramercy', city: 'New York' },
+        room: { name: 'Gramercy Suite' },
+      },
+      {
+        id: '1',
+        checkIn: '2026-10-01',
+        checkOut: '2026-10-04',
+        totalPrice: '1395.00',
+        status: 'confirmed',
+        hotel: { name: 'The Battery', city: 'Charleston' },
+        room: { name: 'Harbor View King' },
+      },
+    ]);
+
+    renderApp('/reservations');
+
+    await screen.findByRole('heading', { name: 'The Battery', level: 2 });
+    const getHotelTitles = () =>
+      Array.from(document.querySelectorAll('article h2')).map(
+        (h) => h.textContent,
+      );
+
+    expect(getHotelTitles()).toEqual(['The Battery', 'The Gramercy']);
+
+    const sortButton = screen.getByRole('button', { name: /Sort by/i });
+    await user.click(sortButton);
+    await user.click(
+      screen.getByRole('option', { name: 'Arrival: latest first' }),
+    );
+
+    expect(getHotelTitles()).toEqual(['The Gramercy', 'The Battery']);
+
+    await user.click(screen.getByRole('button', { name: /Sort by/i }));
+    await user.click(
+      screen.getByRole('option', { name: 'Total: high to low' }),
+    );
+
+    expect(getHotelTitles()).toEqual(['The Gramercy', 'The Battery']);
+  });
+
+  it('displays friendly availability and pricing verification note on review page', async () => {
+    authApi.current.mockResolvedValue({ id: '1', role: 'customer' });
+    catalogApi.hotel.mockResolvedValue(hotel);
+    catalogApi.rooms.mockResolvedValue([
+      {
+        id: '21',
+        hotelId: '11',
+        name: 'Harbor View King',
+        capacity: 2,
+        pricePerNight: '465.00',
+        available: true,
+      },
+    ]);
+    renderApp(
+      '/reserve?hotelId=11&roomId=21&checkIn=2026-10-10&checkOut=2026-10-13&guests=2',
+    );
+    expect(
+      await screen.findByText(
+        'We will verify room availability and pricing before confirming your reservation.',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('sets a descriptive, route-specific browser title', async () => {
     renderApp(
       '/search?city=Charleston&checkIn=2026-10-10&checkOut=2026-10-13&guests=2',
