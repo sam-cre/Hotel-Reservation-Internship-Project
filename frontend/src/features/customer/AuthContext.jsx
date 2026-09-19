@@ -1,10 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
-import { authApi } from '../../services/api.js';
+import { authApi, setUnauthorizedHandler } from '../../services/api.js';
 import { AuthContext } from './auth-context.js';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Clear the cached user whenever an authenticated request comes back 401, so
+  // an expired session drops to signed-out instead of trapping the viewer in a
+  // sign-in redirect loop against stale in-memory state.
+  useEffect(() => {
+    setUnauthorizedHandler(() => setUser(null));
+    return () => setUnauthorizedHandler(null);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();

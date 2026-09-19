@@ -34,5 +34,16 @@ export function createAuthRateLimits(config) {
       ...common(config),
       keyGenerator: (req) => `${ipKeyGenerator(req.ip)}:${emailKey(req)}`,
     }),
+    // Keyed on the target account alone (no IP), so distributed guessing
+    // against one email is throttled regardless of source address. Uses its
+    // own generous window and ceiling to avoid locking legitimate users out.
+    loginByAccount: rateLimit({
+      windowMs: config.accountRateLimitWindowMs,
+      max: config.accountRateLimitMax,
+      standardHeaders: 'draft-8',
+      legacyHeaders: false,
+      handler: rejectLimitedRequest,
+      keyGenerator: emailKey,
+    }),
   };
 }
