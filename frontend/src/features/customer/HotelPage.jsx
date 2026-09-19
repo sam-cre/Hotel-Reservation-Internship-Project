@@ -66,9 +66,34 @@ export function HotelPage() {
         </Link>
       </div>
       {loading && (
-        <section className={styles.statePanel} aria-live="polite">
-          <h1>Preparing the hotel register.</h1>
-          <p>We are checking rooms for your stay.</p>
+        <section aria-live="polite" aria-busy="true">
+          <div className="srOnly" role="status">
+            Preparing the hotel register. We are checking rooms for your stay.
+          </div>
+          <div className={styles.hotelHero}>
+            <div
+              className={`${styles.skeleton} ${styles.hotelHeroImage}`}
+              style={{ minHeight: '380px' }}
+            />
+            <div className={styles.hotelHeroCopy}>
+              <div
+                className={`${styles.skeleton} ${styles.skeletonLine}`}
+                style={{ width: '30%', height: '14px', marginBottom: '16px' }}
+              />
+              <div
+                className={`${styles.skeleton} ${styles.skeletonLine}`}
+                style={{ width: '70%', height: '42px', marginBottom: '20px' }}
+              />
+              <div
+                className={`${styles.skeleton} ${styles.skeletonLine}`}
+                style={{ width: '90%', height: '16px', marginBottom: '12px' }}
+              />
+              <div
+                className={`${styles.skeleton} ${styles.skeletonLine}`}
+                style={{ width: '60%', height: '16px' }}
+              />
+            </div>
+          </div>
         </section>
       )}
       {displayError && (

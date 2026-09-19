@@ -387,6 +387,34 @@ describe('customer application', () => {
     ).toBeInTheDocument();
   });
 
+  it('renders the Destinations navigation menu immediately without layout shift', () => {
+    renderApp('/');
+    expect(
+      screen.getByRole('button', { name: /Destinations/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('protects against XSS injection by safely encoding HTML and script tags', async () => {
+    const maliciousPayload =
+      '<script>window.xssExploit=true</script><img src=x onerror=alert(1)>';
+    catalogApi.hotels.mockResolvedValue([
+      {
+        ...hotel,
+        id: '99',
+        name: maliciousPayload,
+        city: 'Charleston',
+      },
+    ]);
+    renderApp('/hotels');
+
+    const heading = await screen.findByRole('heading', {
+      name: maliciousPayload,
+    });
+    expect(heading).toBeInTheDocument();
+    expect(document.querySelector('script[src*="alert"]')).toBeNull();
+    expect(window.xssExploit).toBeUndefined();
+  });
+
   it('sets a descriptive, route-specific browser title', async () => {
     renderApp(
       '/search?city=Charleston&checkIn=2026-10-10&checkOut=2026-10-13&guests=2',

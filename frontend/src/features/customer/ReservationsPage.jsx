@@ -78,9 +78,86 @@ export function ReservationsPage() {
           )}
         </div>
         {state.loading && (
-          <div className={styles.statePanel} aria-live="polite">
-            <h2>Retrieving your stays.</h2>
-            <p>Your reservation history will appear here.</p>
+          <div
+            className={styles.reservationList}
+            aria-live="polite"
+            aria-busy="true"
+            aria-label="Loading your reservations"
+          >
+            <div className="srOnly" role="status">
+              Retrieving your stays. Your reservation history will appear here.
+            </div>
+            {[1, 2].map((key) => (
+              <div
+                key={key}
+                className={styles.skeletonReservationRow}
+                aria-hidden="true"
+              >
+                <div>
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{
+                      width: '90px',
+                      height: '12px',
+                      marginBottom: '10px',
+                    }}
+                  />
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{
+                      width: '180px',
+                      height: '24px',
+                      marginBottom: '8px',
+                    }}
+                  />
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{ width: '140px', height: '14px' }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '16px',
+                  }}
+                >
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{ height: '36px' }}
+                  />
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{ height: '36px' }}
+                  />
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{ height: '36px' }}
+                  />
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-end',
+                    gap: '12px',
+                  }}
+                >
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{
+                      width: '90px',
+                      height: '24px',
+                      borderRadius: '100px',
+                    }}
+                  />
+                  <div
+                    className={`${styles.skeleton} ${styles.skeletonLine}`}
+                    style={{ width: '100px', height: '14px' }}
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         )}
         {state.error && (

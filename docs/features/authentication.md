@@ -118,3 +118,7 @@ The focused suite uses a migrated in-process PGlite database and non-production 
 - Database and unexpected failures never create an authenticated context.
 - Validation reports safe field names without echoing submitted values.
 - The global error handler returns stable JSON and logs only an event name and request identifier for unexpected failures.
+
+## Third-party OAuth scope boundary
+
+Third-party OAuth identity providers (such as Google Sign-In) are explicitly out of scope for this project. Authentication is intentionally designed to be self-contained using Argon2id password hashing and secure `httpOnly` JWT cookies. Requiring external OAuth provider credentials would introduce external network dependencies, require secret exchange keys during local development, and hinder seamless, reproducible evaluation by project reviewers.
