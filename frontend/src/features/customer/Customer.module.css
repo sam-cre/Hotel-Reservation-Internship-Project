@@ -1330,6 +1330,7 @@
   }
   .heroInner {
     padding-inline: 16px;
+    padding-bottom: 64px;
   }
   .heroTitle {
     font-size: 46px;
@@ -1338,7 +1339,7 @@
     margin-top: 14px;
   }
   .searchDock {
-    margin-top: -48px;
+    margin-top: -24px;
     padding: 20px 16px 16px;
   }
   .searchForm {
