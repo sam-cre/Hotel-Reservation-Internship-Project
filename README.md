@@ -1,176 +1,153 @@
 # Stillwater Hotels
 
-A hotel reservation application for the internship assignment, using React, Express, and PostgreSQL.
+A full-stack hotel reservation platform built for the Modern Solutions B.V. internship assignment, developed using React, Node.js, Express, and PostgreSQL.
 
-## Current state
+---
 
-The application foundation, PostgreSQL infrastructure, backend authentication boundary, catalog APIs, reservation APIs, connected customer and administrator applications, and weather integration are implemented. This includes versioned migrations, schema constraints, connection pooling, development seeds, administrator provisioning, secure account sessions, public hotel search, room availability, protected reservation review, transaction-safe booking, confirmation, reservation history, hotel and room management, reservation administration, guest-information pages, consent controls, current hotel-city conditions, and automated verification.
+## Overview
 
-The Harbor Quiet design foundation is validated and owner-approved. The application is deployed to production: the frontend on Vercel, the API on Railway, and PostgreSQL on Neon. The frontend proxies `/api` requests to the API so the whole site is served from one origin. Payments are out of scope, so this is a demonstration deployment rather than a commercial booking service.
+Stillwater Hotels is a fictional boutique hospitality web application featuring active room availability, server-authoritative pricing, transaction-safe booking, guest account management, live destination weather, and a complete administrator management portal.
 
-## Design previews
+The application is deployed to production with a unified single-origin architecture: the frontend is hosted on Vercel and reverse-proxies `/api` traffic to the Express API on Railway, which connects to a managed PostgreSQL database on Neon.
 
-After starting local development, open:
+- **Live Application**: <https://hotel-reservation-internship-projec-six.vercel.app>
+- **API Health**: <https://hotel-reservation-internship-projec-six.vercel.app/api/health>
+- **API Readiness**: <https://hotel-reservation-internship-projec-six.vercel.app/api/ready>
 
-- [Guest search and room preview](http://127.0.0.1:5173/design/customer)
-- [Administrator reservations preview](http://127.0.0.1:5173/design/admin)
-- [Shared controls and states](http://127.0.0.1:5173/design/components)
+---
 
-The previews use fictional sample records. Search and sort update the URL; administrator changes exist only in browser memory and reset on reload. Booking remains disabled in preview routes. These routes are gated by Vite's development mode and remain separate from the connected customer application.
+## Core Features
 
-Fonts and photos are served locally. See [asset credits](docs/design/asset-credits.md) for provenance and licenses.
+### Guest Experience
 
-## Local development
+- **Hotel Search & Discovery**: Browse destination hotels by city, view high-resolution galleries, amenities, and starting rates.
+- **Live Stay Availability**: Filter room inventory dynamically based on check-in/check-out dates and guest capacity.
+- **Destination Weather**: View current temperature, wind speed, and weather condition badges for hotel destinations via Open-Meteo.
+- **Secure Reservation Flow**: Transparent booking review with server-verified pricing and instant confirmation.
+- **My Reservations**: View past and upcoming stays, inspect detailed booking folios, and sort reservations by arrival date, total price, or hotel name.
+- **Guest Support & Compliance**: Substantive privacy, accessibility, and terms pages with persistent cookie consent controls.
 
-Requirements: Node.js 24, npm 11, Git, and PostgreSQL for the backend. The frontend design preview can still start independently without PostgreSQL. The backend now fails closed unless its database and authentication settings are present.
+### Administrator Portal
 
-From the repository root in PowerShell:
+- **Role-Protected Access**: Dedicated operations area restricted to administrator accounts.
+- **Reservation Register**: Search and filter all customer bookings across hotels, view payment/booking snapshots, and process cancellations.
+- **Hotel Catalog Management**: Create and update hotel profiles, descriptions, amenities, address details, and cover images.
+- **Room Inventory Management**: Configure room types, nightly base rates, and maximum guest capacities per hotel.
 
-```powershell
-npm ci
-npm run dev
+### Engineering & Security Highlights
+
+- **Server-Authoritative Pricing**: The browser never submits booking prices or total calculations; rates and totals are computed strictly on the backend.
+- **Concurrency & Idempotency**: Pessimistic row locking prevents double-booking race conditions during reservation creation. Client requests include UUID idempotency keys for safe retries.
+- **Session Security**: Authentication is managed via secure, `httpOnly`, `SameSite=Lax` JWT cookies with Argon2id password hashing and brute-force rate limiting.
+- **Resilient Weather Adapter**: Server-side caching, request coalescing, and circuit-breaker timeouts ensure third-party weather outages never block hotel bookings.
+
+---
+
+## Technology Stack
+
+- **Frontend**: React 18, Vite, React Router, Headless UI, Lucide Icons, CSS Modules
+- **Backend**: Node.js, Express, `pg` (PostgreSQL client with connection pooling)
+- **Database**: PostgreSQL with versioned SQL migrations and constraint enforcement
+- **Security**: Argon2id, JSON Web Tokens (JWT), cookie-based sessions, CORS protection
+- **Testing**: Vitest (backend and frontend unit/integration), Playwright (browser journey testing)
+- **Tooling**: ESLint, Prettier, Gitleaks
+
+---
+
+## Project Structure
+
+```text
+├── backend/                  # Express REST API, auth, database migrations, and unit tests
+│   ├── src/
+│   │   ├── db/              # Pool configuration, migrations, seeds, and admin provisioning
+│   │   ├── http/            # Error handling and validation middlewares
+│   │   └── modules/         # Auth, catalog, reservations, and weather modules
+│   └── test/                # Backend unit and integration test suites
+├── frontend/                 # React single-page application (Vite)
+│   ├── src/
+│   │   ├── components/      # Reusable UI controls, buttons, fields, and dialogs
+│   │   ├── features/        # Customer, admin, and design system modules
+│   │   └── services/        # API client and session management
+│   └── test/                # Frontend component and integration tests
+├── tests/                    # Playwright end-to-end browser journeys (customer & admin)
+├── scripts/                  # Verification, secret scanning, and foundation checks
+└── docs/                     # Architecture, data model, API contract, and operations docs
 ```
 
-- Frontend: <http://127.0.0.1:5173>
-- API health: <http://127.0.0.1:3001/api/health>
-- API through the frontend proxy: <http://127.0.0.1:5173/api/health>
-- Press Ctrl+C to stop development.
+---
 
-Start applications separately with `npm run dev --workspace backend` and `npm run dev --workspace frontend`.
+## Local Development
 
-## Environment variables
+### Prerequisites
 
-Copy `.env.example` to the ignored `.env` file at the repository root and provide the required database and authentication values. The backend loads that file; shell environment values take precedence. Vite reads the backend port for its local proxy without exposing backend variables to browser code.
+- Node.js 24+ and npm 11+
+- PostgreSQL database instance
+- Git
 
-| Variable                       | Default       | Purpose                                                     |
-| ------------------------------ | ------------- | ----------------------------------------------------------- |
-| `NODE_ENV`                     | `development` | Runtime mode: development, test, or production              |
-| `HOST`                         | `127.0.0.1`   | API bind address; cloud hosting will require `0.0.0.0`      |
-| `PORT`                         | `3001`        | API listening port, from 1 through 65535                    |
-| `TRUST_PROXY_HOPS`             | `0`           | Known reverse-proxy hops used for client IP detection       |
-| `WEATHER_TIMEOUT_MS`           | `4000`        | Maximum time allowed for each Open-Meteo request            |
-| `WEATHER_CACHE_TTL_MS`         | `600000`      | Successful city weather cache duration                      |
-| `WEATHER_MAX_IN_FLIGHT`        | `4`           | Concurrent distinct-city provider lookups allowed           |
-| `WEATHER_MAX_CACHE_ENTRIES`    | `500`         | Maximum cached cities before first-in eviction              |
-| `WEATHER_RATE_LIMIT_WINDOW_MS` | `60000`       | Public weather rate-limit window                            |
-| `WEATHER_RATE_LIMIT_MAX`       | `60`          | Public weather requests allowed per window per client       |
-| `CATALOG_IMAGE_HOST_ALLOWLIST` | (empty)       | Comma-separated HTTPS hosts allowed for remote hotel images |
+### Quickstart
 
-Database variables are documented in [database operations](docs/operations/database.md). JWT, cookie, origin, and rate-limit variables are documented in [authentication operations](docs/features/authentication.md). Keep the local API reachable on `127.0.0.1` for Vite proxying. Restart both development processes after changing configuration. Never store secrets in a variable prefixed `VITE_`, which is intended for public frontend configuration.
+1. **Clone the repository**:
 
-## Verification
+   ```powershell
+   git clone https://github.com/sam-cre/Hotel-Reservation-Internship-Project.git
+   cd "Hotel-Reservation-Internship-Project"
+   ```
+
+2. **Install dependencies**:
+
+   ```powershell
+   npm ci
+   ```
+
+3. **Configure environment variables**:
+   Copy `.env.example` to `.env` and fill in your PostgreSQL connection string and JWT secret:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
+4. **Run migrations and seed data**:
+
+   ```powershell
+   npm run db:migrate --workspace backend
+   npm run db:seed --workspace backend
+   ```
+
+5. **Start development servers**:
+   ```powershell
+   npm run dev
+   ```
+   - Frontend: <http://127.0.0.1:5173>
+   - Backend API: <http://127.0.0.1:3001>
+   - API via Frontend Proxy: <http://127.0.0.1:5173/api/health>
+
+---
+
+## Testing & Quality Assurance
+
+The repository includes a comprehensive verification pipeline covering formatting, linting, 205 automated unit and integration tests, security audit, and Playwright browser journeys.
+
+Run the complete local verification suite:
 
 ```powershell
 npm run verify:local
 ```
 
-This canonical gate checks formatting, linting, backend and frontend component tests, the production build, Git exclusions, the secret-scan configuration and its canary, the live frontend-to-API proxy, dependency advisories, and all connected customer and administrator Playwright journeys. `npm run verify` is an alias for it. The pull-request workflow runs a pinned Gitleaks secret scan and then this same gate; its PostgreSQL integration and concurrency tests run against an ephemeral database service and are skipped locally when `TEST_DATABASE_URL` is absent.
+### Individual Test Suites
 
-The complete design check also runs Chromium browser tests:
+- **Unit & Integration Tests**: `npm test`
+- **Backend Tests**: `npm run test --workspace backend`
+- **Frontend Tests**: `npm run test --workspace frontend`
+- **End-to-End Journeys**: `npm run test:e2e`
+- **Code Formatting**: `npm run format:check` (or `npm run format` to apply)
+- **Code Linting**: `npm run lint`
 
-```powershell
-npm exec playwright -- install chromium
-npm run verify:design
-```
+---
 
-Browser checks cover 320px, 390px, 640px, 960px, and 1440px layouts, accessibility assertions, 200 percent text scaling, search history, custom-select behavior, favicon delivery, dialogs, sample cancellation, reduced motion, and production route isolation. Screenshots and failure traces are written to the ignored `test-results/` directory. Test servers use ports 5175 and 4175 and stop after the run.
+## Deployment Architecture
 
-Additional commands:
+- **Frontend**: Hosted on Vercel with automatic rewrites routing `/api/*` to the backend service.
+- **Backend API**: Hosted on Railway running Node.js in production mode.
+- **Database**: PostgreSQL hosted on Neon with SSL enforcement and connection pooling.
 
-- `npm test`: backend and frontend component tests
-- `npm run test --workspace frontend -- design-system`: focused design component tests
-- `npm run test:design-browser`: browser checks against local development and the most recent production build; run `npm run build` first
-- `npm run test:e2e -- customer-journey`: connected customer browser journeys with mocked network boundaries
-- `npm run test:e2e -- admin-journey`: connected administrator browser journeys with mocked network boundaries
-- `npm run lint`: source checks
-- `npm run format`: apply formatting
-- `npm run build`: create `frontend/dist`
-- `npm run preview --workspace frontend`: preview the static build locally; API integration uses the development server until deployment routing is configured
-- `npm start --workspace backend`: start the API without the file watcher
-
-`/api/health` checks process liveness. `/api/ready` additionally confirms database connectivity and is used for deployment health checks.
-
-## Database foundation
-
-T3 provides versioned migrations, PostgreSQL connection pooling, deterministic development data, and explicit administrator provisioning. See [database operations](docs/operations/database.md) for configuration, safety boundaries, commands, and recovery guidance.
-
-```powershell
-npm run test:database
-npm run verify:database
-```
-
-## Authentication foundation
-
-T4 provides registration, login, logout, current-user restoration, secure JWT cookies, current-role authorization, browser mutation defenses, and bounded authentication attempts. See [authentication operations](docs/features/authentication.md) for configuration, endpoint behavior, security boundaries, and limitations.
-
-```powershell
-npm --workspace backend test -- authentication authorization
-npm run verify:authentication
-```
-
-## Hotel and room catalog APIs
-
-T5 provides public hotel browsing, exact city search, hotel details, room types, stay availability, server-computed starting prices, and administrator hotel and room management. Deletion deactivates records so reservation history can retain its references. See [catalog operations](docs/features/catalog.md) and the [API contract](docs/architecture/api-contract.md).
-
-```powershell
-npm --workspace backend test -- catalog
-npm run verify:catalog
-```
-
-## Reservation APIs
-
-T6 provides authenticated booking, server-authoritative price snapshots, deterministic idempotent retries, customer-owned reservation history, administrator reservation listing, and terminal cancellation. All availability-changing operations use the same room-type row lock. See [reservation operations](docs/features/reservations.md) and the [reservation model](docs/architecture/data-model-and-reservations.md).
-
-```powershell
-npm --workspace backend test -- reservations
-npm run verify:reservations
-```
-
-## Customer application
-
-T7 provides hotel search, URL-preserved stay criteria, hotel and room details, registration and sign-in, protected reservation review, booking confirmation, My Reservations, substantive guest-information pages, and reopenable cookie preferences. The browser uses relative `/api` routes and never supplies a booking price or role. See [customer application operations](docs/features/customer-application.md).
-
-```powershell
-npm --workspace frontend test -- customer
-npm run test:e2e -- customer-journey
-npm run verify:customer
-```
-
-## Administrator application
-
-T8 provides role-protected administrator navigation, reservation filtering and cancellation, hotel management, room management, destructive confirmations, and conflict-preserving forms. React blocks customer accounts before administrator data calls, while Express remains the authoritative role boundary. See [administrator application operations](docs/features/administrator-application.md).
-
-```powershell
-npm --workspace frontend test -- admin
-npm run test:e2e -- admin-journey
-npm run verify:admin
-```
-
-## Weather integration
-
-T9 adds current hotel-city conditions through an Express-owned Open-Meteo adapter. The browser calls only the internal `/api/weather` route. The adapter validates provider responses, limits request duration, coalesces simultaneous city lookups, caches successful results briefly, and returns a stable internal shape. Weather remains supplemental, so provider failure leaves hotel and room details usable. See [weather operations](docs/features/weather.md).
-
-```powershell
-npm --workspace backend test -- weather
-npm --workspace frontend test -- customer
-npm run verify:weather
-```
-
-## Structure
-
-- `frontend/`: React application and Vite configuration
-- `backend/`: Express application, server startup, configuration, and tests
-- `scripts/`: repository verification
-- `docs/`: architecture, per-feature guides, design, operations, project, and quality documentation
-
-## Deployment
-
-The application is live in production:
-
-- Frontend (Vercel): <https://hotel-reservation-internship-projec-six.vercel.app>
-- API health, via the frontend proxy: <https://hotel-reservation-internship-projec-six.vercel.app/api/health>
-- API readiness, which confirms database connectivity: <https://hotel-reservation-internship-projec-six.vercel.app/api/ready>
-
-Vercel serves the built frontend and proxies `/api` requests to the Express API on Railway, which connects to PostgreSQL on Neon. Serving the frontend and API under one origin keeps the authentication cookie first-party and the cross-site request defenses intact. The step-by-step procedure and post-launch operations are documented in [production deployment](docs/operations/production-deployment.md).
-
-See the [documentation index](docs/README.md) for architecture, per-feature guides, and operations.
+For complete architectural details, see the [Architecture Overview](docs/architecture/overview.md), [API Contract](docs/architecture/api-contract.md), and [Data Model & Reservations Specification](docs/architecture/data-model-and-reservations.md).
