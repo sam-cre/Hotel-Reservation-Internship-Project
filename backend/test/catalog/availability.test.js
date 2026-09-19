@@ -108,6 +108,46 @@ describe('room availability', () => {
     );
   });
 
+  it('measures peak concurrency so non-concurrent stays do not hide a multi-unit room', async () => {
+    const harborRoom = await findRoom(
+      database,
+      'The Battery',
+      'Harbor View King',
+    );
+    await database.query('UPDATE rooms SET total_rooms = 2 WHERE id = $1', [
+      harborRoom.id,
+    ]);
+    const customer = await createCustomerSession(context);
+    // Two back-to-back one-night stays that never share a night.
+    await insertReservation(database, {
+      userId: customer.user.id,
+      roomId: harborRoom.id,
+      checkIn: '2026-10-10',
+      checkOut: '2026-10-11',
+    });
+    await insertReservation(database, {
+      userId: customer.user.id,
+      roomId: harborRoom.id,
+      checkIn: '2026-10-11',
+      checkOut: '2026-10-12',
+    });
+
+    const response = await context.request
+      .get('/api/rooms/availability')
+      .query({
+        hotelId: batteryId,
+        checkIn: '2026-10-10',
+        checkOut: '2026-10-12',
+        guests: 2,
+      })
+      .expect(200);
+    const harbor = response.body.rooms.find(
+      (room) => room.name === 'Harbor View King',
+    );
+    // Cumulative counting would report 2 overlaps and hide the room; peak is 1.
+    expect(harbor).toMatchObject({ available: true, remainingRooms: 1 });
+  });
+
   it('does not count cancelled reservations against inventory', async () => {
     const harborRoom = await findRoom(
       database,

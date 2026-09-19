@@ -73,14 +73,26 @@ existing.check_out > requested.check_in
 
 ## Availability
 
-For one room type and requested stay:
+For one room type and requested stay, availability is based on the busiest
+single night in the window, not the total number of reservations that overlap it
+at any point. A new stay occupies every night in `[check_in, check_out)`, so it
+fits whenever a unit is free on each of those nights:
 
 ```text
-remaining = total_rooms - overlapping confirmed reservations
+peak = max over each night n in [check_in, check_out) of
+         count(confirmed reservations with check_in <= n < check_out)
+remaining = total_rooms - peak
 available = remaining > 0
 ```
 
-Guest capacity filters room types before inventory is counted.
+This matters for multi-unit rooms: two back-to-back one-night stays never share a
+night, so they consume one unit at a time, not two at once. Counting every
+reservation that overlaps the window (the earlier approach) would wrongly hide a
+room that is actually free on every requested night. The peak can only occur at
+the window start or at an existing reservation's check-in, so only those nights
+are evaluated.
+
+Guest capacity filters room types before inventory is measured.
 
 ## Reservation transaction
 
@@ -90,8 +102,8 @@ Reservation creation runs inside one PostgreSQL transaction:
 2. Check whether the user already has a reservation for the supplied idempotency key. Return it when room, dates, and guest count match, or reject conflicting key reuse.
 3. Lock the selected room-type row with `SELECT ... FOR UPDATE`.
 4. Validate that the room is active and accommodates the guest count.
-5. Recount overlapping `confirmed` reservations.
-6. Reject the request when the count is at least `total_rooms`.
+5. Recompute the peak concurrent `confirmed` occupancy across the requested nights.
+6. Reject the request when that peak is at least `total_rooms`.
 7. Calculate nights in PostgreSQL from the two dates.
 8. Snapshot the locked nightly price and calculate the total from it.
 9. Insert a `confirmed` reservation.
