@@ -25,6 +25,8 @@
 }
 .header nav a,
 .header nav button {
+  display: inline-flex;
+  align-items: center;
   min-height: 44px;
   padding: 10px 2px;
   color: #d8e0de;

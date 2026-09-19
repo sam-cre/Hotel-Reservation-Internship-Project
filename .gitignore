@@ -17,7 +17,6 @@ tmp/
 results.sarif
 *.sarif
 .vercel/
-.render/
 .idea/
 .vscode/
 .DS_Store
