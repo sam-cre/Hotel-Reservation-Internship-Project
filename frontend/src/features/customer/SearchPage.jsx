@@ -94,6 +94,7 @@ export function SearchPage() {
   const [cities, setCities] = useState([]);
   const [hotels, setHotels] = useState([]);
   const [state, setState] = useState({ key: '', error: '' });
+  const [reloadKey, setReloadKey] = useState(0);
   const loading = canSearch && state.key !== requestKey;
   const resultsRef = useRef(null);
 
@@ -141,7 +142,14 @@ export function SearchPage() {
           });
       });
     return () => controller.abort();
-  }, [canSearch, requestKey, stay]);
+  }, [canSearch, requestKey, stay, reloadKey]);
+
+  // "Try again" repeats the same search. Navigating to the identical URL would
+  // not re-run the fetch effect, so bump a reload key and clear the error.
+  function retrySearch() {
+    setState({ key: '', error: '' });
+    setReloadKey((key) => key + 1);
+  }
 
   const displayError = !canSearch
     ? hasCity
@@ -242,7 +250,7 @@ export function SearchPage() {
             <div className={styles.statePanel} role="alert">
               <h3>We could not complete that search.</h3>
               <p>{displayError}</p>
-              <Button variant="secondary" onClick={() => search(stay)}>
+              <Button variant="secondary" onClick={retrySearch}>
                 <RefreshCw size={17} aria-hidden="true" />
                 Try again
               </Button>
