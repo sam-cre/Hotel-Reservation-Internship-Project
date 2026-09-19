@@ -29,8 +29,15 @@ function isCalendarDate(value) {
 
 export function createImageUrlValidator(allowedHosts = new Set()) {
   return (value) => {
-    // Same-origin managed asset paths are always allowed.
-    if (value.startsWith('/') && !value.startsWith('//')) return true;
+    // Same-origin managed asset paths are always allowed. Backslashes are
+    // rejected because browsers normalize "/\" to "//", which would let a
+    // relative-looking value resolve to an arbitrary external origin.
+    if (
+      value.startsWith('/') &&
+      !value.startsWith('//') &&
+      !value.includes('\\')
+    )
+      return true;
     let url;
     try {
       url = new URL(value);
@@ -129,6 +136,21 @@ export function createHotelMutationSchema(imageHostAllowlist = new Set()) {
     })
     .strict();
 }
+
+// A themed "Upload image" control in the admin dashboard reads the chosen file
+// in the browser and posts it as standard base64. The decoded byte length and
+// magic-byte signature are re-checked server-side before anything is stored;
+// this schema only enforces the transport shape and an outer size ceiling.
+export const imageUploadSchema = z
+  .object({
+    contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
+    data: z
+      .string()
+      .min(1)
+      .max(7_200_000)
+      .regex(/^[A-Za-z0-9+/]+={0,2}$/),
+  })
+  .strict();
 
 export const roomMutationSchema = z
   .object({

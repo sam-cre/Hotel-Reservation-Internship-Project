@@ -558,6 +558,87 @@
   gap: 20px;
 }
 
+.imageField {
+  display: grid;
+  gap: 8px;
+}
+
+.imageFieldLabel {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.imageUploader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.imagePreview,
+.imagePlaceholder {
+  width: 150px;
+  height: 92px;
+  flex-shrink: 0;
+  border-radius: var(--radius-control);
+  background: var(--color-soft);
+}
+
+.imagePreview {
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+}
+
+.imagePlaceholder {
+  display: grid;
+  place-items: center;
+  color: var(--color-muted);
+  border: 1px dashed var(--color-control-border);
+}
+
+.imageUploadControl {
+  display: grid;
+  gap: 6px;
+}
+
+.uploadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 10px 16px;
+  color: var(--color-ink);
+  background: var(--color-surface);
+  border: 1px solid var(--color-control-border);
+  border-radius: var(--radius-control);
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.uploadButton:hover {
+  background: var(--color-soft);
+}
+
+.uploadButton:focus-within {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.uploadButtonBusy {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.spinner {
+  animation: uploadSpin 0.8s linear infinite;
+}
+
+@keyframes uploadSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .roomManagerHeading {
   display: flex;
   align-items: center;

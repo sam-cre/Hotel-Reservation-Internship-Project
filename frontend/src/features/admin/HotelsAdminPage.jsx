@@ -10,7 +10,7 @@ import {
 import { Button } from '../../components/ui/Button.jsx';
 import { Dialog } from '../../components/ui/Dialog.jsx';
 import { Field } from '../../components/ui/Field.jsx';
-import { adminApi, apiMessage, catalogApi } from '../../services/api.js';
+import { adminApi, apiMessage } from '../../services/api.js';
 import { FormNotice } from './AdminFields.jsx';
 import { HotelFormDialog } from './HotelFormDialog.jsx';
 import { RoomManagerDialog } from './RoomManagerDialog.jsx';
@@ -29,8 +29,8 @@ export function HotelsAdminPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    catalogApi
-      .hotels({}, controller.signal)
+    adminApi
+      .hotels(controller.signal)
       .then(setHotels)
       .catch((nextError) => {
         if (nextError.code !== 'ERR_CANCELED')

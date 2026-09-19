@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Router } from 'express';
 import { asyncHandler } from '../../http/errors.js';
 import { parseRequest } from '../../http/validation.js';
 import { createCatalogService } from './service.js';
@@ -8,9 +8,15 @@ import {
   hotelIdParamsSchema,
   hotelSearchSchema,
   idParamsSchema,
+  imageUploadSchema,
   roomListSchema,
   roomMutationSchema,
 } from './validation.js';
+
+// Hotel image uploads carry a base64 payload far larger than the strict global
+// body limit, so this route parses its own body. app.js skips the global parser
+// for POST /api/admin/images so this ceiling is the only one that applies there.
+const uploadJson = express.json({ limit: '8mb' });
 
 export function createCatalogRouter({
   database,
@@ -47,6 +53,17 @@ export function createCatalogRouter({
     }),
   );
   router.get(
+    '/images/:id',
+    asyncHandler(async (req, res) => {
+      const { id } = parseRequest(idParamsSchema, req.params);
+      const image = await service.getImage(id);
+      // These bytes are content-addressed and never change, so allow caching
+      // even though authenticated API responses default to no-store.
+      res.set('Cache-Control', 'public, max-age=31536000, immutable');
+      res.type(image.contentType).send(image.bytes);
+    }),
+  );
+  router.get(
     '/rooms/availability',
     asyncHandler(async (req, res) => {
       const criteria = parseRequest(availabilitySchema, req.query);
@@ -62,6 +79,22 @@ export function createCatalogRouter({
     }),
   );
 
+  router.get(
+    '/admin/hotels',
+    ...admin,
+    asyncHandler(async (_req, res) => {
+      res.json({ hotels: await service.listAdminHotels() });
+    }),
+  );
+  router.post(
+    '/admin/images',
+    ...admin,
+    uploadJson,
+    asyncHandler(async (req, res) => {
+      const input = parseRequest(imageUploadSchema, req.body);
+      res.status(201).json(await service.storeImage(input));
+    }),
+  );
   router.post(
     '/hotels',
     ...admin,

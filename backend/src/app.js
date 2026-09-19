@@ -28,7 +28,15 @@ export function createApp({
     res.set('Cache-Control', 'no-store');
     next();
   });
-  app.use(express.json({ limit: '16kb' }));
+  // The hotel image upload carries a base64 payload far larger than this strict
+  // default and parses its own body inside the catalog router. Skip the global
+  // parser for that one route so the small limit keeps guarding everything else.
+  const parseJsonBody = express.json({ limit: '16kb' });
+  app.use((req, res, next) => {
+    if (req.method === 'POST' && req.path === '/api/admin/images')
+      return next();
+    return parseJsonBody(req, res, next);
+  });
   app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
   if (database) {
     app.get('/api/ready', async (_req, res) => {

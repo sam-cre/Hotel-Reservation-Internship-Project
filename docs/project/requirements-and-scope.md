@@ -92,6 +92,7 @@ The original assignment PDF remains local and excluded from Git. This document i
 - The server snapshots the nightly price and calculates and stores the total from that snapshot.
 - Retrying the same reservation request with the same idempotency key returns the original result instead of creating another reservation.
 - Public registration always creates a customer.
-- Hotel images use a validated same-origin asset path or an HTTPS URL whose host is on the server-configured allowlist, which is empty by default. Insecure HTTP, credentialed URLs, and unapproved remote hosts are rejected. File uploads are out of scope.
+- Administrators set a hotel image by uploading a file (PNG, JPEG, or WebP up to 5 MB) in the admin dashboard. The image is stored in the database and served from a same-origin API path; the byte content is checked against a magic-byte signature so the stored type matches what was declared.
+- A hotel image may alternatively reference a validated same-origin asset path or an HTTPS URL whose host is on the server-configured allowlist, which is empty by default. Insecure HTTP, credentialed URLs, backslash-obscured relative paths, and unapproved remote hosts are rejected.
 - Hotels and room types are deactivated instead of destructively deleted; inactive records stay available to historical reservations and are excluded from public browsing.
 - Hotel amenities are stored per hotel as a bounded list of short labels and are entered by an administrator, so guest-facing amenities reflect the actual hotel rather than a derived guess.

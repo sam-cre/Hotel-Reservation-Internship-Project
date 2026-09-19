@@ -31,6 +31,8 @@ vi.mock('../src/services/api.js', () => ({
   adminApi: {
     reservations: vi.fn(),
     updateReservationStatus: vi.fn(),
+    hotels: vi.fn(),
+    uploadImage: vi.fn(),
     createHotel: vi.fn(),
     updateHotel: vi.fn(),
     deactivateHotel: vi.fn(),
@@ -100,6 +102,8 @@ beforeEach(() => {
   authApi.logout.mockResolvedValue();
   catalogApi.hotels.mockResolvedValue([hotel]);
   catalogApi.rooms.mockResolvedValue([room]);
+  adminApi.hotels.mockResolvedValue([hotel]);
+  adminApi.uploadImage.mockResolvedValue('/api/images/99');
   adminApi.reservations.mockResolvedValue([reservation]);
   adminApi.updateReservationStatus.mockResolvedValue({
     ...reservation,
@@ -211,9 +215,14 @@ describe('administrator application', () => {
     );
     await user.clear(screen.getByLabelText('Rating'));
     await user.type(screen.getByLabelText('Rating'), '4.6');
-    await user.type(
-      screen.getByLabelText('Image URL'),
-      '/images/calhoun-lobby.jpg',
+    await user.upload(
+      screen.getByLabelText('Upload image'),
+      new File(['png-bytes'], 'hotel.png', { type: 'image/png' }),
+    );
+    // The upload must complete before the image is accepted for saving.
+    await screen.findByLabelText('Replace image');
+    expect(adminApi.uploadImage).toHaveBeenCalledWith(
+      expect.objectContaining({ contentType: 'image/png' }),
     );
     await user.type(
       screen.getByLabelText('Amenities'),
