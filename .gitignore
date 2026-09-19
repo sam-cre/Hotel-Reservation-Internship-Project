@@ -13,6 +13,7 @@ tmp/
 *.p12
 *.pfx
 .security-audit/
+.claude/
 results.sarif
 *.sarif
 .vercel/
