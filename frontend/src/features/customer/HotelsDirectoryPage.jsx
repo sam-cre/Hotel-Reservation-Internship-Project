@@ -74,7 +74,7 @@ export function HotelsDirectoryPage() {
                 <Link
                   key={hotel.id}
                   className={styles.hotelCard}
-                  to={`/hotels/${hotel.id}?${stayQuery({ ...defaultStay(), city: hotel.city })}`}
+                  to={`/search?${stayQuery({ ...defaultStay(), city: hotel.city })}`}
                 >
                   <div className={styles.hotelCardImage}>
                     <Photo
