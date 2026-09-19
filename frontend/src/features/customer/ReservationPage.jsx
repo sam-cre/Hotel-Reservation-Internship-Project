@@ -289,8 +289,8 @@ export function ReservationPage({ confirmation = false }) {
         {room && (
           <div className={styles.bookingActions}>
             <p>
-              The server will recheck inventory and price before creating the
-              reservation.
+              We will verify room availability and pricing before confirming
+              your reservation.
             </p>
             <Button onClick={book} loading={state.busy}>
               Confirm reservation

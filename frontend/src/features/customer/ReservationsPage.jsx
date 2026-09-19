@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/ui/Button.jsx';
+import { SelectField } from '../../components/ui/Field.jsx';
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx';
 import { apiMessage, reservationApi } from '../../services/api.js';
 import { money, shortDate } from './customer-utils.js';
@@ -11,6 +12,8 @@ export function ReservationsPage() {
   const [reservations, setReservations] = useState([]);
   const [reload, setReload] = useState(0);
   const [state, setState] = useState({ loading: true, error: '' });
+  const [sortBy, setSortBy] = useState('arrival-asc');
+
   useEffect(() => {
     const controller = new AbortController();
     reservationApi
@@ -29,15 +32,50 @@ export function ReservationsPage() {
     return () => controller.abort();
   }, [reload]);
 
+  const sortedReservations = useMemo(() => {
+    return [...reservations].sort((a, b) => {
+      switch (sortBy) {
+        case 'arrival-desc':
+          return new Date(b.checkIn).getTime() - new Date(a.checkIn).getTime();
+        case 'price-desc':
+          return Number(b.totalPrice) - Number(a.totalPrice);
+        case 'price-asc':
+          return Number(a.totalPrice) - Number(b.totalPrice);
+        case 'hotel-asc':
+          return (a.hotel?.name || '').localeCompare(b.hotel?.name || '');
+        case 'arrival-asc':
+        default:
+          return new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime();
+      }
+    });
+  }, [reservations, sortBy]);
+
   return (
     <main id="main-content" className={styles.main}>
       <section className={styles.reservationsPage}>
-        <div className={styles.sectionHeading}>
-          <p className={styles.kicker}>Your Stillwater account</p>
-          <h1>My reservations.</h1>
-          <p className={styles.muted}>
-            Every current and previous stay connected to this account.
-          </p>
+        <div className={styles.reservationsHeader}>
+          <div className={styles.sectionHeading}>
+            <p className={styles.kicker}>Your Stillwater account</p>
+            <h1>My reservations.</h1>
+            <p className={styles.muted}>
+              Every current and previous stay connected to this account.
+            </p>
+          </div>
+          {!state.loading && !state.error && reservations.length > 0 && (
+            <div className={styles.reservationsSort}>
+              <SelectField
+                label="Sort by"
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+              >
+                <option value="arrival-asc">Arrival: earliest first</option>
+                <option value="arrival-desc">Arrival: latest first</option>
+                <option value="price-desc">Total: high to low</option>
+                <option value="price-asc">Total: low to high</option>
+                <option value="hotel-asc">Hotel name: A to Z</option>
+              </SelectField>
+            </div>
+          )}
         </div>
         {state.loading && (
           <div className={styles.statePanel} aria-live="polite">
@@ -80,7 +118,7 @@ export function ReservationsPage() {
         )}
         {!state.loading && !state.error && reservations.length > 0 && (
           <div className={styles.reservationList}>
-            {reservations.map((reservation) => (
+            {sortedReservations.map((reservation) => (
               <article key={reservation.id} className={styles.reservationRow}>
                 <div>
                   <p className={styles.reservationReference}>
