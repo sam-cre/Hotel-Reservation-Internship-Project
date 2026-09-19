@@ -179,4 +179,34 @@ describe('reservation creation', () => {
       input: { ...input, checkIn: '2026-10-13', checkOut: '2026-10-15' },
     }).expect(201);
   });
+
+  it('allows a multi-unit booking when existing stays never share a night', async () => {
+    await database.query('UPDATE rooms SET total_rooms = 2 WHERE id = $1', [
+      room.id,
+    ]);
+    const first = await createCustomerSession(context);
+    const second = await createCustomerSession(context, {
+      email: 'second@example.com',
+    });
+    const third = await createCustomerSession(context, {
+      email: 'third@example.com',
+    });
+    const base = { ...reservationInput, roomId: room.id };
+    // Two back-to-back one-night stays: one unit is used on 10/10, one on 10/11.
+    await reserve(context, {
+      cookie: first.cookie,
+      input: { ...base, checkIn: '2026-10-10', checkOut: '2026-10-11' },
+    }).expect(201);
+    await reserve(context, {
+      cookie: second.cookie,
+      input: { ...base, checkIn: '2026-10-11', checkOut: '2026-10-12' },
+    }).expect(201);
+    // Spans both nights. Peak concurrent occupancy of the existing stays is 1 on
+    // each night, below the 2 units, so this fits. The old cumulative count saw
+    // two overlapping reservations and wrongly rejected it.
+    await reserve(context, {
+      cookie: third.cookie,
+      input: { ...base, checkIn: '2026-10-10', checkOut: '2026-10-12' },
+    }).expect(201);
+  });
 });

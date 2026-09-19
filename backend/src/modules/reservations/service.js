@@ -55,13 +55,13 @@ export function createReservationService({ database, now = () => new Date() }) {
             'That room type cannot accommodate the requested guests.',
           );
 
-        const occupied = await repository.countOverlappingConfirmed(
+        const peakOccupancy = await repository.peakConcurrentConfirmed(
           client,
           input.roomId,
           stay.checkIn,
           stay.checkOut,
         );
-        if (occupied >= Number(room.total_rooms))
+        if (peakOccupancy >= Number(room.total_rooms))
           throw conflict(
             'ROOM_UNAVAILABLE',
             'That room type is no longer available for these dates.',

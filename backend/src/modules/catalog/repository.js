@@ -25,6 +25,38 @@ const roomColumns = `
   r.created_at
 `;
 
+// Correlated subquery giving the peak number of confirmed reservations that
+// coincide on any single night within the requested window [$2, $3). This is
+// the correct availability measure for multi-unit rooms: counting every
+// reservation that overlaps the window anywhere over-rejects non-concurrent
+// stays (two back-to-back one-night stays are not two rooms occupied at once).
+// The peak always occurs at the window start or at some reservation's check-in,
+// so those are the only nights that need checking. `roomRef` is a fixed column
+// reference chosen by this module, never user input.
+function peakOccupancy(roomRef) {
+  return `(
+    SELECT COALESCE(MAX(occupancy.count), 0)
+    FROM (
+      SELECT $2::date AS night
+      UNION
+      SELECT starting.check_in
+        FROM reservations starting
+       WHERE starting.room_id = ${roomRef}
+         AND starting.status = 'confirmed'
+         AND starting.check_in >= $2::date
+         AND starting.check_in < $3::date
+    ) candidate
+    CROSS JOIN LATERAL (
+      SELECT COUNT(*) AS count
+        FROM reservations occupant
+       WHERE occupant.room_id = ${roomRef}
+         AND occupant.status = 'confirmed'
+         AND occupant.check_in <= candidate.night
+         AND occupant.check_out > candidate.night
+    ) occupancy
+  )`;
+}
+
 export function createCatalogRepository(database) {
   return {
     async searchHotels({ city, stay }) {
@@ -45,15 +77,9 @@ export function createCatalogRepository(database) {
         `WITH available_rooms AS (
            SELECT r.hotel_id, r.price_per_night
            FROM rooms r
-           LEFT JOIN reservations reservation
-             ON reservation.room_id = r.id
-            AND reservation.status = 'confirmed'
-            AND reservation.check_in < $3::date
-            AND reservation.check_out > $2::date
            WHERE r.is_active = true
              AND r.capacity >= $4
-           GROUP BY r.id
-           HAVING COUNT(reservation.id) < r.total_rooms
+             AND ${peakOccupancy('r.id')} < r.total_rooms
          )
          SELECT ${hotelColumns}, MIN(available_rooms.price_per_night) AS starting_price
          FROM hotels h
@@ -202,19 +228,20 @@ export function createCatalogRepository(database) {
         return result.rows.map(mapRoom);
       }
       const result = await database.query(
-        `SELECT ${roomColumns},
-                (r.total_rooms - COUNT(reservation.id))::integer AS remaining_rooms,
-                (r.capacity >= $4 AND COUNT(reservation.id) < r.total_rooms) AS available,
-                (r.price_per_night * $5::integer) AS estimated_total
-         FROM rooms r
-         LEFT JOIN reservations reservation
-           ON reservation.room_id = r.id
-          AND reservation.status = 'confirmed'
-          AND reservation.check_in < $3::date
-          AND reservation.check_out > $2::date
-         WHERE r.hotel_id = $1 AND r.is_active = true
-         GROUP BY r.id
-         ORDER BY r.price_per_night, lower(r.name), r.id`,
+        `WITH room_availability AS (
+           SELECT ${roomColumns},
+                  ${peakOccupancy('r.id')} AS peak_occupancy,
+                  (r.price_per_night * $5::integer) AS estimated_total
+           FROM rooms r
+           WHERE r.hotel_id = $1 AND r.is_active = true
+         )
+         SELECT
+           id, hotel_id, name, description, price_per_night, capacity,
+           total_rooms, is_active, created_at, estimated_total,
+           (total_rooms - peak_occupancy)::integer AS remaining_rooms,
+           (capacity >= $4 AND peak_occupancy < total_rooms) AS available
+         FROM room_availability
+         ORDER BY price_per_night, lower(name), id`,
         [hotelId, stay.checkIn, stay.checkOut, stay.guests, stay.nights],
       );
       return result.rows.map(mapRoom);

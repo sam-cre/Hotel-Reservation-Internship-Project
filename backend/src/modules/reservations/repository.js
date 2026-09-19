@@ -92,17 +92,35 @@ export function createReservationRepository(database) {
       return result.rows[0] ?? null;
     },
 
-    async countOverlappingConfirmed(client, roomId, checkIn, checkOut) {
+    async peakConcurrentConfirmed(client, roomId, checkIn, checkOut) {
+      // Peak number of confirmed reservations that coincide on any single night
+      // within [$2, $3). A new stay occupies every night in the window, so it
+      // fits whenever this peak is below total_rooms. Counting every reservation
+      // that merely overlaps the window would reject non-concurrent stays that
+      // never share a night.
       const result = await client.query(
-        `SELECT COUNT(*)::integer AS count
-         FROM reservations
-         WHERE room_id = $1
-           AND status = 'confirmed'
-           AND check_in < $3::date
-           AND check_out > $2::date`,
+        `SELECT COALESCE(MAX(occupancy.count), 0)::integer AS peak
+         FROM (
+           SELECT $2::date AS night
+           UNION
+           SELECT check_in
+             FROM reservations
+            WHERE room_id = $1
+              AND status = 'confirmed'
+              AND check_in >= $2::date
+              AND check_in < $3::date
+         ) candidate
+         CROSS JOIN LATERAL (
+           SELECT COUNT(*) AS count
+             FROM reservations
+            WHERE room_id = $1
+              AND status = 'confirmed'
+              AND check_in <= candidate.night
+              AND check_out > candidate.night
+         ) occupancy`,
         [roomId, checkIn, checkOut],
       );
-      return Number(result.rows[0].count);
+      return Number(result.rows[0].peak);
     },
 
     async create(
